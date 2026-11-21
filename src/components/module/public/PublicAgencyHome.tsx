@@ -137,7 +137,7 @@ export function PublicAgencyHome({
   };
 
   return (
-    <div className="flex-1 bg-[#F9F8F5] text-[#181611]">
+    <div className="flex-1 bg-[#F9F8F5] text-[#181611] overflow-x-clip">
       {!isBackendConnected && (
         <div className="bg-[#F8F3E6] border-b border-[#DFCEAA] px-4 py-2 text-center text-xs font-medium text-[#6F5319]">
           Preview Mode: Connect the backend server to load live {branding.displayName} packages,
@@ -157,7 +157,7 @@ export function PublicAgencyHome({
         />
         <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16 lg:py-20">
           <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
-            <div className="lg:col-span-7 space-y-6">
+            <div className="lg:col-span-7 min-w-0 space-y-6">
               <div className="inline-flex flex-wrap items-center gap-2 rounded-full border border-[#DFCEAA] bg-white/95 px-4 py-1.5 text-xs font-semibold text-[#4A4438] shadow-2xs">
                 <ApertureIcon className="w-3.5 h-3.5" style={{ color: accent }} />
                 <span>{branding.displayName}</span>
@@ -855,7 +855,7 @@ export function PublicAgencyHome({
           {/* Booking Timeline + FAQ Accordion */}
           <div className="grid gap-8 lg:grid-cols-12 items-start">
             {/* Left: 3-Step Booking & Delivery Process */}
-            <div className="lg:col-span-5 atelier-card p-6 bg-[#14120E] text-[#F4EFE4] border-[#2E291F] space-y-5">
+            <div className="lg:col-span-5 min-w-0 atelier-card p-6 bg-[#14120E] text-[#F4EFE4] border-[#2E291F] space-y-5">
               <div className="border-b border-white/10 pb-3.5">
                 <p className="text-[10.5px] font-bold uppercase tracking-[0.2em] text-[#E7D1AA]">
                   From Inquiry to Album

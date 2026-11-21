@@ -282,17 +282,17 @@ export function PublicPortfolioShowcase({
     <section
       id="portfolio"
       ref={sectionRef}
-      className="border-y border-[#E5DFD0] bg-white scroll-mt-16"
+      className="border-y border-[#E5DFD0] bg-white scroll-mt-16 overflow-x-clip"
     >
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20 sm:px-6 space-y-10">
+      <div className="mx-auto max-w-6xl min-w-0 px-4 py-14 sm:py-20 sm:px-6 space-y-8 sm:space-y-10">
         {/* Section Header & Medium Switcher */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#DFCEAA] bg-[#F8F3E6] px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6F5319]">
-              <CameraIcon className="w-3.5 h-3.5" />
-              <span>Step 02B • Visual Exhibition &amp; Cinema</span>
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 min-w-0">
+          <div className="min-w-0">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#DFCEAA] bg-[#F8F3E6] px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6F5319] max-w-full">
+              <CameraIcon className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Step 02B • Visual Exhibition &amp; Cinema</span>
             </div>
-            <h2 className="font-editorial text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-[#181611] mt-2">
+            <h2 className="font-editorial text-2xl sm:text-4xl lg:text-[2.75rem] font-semibold text-[#181611] mt-2 leading-tight">
               Captured Moments &amp; Highlight Films
             </h2>
             <p className="text-sm text-[#4A4438] mt-1.5 max-w-xl">
@@ -301,8 +301,8 @@ export function PublicPortfolioShowcase({
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
-            <div className="inline-flex flex-wrap rounded-xl border border-[#DFCEAA] bg-[#F8F3E6] p-1 gap-1">
+          <div className="flex flex-wrap items-center gap-2.5 min-w-0 max-w-full">
+            <div className="flex flex-wrap rounded-xl border border-[#DFCEAA] bg-[#F8F3E6] p-1 gap-1 max-w-full">
               {[
                 { id: 'all' as const, label: 'All Showcase' },
                 {
@@ -330,7 +330,7 @@ export function PublicPortfolioShowcase({
                     setVisiblePhotoCount(INITIAL_PHOTO_BATCH);
                   }}
                   className={cn(
-                    'rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer',
+                    'rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer',
                     mediaFilter === tab.id
                       ? 'bg-[#181611] text-white shadow-2xs'
                       : 'text-[#4A4438] hover:text-[#181611]',
@@ -367,20 +367,20 @@ export function PublicPortfolioShowcase({
           >
             <span className="sr-only">Loading photography and highlight films...</span>
             {/* Cinema Theater Skeleton */}
-            <div className="rounded-3xl border border-[#2E291F] bg-[#14120E] p-5 sm:p-7 space-y-5">
+            <div className="rounded-2xl sm:rounded-3xl border border-[#2E291F] bg-[#14120E] p-3.5 sm:p-7 space-y-5 min-w-0 overflow-hidden">
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                <div className="h-3.5 w-48 rounded-full skeleton-bone-dark" />
+                <div className="h-3.5 w-48 max-w-full rounded-full skeleton-bone-dark" />
                 <div className="hidden sm:block h-3 w-56 rounded-full skeleton-bone-dark" />
               </div>
-              <div className="grid lg:grid-cols-12 gap-6 items-start">
-                <div className="lg:col-span-8 space-y-3">
-                  <div className="aspect-video w-full rounded-2xl skeleton-bone-dark border border-white/10" />
+              <div className="grid lg:grid-cols-12 gap-5 sm:gap-6 items-start min-w-0">
+                <div className="lg:col-span-8 min-w-0 w-full space-y-3">
+                  <div className="aspect-video w-full rounded-xl sm:rounded-2xl skeleton-bone-dark border border-white/10" />
                   <div className="flex items-center justify-between px-1">
                     <div className="h-3.5 w-24 rounded-md skeleton-bone-dark" />
                     <div className="h-6 w-20 rounded-full skeleton-bone-dark" />
                   </div>
                 </div>
-                <div className="lg:col-span-4 space-y-2.5">
+                <div className="lg:col-span-4 min-w-0 w-full space-y-2.5">
                   <div className="h-3 w-24 rounded-md skeleton-bone-dark mb-1" />
                   {[1, 2, 3].map((idx) => (
                     <div
@@ -422,31 +422,37 @@ export function PublicPortfolioShowcase({
               : 'No gallery items match your selected filter or search.'}
           </div>
         ) : (
-          <div className="space-y-12">
+          <div className="space-y-10 sm:space-y-12 min-w-0">
             {/* SUB-STAGE A: DEDICATED CINEMA THEATER (Separated from Photos!) */}
             {activeFilm && (
-              <div className="rounded-3xl border border-[#2E291F] bg-[#14120E] p-5 sm:p-7 text-[#F4EFE4] space-y-5 shadow-[0_28px_64px_-24px_rgba(20,18,14,0.55)]">
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
-                  <div className="flex items-center gap-3">
-                    <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#CAA650]" />
-                    <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#E7D1AA]">
+              <div className="rounded-2xl sm:rounded-3xl border border-[#2E291F] bg-[#14120E] p-3.5 sm:p-7 text-[#F4EFE4] space-y-4 sm:space-y-5 shadow-[0_28px_64px_-24px_rgba(20,18,14,0.55)] min-w-0 w-full overflow-hidden">
+                <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 border-b border-white/10 pb-3.5 sm:pb-4 min-w-0">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="inline-flex h-2.5 w-2.5 shrink-0 rounded-full bg-[#CAA650]" />
+                    <span className="text-[11px] font-bold uppercase tracking-[0.16em] sm:tracking-[0.2em] text-[#E7D1AA] truncate">
                       Signature Highlight Films ({filteredVideos.length})
                     </span>
                   </div>
-                  <p className="text-xs text-[#9C937E]">
+                  <p className="text-xs text-[#9C937E] leading-relaxed">
                     Dedicated widescreen theater — click any reel to stream on demand
                   </p>
                 </div>
 
                 <div
                   className={cn(
-                    'grid gap-6 items-start',
+                    'grid gap-5 sm:gap-6 items-start min-w-0',
                     filteredVideos.length > 1 ? 'lg:grid-cols-12' : 'grid-cols-1',
                   )}
                 >
                   {/* Lead Theater Stage */}
-                  <div className={filteredVideos.length > 1 ? 'lg:col-span-8 space-y-3' : 'space-y-3'}>
-                    <div className="rounded-2xl overflow-hidden border border-white/10 bg-black">
+                  <div
+                    className={
+                      filteredVideos.length > 1
+                        ? 'lg:col-span-8 min-w-0 w-full space-y-3'
+                        : 'min-w-0 w-full space-y-3'
+                    }
+                  >
+                    <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 bg-black w-full">
                       <AdaptiveVideoPlayer
                         key={activeFilm.id}
                         src={activeFilm.deliveryUrls?.fullUrl || activeFilm.secureUrl}
@@ -481,7 +487,7 @@ export function PublicPortfolioShowcase({
 
                   {/* Interactive Reel Switcher Playlist — Horizontal Snap Rail on Mobile, Playlist Column on Desktop */}
                   {filteredVideos.length > 1 && (
-                    <div className="lg:col-span-4 space-y-2.5">
+                    <div className="lg:col-span-4 min-w-0 w-full space-y-2.5">
                       <div className="flex items-center justify-between px-1">
                         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#9C937E]">
                           Film Reels ({filteredVideos.length})
@@ -490,7 +496,7 @@ export function PublicPortfolioShowcase({
                           Swipe reels →
                         </span>
                       </div>
-                      <div className="flex lg:flex-col gap-2.5 overflow-x-auto lg:overflow-x-visible lg:overflow-y-auto snap-x snap-mandatory lg:max-h-[420px] pb-1 lg:pb-0 lg:pr-1 no-scrollbar">
+                      <div className="flex lg:flex-col gap-2.5 w-full min-w-0 overflow-x-auto lg:overflow-x-visible lg:overflow-y-auto snap-x snap-mandatory lg:max-h-[420px] pb-1 lg:pb-0 lg:pr-1 no-scrollbar">
                         {filteredVideos.map((reel, idx) => {
                           const isCurrent = reel.id === activeFilm.id;
                           const poster =
@@ -507,7 +513,7 @@ export function PublicPortfolioShowcase({
                                 setPlayingVideoIds((prev) => ({ ...prev, [reel.id]: true }));
                               }}
                               className={cn(
-                                'w-[70vw] sm:w-[260px] lg:w-full shrink-0 snap-start text-left rounded-2xl border p-2.5 flex items-center gap-3 transition-all cursor-pointer',
+                                'w-[74%] min-w-[205px] max-w-[260px] lg:min-w-0 lg:w-full lg:max-w-none shrink-0 snap-start text-left rounded-2xl border p-2.5 flex items-center gap-3 transition-all cursor-pointer',
                                 isCurrent
                                   ? 'border-[#E7D1AA]/75 bg-white/10 shadow-sm'
                                   : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.07] hover:border-white/25',
@@ -578,14 +584,14 @@ export function PublicPortfolioShowcase({
               };
 
               return (
-                <div className="space-y-4 sm:space-y-5">
-                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#ECE6D8] pb-3">
-                    <div className="flex items-center gap-2.5">
-                      <span className="inline-flex h-2 w-2 rounded-full bg-[#CAA650]" />
-                      <h3 className="font-editorial text-2xl font-semibold text-[#181611]">
+                <div className="space-y-4 sm:space-y-5 min-w-0">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#ECE6D8] pb-3 min-w-0">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-[#CAA650]" />
+                      <h3 className="font-editorial text-xl sm:text-2xl font-semibold text-[#181611] truncate">
                         Photography Wall
                       </h3>
-                      <span className="rounded-full bg-[#F8F3E6] border border-[#DFCEAA] px-2.5 py-0.5 text-[11px] font-mono-code text-[#6B6352] tabular-nums">
+                      <span className="rounded-full bg-[#F8F3E6] border border-[#DFCEAA] px-2.5 py-0.5 text-[11px] font-mono-code text-[#6B6352] tabular-nums shrink-0">
                         {filteredPhotos.length} frames
                       </span>
                     </div>
@@ -596,7 +602,7 @@ export function PublicPortfolioShowcase({
                     </p>
 
                     {/* Distinct Mobile Mode Toggle: Story Swipe vs 2-Col Lookbook Grid */}
-                    <div className="sm:hidden inline-flex rounded-xl border border-[#DFCEAA] bg-[#F8F3E6] p-1 gap-1">
+                    <div className="sm:hidden inline-flex rounded-xl border border-[#DFCEAA] bg-[#F8F3E6] p-1 gap-1 shrink-0">
                       <button
                         type="button"
                         onClick={() => setMobilePhotoMode('swipe')}
@@ -628,13 +634,13 @@ export function PublicPortfolioShowcase({
 
                   {/* MOBILE VIEW A: Thumb-Friendly Horizontal Snap-Scroll Lookbook Deck */}
                   {mobilePhotoMode === 'swipe' && (
-                    <div className="sm:hidden space-y-3">
-                      <div className="flex items-center justify-between text-[11.5px] text-[#6B6352]">
-                        <span className="font-medium tabular-nums">
+                    <div className="sm:hidden space-y-3 min-w-0 w-full">
+                      <div className="flex items-center justify-between gap-2 text-[11.5px] text-[#6B6352]">
+                        <span className="font-medium tabular-nums truncate">
                           Frame <strong className="text-[#181611]">{clampedMobileSlide + 1}</strong> of{' '}
-                          {visiblePhotos.length} • Tap photo for full screen
+                          {visiblePhotos.length} • Tap photo to zoom
                         </span>
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 shrink-0">
                           <button
                             type="button"
                             onClick={() => jumpToMobileCard(clampedMobileSlide - 1)}
@@ -662,7 +668,7 @@ export function PublicPortfolioShowcase({
                           const rail = e.currentTarget;
                           const firstCard = rail.firstElementChild as HTMLElement | null;
                           if (!firstCard) return;
-                          const step = firstCard.offsetWidth + 14;
+                          const step = firstCard.offsetWidth + 12;
                           if (step <= 0) return;
                           const next = Math.max(
                             0,
@@ -672,7 +678,7 @@ export function PublicPortfolioShowcase({
                             setMobileSlideIndex(next);
                           }
                         }}
-                        className="flex overflow-x-auto snap-x snap-mandatory gap-3.5 px-4 -mx-4 pb-1 no-scrollbar"
+                        className="flex w-full min-w-0 overflow-x-auto snap-x snap-mandatory gap-3 pb-1 no-scrollbar"
                       >
                         {visiblePhotos.map((media, idx) => {
                           const thumbUrl =
@@ -688,7 +694,7 @@ export function PublicPortfolioShowcase({
                               key={media.id}
                               type="button"
                               onClick={() => setSelectedGalleryPhoto(media)}
-                              className="relative w-[82vw] max-w-[330px] shrink-0 snap-center aspect-[4/5] rounded-2xl overflow-hidden border border-[#DFCEAA] bg-[#EFECE3] text-left shadow-sm active:scale-[0.99] transition-transform cursor-pointer"
+                              className="relative w-[84%] max-w-[320px] shrink-0 snap-center aspect-[4/5] rounded-2xl overflow-hidden border border-[#DFCEAA] bg-[#EFECE3] text-left shadow-sm active:scale-[0.99] transition-transform cursor-pointer"
                             >
                               <LazyViewportImage
                                 src={thumbUrl}
@@ -722,7 +728,7 @@ export function PublicPortfolioShowcase({
                             onClick={() =>
                               setVisiblePhotoCount((prev) => prev + INITIAL_PHOTO_BATCH)
                             }
-                            className="w-[62vw] max-w-[260px] shrink-0 snap-center aspect-[4/5] rounded-2xl border border-dashed border-[#CAA650] bg-[#F8F3E6] p-5 flex flex-col items-center justify-center text-center gap-2 text-[#181611] cursor-pointer"
+                            className="w-[68%] max-w-[260px] shrink-0 snap-center aspect-[4/5] rounded-2xl border border-dashed border-[#CAA650] bg-[#F8F3E6] p-5 flex flex-col items-center justify-center text-center gap-2 text-[#181611] cursor-pointer"
                           >
                             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#181611] text-[#E7D1AA] text-sm font-bold">
                               +
