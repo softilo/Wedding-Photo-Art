@@ -14,13 +14,20 @@ import {
 } from '@/types/event-management';
 import { cn, formatDateTimeInTz, formatLocalDate, formatPoisha } from '@/lib/utils';
 import { StatusBadge } from '@/components/shared/StatusBadge';
+import { BrandMark } from '@/components/common/BrandMark';
 import {
   ArrowRightIcon,
   BarChartIcon,
   CalendarIcon,
+  CameraIcon,
   CheckCircleIcon,
+  ClockIcon,
+  ExternalLinkIcon,
+  FilmIcon,
+  PlusIcon,
   ReceiptIcon,
   SparklesIcon,
+  StarIcon,
   UsersIcon,
 } from '@/components/shared/Icons';
 import {
@@ -47,7 +54,13 @@ type AlertTab = 'payments' | 'confirm' | 'unscheduled' | 'deliverables';
 type TrendChartMode = 'cashflow' | 'activity' | 'shoots';
 type MixChartMode = 'status' | 'categories' | 'funnel';
 
-const CHART_PALETTE = ['#2563EB', '#6D28D9', '#10B981', '#F59E0B', '#64748B'];
+const CHART_PALETTE = ['#CAA650', '#8B6A21', '#E7D1AA', '#A88332', '#6F6130'];
+
+function parseUtcDayMs(dateKey: string): number {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(dateKey.trim());
+  if (!match) return Number.NaN;
+  return Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+}
 
 function toLocalMonthKey(dateInput: string, timezone: string): string | null {
   const d = new Date(dateInput);
@@ -206,9 +219,9 @@ export function AdminOverview({
       color: string;
     }> = [
       { id: 'CONFIRMED', label: 'Confirmed', color: '#10B981' },
-      { id: 'PENDING_CONFIRMATION', label: 'Pending Confirm', color: '#F59E0B' },
-      { id: 'COMPLETED', label: 'Completed', color: '#2563EB' },
-      { id: 'CANCELLED', label: 'Cancelled', color: '#FB7185' },
+      { id: 'PENDING_CONFIRMATION', label: 'Pending Confirm', color: '#CAA650' },
+      { id: 'COMPLETED', label: 'Completed', color: '#8B6A21' },
+      { id: 'CANCELLED', label: 'Cancelled', color: '#9E6359' },
     ];
 
     return buckets.map((bucket) => {
@@ -281,7 +294,7 @@ export function AdminOverview({
         displayValue: `${inquiries.length}`,
         percent: (inquiries.length / base) * 100,
         subtext: `${newInquiriesCount} awaiting triage`,
-        color: '#6D28D9',
+        color: '#E7D1AA',
       },
       {
         id: 'quotes',
@@ -290,7 +303,7 @@ export function AdminOverview({
         displayValue: `${activeQuotesCount}`,
         percent: (activeQuotesCount / base) * 100,
         subtext: `${acceptedQuotesCount} accepted by client`,
-        color: '#2563EB',
+        color: '#CAA650',
       },
       {
         id: 'bookings',
@@ -299,7 +312,7 @@ export function AdminOverview({
         displayValue: `${activeBookingsCount}`,
         percent: (activeBookingsCount / base) * 100,
         subtext: `${pendingConfirmCount} awaiting confirmation`,
-        color: '#F59E0B',
+        color: '#8B6A21',
       },
       {
         id: 'confirmed',
@@ -320,6 +333,82 @@ export function AdminOverview({
     totalAgreedPoisha,
     currency,
   ]);
+
+  const nextShootSpotlight = useMemo(() => {
+    const active = upcomingSessions
+      .filter((s) => s.status !== 'CANCELLED')
+      .sort((a, b) => (Date.parse(a.startAt) || 0) - (Date.parse(b.startAt) || 0));
+    if (active.length === 0) return null;
+
+    const anchorMs = parseUtcDayMs(anchorDate);
+    const chosen =
+      active.find((s) => {
+        const dk = s.agencyLocalDate || toLocalDateKey(s.startAt, timezone);
+        const ms = parseUtcDayMs(dk);
+        return Number.isNaN(anchorMs) || Number.isNaN(ms) || ms >= anchorMs;
+      }) || active[0];
+
+    const chosenDateKey =
+      chosen.agencyLocalDate || toLocalDateKey(chosen.startAt, timezone);
+    const chosenMs = parseUtcDayMs(chosenDateKey);
+    const diffDays =
+      !Number.isNaN(anchorMs) && !Number.isNaN(chosenMs)
+        ? Math.round((chosenMs - anchorMs) / 86400000)
+        : 0;
+
+    const countdownLabel =
+      diffDays <= 0
+        ? 'Shoot Today'
+        : diffDays === 1
+          ? 'Tomorrow'
+          : `In ${diffDays} Days`;
+
+    return {
+      session: chosen,
+      dateKey: chosenDateKey,
+      countdownLabel,
+    };
+  }, [upcomingSessions, anchorDate, timezone]);
+
+  const formattedAnchorDate = useMemo(() => {
+    const parsed = new Date(`${anchorDate}T12:00:00.000Z`);
+    if (Number.isNaN(parsed.getTime())) return anchorDate;
+    try {
+      return new Intl.DateTimeFormat('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        timeZone: 'UTC',
+      }).format(parsed);
+    } catch {
+      return anchorDate;
+    }
+  }, [anchorDate]);
+
+  const activeBookingsTotal = bookings.filter((b) => b.status !== 'CANCELLED').length;
+  const meterPercent = financialReport
+    ? Math.max(0, Math.min(100, financialReport.summary.collectionRatePercent))
+    : activeBookingsTotal > 0
+      ? Math.round((confirmedCount / activeBookingsTotal) * 100)
+      : 0;
+
+  const inquiriesRatio =
+    inquiries.length > 0
+      ? Math.min(100, Math.max(10, Math.round((newInquiriesCount / inquiries.length) * 100)))
+      : 0;
+  const quotesRatio =
+    quotes.length > 0
+      ? Math.min(100, Math.max(10, Math.round((openQuotesCount / quotes.length) * 100)))
+      : 0;
+  const confirmedRatio =
+    activeBookingsTotal > 0
+      ? Math.min(100, Math.max(10, Math.round((confirmedCount / activeBookingsTotal) * 100)))
+      : 0;
+  const shootsRatio =
+    upcomingSessions.length > 0
+      ? Math.min(100, Math.max(14, upcomingSessions.length * 10))
+      : 0;
 
   const defaultAlertTab: AlertTab =
     (alerts?.counts.pendingPayments ?? 0) > 0
@@ -344,130 +433,442 @@ export function AdminOverview({
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="admin-page-title">
-            {settings?.displayName || 'Studio Overview'}
-          </h1>
-          <p className="admin-meta mt-1 tabular-nums">
-            Needs-attention queue, studio analytics, recent bookings, and next 14 days of shoots (
-            {timezone})
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2.5">
-          <Link
-            href="/admin/calendar"
-            className="inline-flex items-center gap-2 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-2 text-[13px] font-medium text-[var(--admin-text)] hover:bg-[var(--admin-surface-subtle)] transition-colors"
-          >
-            <CalendarIcon className="w-4 h-4 text-[var(--admin-accent)]" />
-            <span>Shoot Calendar</span>
-          </Link>
-          <Link
-            href="/admin/bookings"
-            className="inline-flex items-center gap-2 rounded-lg bg-[var(--admin-accent)] px-3.5 py-2 text-[13px] font-semibold text-[#FCFDFD] hover:opacity-95 transition-opacity"
-          >
-            <span>All Bookings</span>
-            <ArrowRightIcon className="w-4 h-4" />
-          </Link>
-        </div>
-      </div>
+      {/* Wedding PhotoArt Obsidian & Gold Studio Command Spotlight */}
+      <section className="relative overflow-hidden rounded-2xl border border-[#CAA650]/35 bg-[#14120E] text-[#F9F8F5] shadow-sm">
+        <div className="h-[2px] w-full bg-gradient-to-r from-[#8B6A21] via-[#E7D1AA] to-[#8B6A21]" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full opacity-20 blur-3xl"
+          style={{
+            background: 'radial-gradient(circle, #CAA650 0%, transparent 70%)',
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-16 -bottom-24 h-60 w-60 rounded-full opacity-10 blur-3xl"
+          style={{
+            background: 'radial-gradient(circle, #8B6A21 0%, transparent 70%)',
+          }}
+        />
 
-      {/* 4 Focused KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="relative grid gap-5 p-5 sm:p-6 xl:grid-cols-12 items-stretch">
+          <div className="xl:col-span-6 flex flex-col justify-between gap-4">
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <BrandMark
+                  logoUrl={settings?.logoUrl}
+                  alt={settings?.displayName || 'Wedding PhotoArt'}
+                  variant="dark"
+                  size={52}
+                  className="rounded-xl shadow-sm"
+                />
+                <div className="min-w-0">
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-[#CAA650]/35 bg-[#CAA650]/10 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider text-[#E7D1AA]">
+                    <StarIcon className="w-3 h-3 text-[#CAA650]" />
+                    <span>Studio Command Cockpit</span>
+                  </div>
+                  <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-[#F9F8F5] mt-1.5 truncate">
+                    {settings?.displayName || 'Wedding PhotoArt'}
+                  </h1>
+                </div>
+              </div>
+
+              <p className="text-[13px] leading-relaxed text-[#E7D1AA]/85 tabular-nums">
+                <span className="text-[#CAA650] font-medium">{formattedAnchorDate}</span> •{' '}
+                {confirmedCount} confirmed bookings • {newInquiriesCount} new inquiries •{' '}
+                {upcomingSessions.length} shoots in the next 14 days
+                {totalAlerts > 0 ? ` • ${totalAlerts} items awaiting action` : ''}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2.5 pt-1">
+              <Link
+                href="/admin/calendar"
+                className="inline-flex items-center gap-2 rounded-lg border border-[#CAA650]/40 bg-white/5 px-3.5 py-2 text-[13px] font-medium text-[#F9F8F5] hover:bg-white/10 transition-colors"
+              >
+                <CalendarIcon className="w-4 h-4 text-[#CAA650]" />
+                <span>Shoot Calendar</span>
+              </Link>
+              <Link
+                href="/admin/bookings"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#CAA650] px-3.5 py-2 text-[13px] font-semibold text-[#181611] hover:bg-[#E7D1AA] transition-colors"
+              >
+                <span>All Bookings</span>
+                <ArrowRightIcon className="w-4 h-4" />
+              </Link>
+              {financialReport && (
+                <Link
+                  href="/admin/finance"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[#CAA650]/25 px-3.5 py-2 text-[13px] font-medium text-[#E7D1AA] hover:border-[#CAA650]/55 hover:bg-white/5 transition-colors"
+                >
+                  <ReceiptIcon className="w-4 h-4 text-[#CAA650]" />
+                  <span>Finance Ledger</span>
+                </Link>
+              )}
+            </div>
+          </div>
+
+          <div className="xl:col-span-6 grid gap-3.5 sm:grid-cols-2">
+            {/* Next Shoot Countdown Card */}
+            {nextShootSpotlight ? (
+              nextShootSpotlight.session.bookingId ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setDrawerState({
+                      bookingId: nextShootSpotlight.session.bookingId!,
+                      focus: 'schedule',
+                    })
+                  }
+                  className="group w-full text-left rounded-xl border border-[#CAA650]/30 bg-[#1C1913] p-4 flex flex-col justify-between gap-3 hover:border-[#CAA650] hover:bg-[#231F17] transition-all cursor-pointer"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-[#E7D1AA]">
+                      <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                      Next Shoot Countdown
+                    </span>
+                    <ClockIcon className="w-4 h-4 text-[#CAA650]" />
+                  </div>
+
+                  <div>
+                    <p className="text-2xl font-semibold tracking-tight text-[#CAA650] tabular-nums">
+                      {nextShootSpotlight.countdownLabel}
+                    </p>
+                    <p className="text-[13.5px] font-medium text-[#F9F8F5] line-clamp-1 mt-0.5">
+                      {nextShootSpotlight.session.title}
+                    </p>
+                    <p className="text-[12px] text-[#E7D1AA]/75 mt-1 tabular-nums line-clamp-1">
+                      {nextShootSpotlight.dateKey} •{' '}
+                      {formatDateTimeInTz(nextShootSpotlight.session.startAt, timezone)}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between border-t border-[#CAA650]/20 pt-2.5 text-[12px]">
+                    <span className="text-[#E7D1AA]/80 truncate">
+                      {nextShootSpotlight.session.booking?.reference || 'Scheduled session'}
+                    </span>
+                    <span className="font-medium text-[#CAA650] group-hover:translate-x-0.5 transition-transform">
+                      Open slot →
+                    </span>
+                  </div>
+                </button>
+              ) : (
+                <Link
+                  href="/admin/calendar"
+                  className="group w-full text-left rounded-xl border border-[#CAA650]/30 bg-[#1C1913] p-4 flex flex-col justify-between gap-3 hover:border-[#CAA650] hover:bg-[#231F17] transition-all"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-[#E7D1AA]">
+                      <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                      Next Shoot Countdown
+                    </span>
+                    <ClockIcon className="w-4 h-4 text-[#CAA650]" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-semibold tracking-tight text-[#CAA650] tabular-nums">
+                      {nextShootSpotlight.countdownLabel}
+                    </p>
+                    <p className="text-[13.5px] font-medium text-[#F9F8F5] line-clamp-1 mt-0.5">
+                      {nextShootSpotlight.session.title}
+                    </p>
+                    <p className="text-[12px] text-[#E7D1AA]/75 mt-1 tabular-nums line-clamp-1">
+                      {nextShootSpotlight.dateKey} •{' '}
+                      {formatDateTimeInTz(nextShootSpotlight.session.startAt, timezone)}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-[#CAA650]/20 pt-2.5 text-[12px]">
+                    <span className="text-[#E7D1AA]/80">Calendar slot</span>
+                    <span className="font-medium text-[#CAA650]">Open calendar →</span>
+                  </div>
+                </Link>
+              )
+            ) : (
+              <Link
+                href="/admin/calendar"
+                className="group w-full text-left rounded-xl border border-dashed border-[#CAA650]/35 bg-[#1C1913] p-4 flex flex-col justify-between gap-3 hover:border-[#CAA650] transition-colors"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[11px] font-medium uppercase tracking-wider text-[#E7D1AA]">
+                    Next Shoot Countdown
+                  </span>
+                  <CalendarIcon className="w-4 h-4 text-[#CAA650]" />
+                </div>
+                <div>
+                  <p className="text-lg font-semibold text-[#F9F8F5]">No Shoots in 14d Window</p>
+                  <p className="text-[12px] text-[#E7D1AA]/75 mt-1">
+                    Assign shoot dates for confirmed weddings and pre-wedding sessions.
+                  </p>
+                </div>
+                <span className="text-[12px] font-medium text-[#CAA650]">
+                  Schedule next shoot →
+                </span>
+              </Link>
+            )}
+
+            {/* Studio Pipeline & Collection Meter Card */}
+            <div className="rounded-xl border border-[#CAA650]/30 bg-[#1C1913] p-4 flex flex-col justify-between gap-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[11px] font-medium uppercase tracking-wider text-[#E7D1AA]">
+                  {financialReport ? 'Collection Health' : 'Pipeline Readiness'}
+                </span>
+                <span className="rounded-full bg-[#CAA650]/15 px-2 py-0.5 text-[11px] font-semibold text-[#CAA650] tabular-nums">
+                  {meterPercent.toFixed(0)}%
+                </span>
+              </div>
+
+              <div>
+                <p className="text-2xl font-semibold tracking-tight text-[#F9F8F5] tabular-nums">
+                  {formatPoisha(totalAgreedPoisha, currency)}
+                </p>
+                <p className="text-[12px] text-[#E7D1AA]/75 mt-0.5 tabular-nums">
+                  {financialReport
+                    ? `${formatPoisha(financialReport.summary.totalOutstandingDuePoisha, currency)} outstanding balance`
+                    : `${confirmedCount} confirmed of ${activeBookingsTotal} active bookings`}
+                </p>
+              </div>
+
+              <div className="space-y-2 border-t border-[#CAA650]/20 pt-2.5">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${Math.max(4, meterPercent)}%`,
+                      background:
+                        'linear-gradient(90deg, #8B6A21 0%, #CAA650 55%, #E7D1AA 100%)',
+                    }}
+                  />
+                </div>
+                <div className="flex items-center justify-between text-[11.5px] text-[#E7D1AA]/80 tabular-nums">
+                  <span>
+                    {financialReport
+                      ? `${meterPercent.toFixed(1)}% collected`
+                      : `${openQuotesCount} active proposals`}
+                  </span>
+                  <span>{timezone}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 1-Click Studio Launchpad Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
         <Link
           href="/admin/inquiries"
-          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 hover:border-[var(--admin-accent)]/50 transition-colors group"
+          className="group flex items-center gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-2.5 transition-all hover:-translate-y-0.5 hover:border-[var(--admin-accent)]"
         >
-          <div className="flex items-center justify-between">
-            <span className="text-[13px] font-medium text-[var(--admin-muted)]">
-              Inquiries
-            </span>
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
-              <SparklesIcon className="w-4 h-4" />
-            </span>
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
+            <PlusIcon className="w-4 h-4" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[13px] font-semibold text-[var(--admin-text)] group-hover:text-[var(--admin-accent)] transition-colors truncate">
+              Log Inquiry
+            </p>
+            <p className="text-[11.5px] text-[var(--admin-muted)] truncate">
+              Capture new client lead
+            </p>
           </div>
-          <p className="text-[22px] font-semibold tracking-tight text-[var(--admin-text)] mt-2.5 tabular-nums">
-            {newInquiriesCount}
-            <span className="text-[12.5px] font-normal text-[var(--admin-muted)] ml-1.5">
-              new
-            </span>
-          </p>
-          <p className="text-[12.5px] text-[var(--admin-muted)] mt-1.5 flex items-center gap-1 group-hover:text-[var(--admin-accent)] transition-colors tabular-nums">
-            <span>{inquiries.length} total • Open queue</span>
-            <ArrowRightIcon className="w-3 h-3" />
-          </p>
         </Link>
 
         <Link
           href="/admin/quotes"
-          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 hover:border-[var(--admin-accent)]/50 transition-colors group"
+          className="group flex items-center gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-2.5 transition-all hover:-translate-y-0.5 hover:border-[var(--admin-accent)]"
         >
-          <div className="flex items-center justify-between">
-            <span className="text-[13px] font-medium text-[var(--admin-muted)]">
-              Price Quotes
-            </span>
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--admin-violet-soft)] text-[var(--admin-violet)]">
-              <ReceiptIcon className="w-4 h-4" />
-            </span>
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
+            <ReceiptIcon className="w-4 h-4" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[13px] font-semibold text-[var(--admin-text)] group-hover:text-[var(--admin-accent)] transition-colors truncate">
+              Craft Quote
+            </p>
+            <p className="text-[11.5px] text-[var(--admin-muted)] truncate">
+              Send custom proposal
+            </p>
           </div>
-          <p className="text-[22px] font-semibold tracking-tight text-[var(--admin-text)] mt-2.5 tabular-nums">
-            {openQuotesCount}
-            <span className="text-[12.5px] font-normal text-[var(--admin-muted)] ml-1.5">
-              active
-            </span>
-          </p>
-          <p className="text-[12.5px] text-[var(--admin-muted)] mt-1.5 flex items-center gap-1 group-hover:text-[var(--admin-violet)] transition-colors tabular-nums">
-            <span>{quotes.length} total • Manage quotes</span>
-            <ArrowRightIcon className="w-3 h-3" />
-          </p>
+        </Link>
+
+        <Link
+          href="/admin/gallery"
+          className="group flex items-center gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-2.5 transition-all hover:-translate-y-0.5 hover:border-[var(--admin-accent)]"
+        >
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
+            <CameraIcon className="w-4 h-4" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[13px] font-semibold text-[var(--admin-text)] group-hover:text-[var(--admin-accent)] transition-colors truncate">
+              Upload Gallery
+            </p>
+            <p className="text-[11.5px] text-[var(--admin-muted)] truncate">
+              Deliver client albums
+            </p>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/portfolio"
+          className="group flex items-center gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-2.5 transition-all hover:-translate-y-0.5 hover:border-[var(--admin-accent)]"
+        >
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
+            <FilmIcon className="w-4 h-4" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[13px] font-semibold text-[var(--admin-text)] group-hover:text-[var(--admin-accent)] transition-colors truncate">
+              Publish Highlight
+            </p>
+            <p className="text-[11.5px] text-[var(--admin-muted)] truncate">
+              Showcase films &amp; reels
+            </p>
+          </div>
+        </Link>
+
+        <Link
+          href="/"
+          target="_blank"
+          rel="noreferrer"
+          className="group col-span-2 sm:col-span-1 flex items-center gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-2.5 transition-all hover:-translate-y-0.5 hover:border-[var(--admin-accent)]"
+        >
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
+            <ExternalLinkIcon className="w-4 h-4" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[13px] font-semibold text-[var(--admin-text)] group-hover:text-[var(--admin-accent)] transition-colors truncate">
+              Live Storefront
+            </p>
+            <p className="text-[11.5px] text-[var(--admin-muted)] truncate">
+              Preview public site
+            </p>
+          </div>
+        </Link>
+      </div>
+
+      {/* 4 Branded KPI Cards with Momentum Meters */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Link
+          href="/admin/inquiries"
+          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 hover:border-[var(--admin-accent)]/60 transition-all group flex flex-col justify-between gap-3"
+        >
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-[13px] font-medium text-[var(--admin-muted)]">
+                Inquiries
+              </span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
+                <SparklesIcon className="w-4 h-4" />
+              </span>
+            </div>
+            <p className="text-[24px] font-semibold tracking-tight text-[var(--admin-text)] mt-2.5 tabular-nums">
+              {newInquiriesCount}
+              <span className="text-[12.5px] font-normal text-[var(--admin-muted)] ml-1.5">
+                new
+              </span>
+            </p>
+            <p className="text-[12.5px] text-[var(--admin-muted)] mt-1 flex items-center gap-1 group-hover:text-[var(--admin-accent)] transition-colors tabular-nums">
+              <span>{inquiries.length} total • Open queue</span>
+              <ArrowRightIcon className="w-3 h-3" />
+            </p>
+          </div>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--admin-surface-subtle)]">
+            <div
+              className="h-full rounded-full bg-[var(--admin-accent)] transition-all duration-500"
+              style={{ width: `${inquiriesRatio}%` }}
+            />
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/quotes"
+          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 hover:border-[var(--admin-accent)]/60 transition-all group flex flex-col justify-between gap-3"
+        >
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-[13px] font-medium text-[var(--admin-muted)]">
+                Price Quotes
+              </span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#CAA650]/15 text-[#8B6A21]">
+                <ReceiptIcon className="w-4 h-4" />
+              </span>
+            </div>
+            <p className="text-[24px] font-semibold tracking-tight text-[var(--admin-text)] mt-2.5 tabular-nums">
+              {openQuotesCount}
+              <span className="text-[12.5px] font-normal text-[var(--admin-muted)] ml-1.5">
+                active
+              </span>
+            </p>
+            <p className="text-[12.5px] text-[var(--admin-muted)] mt-1 flex items-center gap-1 group-hover:text-[var(--admin-accent)] transition-colors tabular-nums">
+              <span>{quotes.length} total • Manage quotes</span>
+              <ArrowRightIcon className="w-3 h-3" />
+            </p>
+          </div>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--admin-surface-subtle)]">
+            <div
+              className="h-full rounded-full bg-[#CAA650] transition-all duration-500"
+              style={{ width: `${quotesRatio}%` }}
+            />
+          </div>
         </Link>
 
         <Link
           href="/admin/bookings"
-          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 hover:border-[var(--admin-accent)]/50 transition-colors group"
+          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 hover:border-[var(--admin-accent)]/60 transition-all group flex flex-col justify-between gap-3"
         >
-          <div className="flex items-center justify-between">
-            <span className="text-[13px] font-medium text-[var(--admin-muted)]">
-              Bookings
-            </span>
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
-              <UsersIcon className="w-4 h-4" />
-            </span>
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-[13px] font-medium text-[var(--admin-muted)]">
+                Bookings
+              </span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/12 text-emerald-600">
+                <UsersIcon className="w-4 h-4" />
+              </span>
+            </div>
+            <p className="text-[24px] font-semibold tracking-tight text-[var(--admin-text)] mt-2.5 tabular-nums">
+              {confirmedCount}
+              <span className="text-[12.5px] font-normal text-[var(--admin-muted)] ml-1.5">
+                confirmed{pendingConfirmCount > 0 ? ` • ${pendingConfirmCount} pending` : ''}
+              </span>
+            </p>
+            <p className="text-[12.5px] text-[var(--admin-muted)] mt-1 tabular-nums truncate group-hover:text-[var(--admin-accent)] transition-colors">
+              {formatPoisha(totalAgreedPoisha, currency)} active pipeline
+            </p>
           </div>
-          <p className="text-[22px] font-semibold tracking-tight text-[var(--admin-text)] mt-2.5 tabular-nums">
-            {confirmedCount}
-            <span className="text-[12.5px] font-normal text-[var(--admin-muted)] ml-1.5">
-              confirmed{pendingConfirmCount > 0 ? ` • ${pendingConfirmCount} pending` : ''}
-            </span>
-          </p>
-          <p className="font-mono-code text-[12.5px] text-[var(--admin-muted)] mt-1.5 tabular-nums truncate">
-            {formatPoisha(totalAgreedPoisha, currency)} active pipeline
-          </p>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--admin-surface-subtle)]">
+            <div
+              className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+              style={{ width: `${confirmedRatio}%` }}
+            />
+          </div>
         </Link>
 
         <Link
           href="/admin/calendar"
-          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 hover:border-[var(--admin-accent)]/50 transition-colors group"
+          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 hover:border-[var(--admin-accent)]/60 transition-all group flex flex-col justify-between gap-3"
         >
-          <div className="flex items-center justify-between">
-            <span className="text-[13px] font-medium text-[var(--admin-muted)]">
-              Upcoming Shoots
-            </span>
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
-              <CalendarIcon className="w-4 h-4" />
-            </span>
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-[13px] font-medium text-[var(--admin-muted)]">
+                Upcoming Shoots
+              </span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
+                <CalendarIcon className="w-4 h-4" />
+              </span>
+            </div>
+            <p className="text-[24px] font-semibold tracking-tight text-[var(--admin-text)] mt-2.5 tabular-nums">
+              {upcomingSessions.length}
+              <span className="text-[12.5px] font-normal text-[var(--admin-muted)] ml-1.5">
+                next 14d
+              </span>
+            </p>
+            <p className="text-[12.5px] text-[var(--admin-muted)] mt-1 flex items-center gap-1 group-hover:text-[var(--admin-accent)] transition-colors">
+              <span>View schedule</span>
+              <ArrowRightIcon className="w-3 h-3" />
+            </p>
           </div>
-          <p className="text-[22px] font-semibold tracking-tight text-[var(--admin-text)] mt-2.5 tabular-nums">
-            {upcomingSessions.length}
-            <span className="text-[12.5px] font-normal text-[var(--admin-muted)] ml-1.5">
-              next 14d
-            </span>
-          </p>
-          <p className="text-[12.5px] text-[var(--admin-muted)] mt-1.5 flex items-center gap-1 group-hover:text-[var(--admin-accent)] transition-colors">
-            <span>View schedule</span>
-            <ArrowRightIcon className="w-3 h-3" />
-          </p>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--admin-surface-subtle)]">
+            <div
+              className="h-full rounded-full bg-[#8B6A21] transition-all duration-500"
+              style={{ width: `${shootsRatio}%` }}
+            />
+          </div>
         </Link>
       </div>
 
@@ -520,8 +921,8 @@ export function AdminOverview({
                 data={cashflowChartData}
                 series={[
                   { key: 'collected', label: 'Collected', color: '#10B981' },
-                  { key: 'expenses', label: 'Expenses', color: '#F43F5E' },
-                  { key: 'profit', label: 'Net Profit', color: '#2563EB' },
+                  { key: 'expenses', label: 'Expenses', color: '#9E6359' },
+                  { key: 'profit', label: 'Net Profit', color: '#CAA650' },
                 ]}
                 formatValue={(v) => formatPoisha(v, currency)}
                 formatAxis={(v) => formatCompactPoisha(v, currency)}
@@ -565,8 +966,8 @@ export function AdminOverview({
             <GroupedBarChart
               data={activityChartData}
               series={[
-                { key: 'inquiries', label: 'Inquiries', color: '#6D28D9' },
-                { key: 'bookings', label: 'Active Bookings', color: '#2563EB' },
+                { key: 'inquiries', label: 'Inquiries', color: '#CAA650' },
+                { key: 'bookings', label: 'Active Bookings', color: '#6F6130' },
               ]}
               formatValue={(v) => `${Math.round(v)}`}
               formatAxis={(v) => `${Math.round(v)}`}
@@ -577,7 +978,7 @@ export function AdminOverview({
           {trendMode === 'shoots' && (
             <GroupedBarChart
               data={shootLoadChartData}
-              series={[{ key: 'shoots', label: 'Scheduled Shoots', color: '#2563EB' }]}
+              series={[{ key: 'shoots', label: 'Scheduled Shoots', color: '#CAA650' }]}
               formatValue={(v) => `${Math.round(v)} ${v === 1 ? 'shoot' : 'shoots'}`}
               formatAxis={(v) => `${Math.round(v)}`}
               maxVisibleXLabels={7}
@@ -683,7 +1084,7 @@ export function AdminOverview({
                   id: 'unscheduled' as const,
                   label: 'Needs Shoot Slot',
                   count: alerts.counts.unscheduledConfirmed,
-                  dot: 'bg-[#2563EB]',
+                  dot: 'bg-[#CAA650]',
                 },
                 {
                   id: 'deliverables' as const,
@@ -829,7 +1230,7 @@ export function AdminOverview({
                               {b.eventTitle}
                             </p>
                             <p className="admin-meta flex items-center gap-1.5 line-clamp-1 tabular-nums">
-                              <span className="h-[6px] w-[6px] rounded-full bg-[#2563EB] shrink-0" />
+                              <span className="h-[6px] w-[6px] rounded-full bg-[#CAA650] shrink-0" />
                               <span>
                                 {b.clientName} • {formatLocalDate(b.eventDate)}
                               </span>

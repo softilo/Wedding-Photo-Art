@@ -2903,7 +2903,7 @@ export function BookingsWorkspace({
                         <div className="flex items-center gap-3">
                           <Link
                             href="/admin/crew"
-                            className="text-xs font-medium text-slate-500 hover:text-[#2563EB] hover:underline"
+                            className="text-xs font-medium text-slate-500 hover:text-[var(--admin-accent)] hover:underline"
                           >
                             Crew &amp; Gear Page ↗
                           </Link>

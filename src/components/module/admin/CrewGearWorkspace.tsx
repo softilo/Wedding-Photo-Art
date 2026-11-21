@@ -172,7 +172,7 @@ export function CrewGearWorkspace({
   }, [resources, sessionsByResource]);
 
   const inputClass =
-    'w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#2563EB] focus:bg-white transition-all';
+    'w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-[var(--admin-accent)] focus:bg-white transition-all';
 
   const handleCheckAvailability = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -446,7 +446,7 @@ export function CrewGearWorkspace({
 
         <div className="atelier-card p-4 sm:p-5 space-y-1">
           <p className="admin-meta">Upcoming Reserved Slots</p>
-          <p className="text-2xl font-semibold text-[#2563EB] tabular-nums">
+          <p className="text-2xl font-semibold text-[var(--admin-accent)] tabular-nums">
             {totalUpcomingBookings}
           </p>
           <p className="admin-meta">Active locks next 30 days</p>
@@ -509,7 +509,7 @@ export function CrewGearWorkspace({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search crew name, specialty, drone, camera..."
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-8 pr-3 py-1.5 text-xs text-slate-900 outline-none focus:border-[#2563EB] focus:bg-white"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-8 pr-3 py-1.5 text-xs text-slate-900 outline-none focus:border-[var(--admin-accent)] focus:bg-white"
             />
           </div>
         </div>
@@ -809,7 +809,7 @@ export function CrewGearWorkspace({
                 value={gearName}
                 onChange={(e) => setGearName(e.target.value)}
                 placeholder="e.g. Sony FX6 Kit B / DJI Mavic 3 Pro"
-                className="flex-1 min-w-[190px] rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-[#2563EB]"
+                className="flex-1 min-w-[190px] rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-[var(--admin-accent)]"
               />
               <select
                 value={gearType}

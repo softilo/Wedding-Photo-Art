@@ -110,14 +110,20 @@ export function StaffWorkspace({
 
         {isManager && initialStudioDispatch && (
           <div className="flex flex-wrap items-center gap-2">
-            <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1 gap-1">
+            <div
+              className="inline-flex rounded-xl border p-1 gap-1"
+              style={{
+                borderColor: 'var(--admin-border)',
+                backgroundColor: 'var(--admin-surface)',
+              }}
+            >
               <button
                 type="button"
                 onClick={() => setViewMode('dispatch')}
                 className={cn(
-                  'rounded-lg px-3 py-1.5 text-xs font-medium cursor-pointer',
+                  'rounded-lg px-3 py-1.5 text-xs font-medium cursor-pointer transition-colors',
                   viewMode === 'dispatch'
-                    ? 'bg-slate-900 text-white'
+                    ? 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)] shadow-sm'
                     : 'text-slate-600 hover:bg-slate-100',
                 )}
               >
@@ -127,9 +133,9 @@ export function StaffWorkspace({
                 type="button"
                 onClick={() => setViewMode('my')}
                 className={cn(
-                  'rounded-lg px-3 py-1.5 text-xs font-medium cursor-pointer tabular-nums',
+                  'rounded-lg px-3 py-1.5 text-xs font-medium cursor-pointer tabular-nums transition-colors',
                   viewMode === 'my'
-                    ? 'bg-slate-900 text-white'
+                    ? 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)] shadow-sm'
                     : 'text-slate-600 hover:bg-slate-100',
                 )}
               >
@@ -165,7 +171,7 @@ export function StaffWorkspace({
                 <button
                   type="button"
                   onClick={() => setSelectedCrewUserId('ALL')}
-                  className="text-xs font-medium text-[#2563EB] hover:underline cursor-pointer"
+                  className="text-xs font-medium text-[var(--admin-accent)] hover:underline cursor-pointer"
                 >
                   Show All Crew
                 </button>
@@ -186,7 +192,7 @@ export function StaffWorkspace({
                     className={cn(
                       'rounded-xl border p-3.5 text-left transition-colors cursor-pointer space-y-1.5',
                       isSelected
-                        ? 'border-[#2563EB] bg-[var(--admin-accent-soft)]'
+                        ? 'border-[var(--admin-accent)] bg-[var(--admin-accent-soft)]'
                         : 'border-slate-200 bg-slate-50/60 hover:bg-white',
                     )}
                   >
@@ -226,7 +232,7 @@ export function StaffWorkspace({
                 </div>
                 <Link
                   href="/admin/calendar"
-                  className="text-xs font-medium text-[#2563EB] hover:underline shrink-0"
+                  className="text-xs font-medium text-[var(--admin-accent)] hover:underline shrink-0"
                 >
                   Open Calendar →
                 </Link>
@@ -252,7 +258,7 @@ export function StaffWorkspace({
                               {sess.booking && (
                                 <Link
                                   href={`/admin/bookings/${encodeURIComponent(sess.booking.id)}?section=schedule`}
-                                  className="font-mono-code text-xs font-semibold text-[#2563EB] hover:underline tabular-nums"
+                                  className="font-mono-code text-xs font-semibold text-[var(--admin-accent)] hover:underline tabular-nums"
                                 >
                                   {sess.booking.reference}
                                 </Link>
@@ -356,7 +362,7 @@ export function StaffWorkspace({
                         {a.booking ? (
                           <Link
                             href={`/admin/bookings/${encodeURIComponent(a.booking.id)}?section=tasks`}
-                            className="text-[11px] font-medium text-[#2563EB] hover:underline"
+                            className="text-[11px] font-medium text-[var(--admin-accent)] hover:underline"
                           >
                             Open Booking →
                           </Link>
@@ -486,7 +492,7 @@ export function StaffWorkspace({
                         {isManager && sess.booking && (
                           <Link
                             href={`/admin/bookings/${encodeURIComponent(sess.booking.id)}?section=schedule`}
-                            className="text-xs font-medium text-[#2563EB] hover:underline"
+                            className="text-xs font-medium text-[var(--admin-accent)] hover:underline"
                           >
                             Open Booking →
                           </Link>

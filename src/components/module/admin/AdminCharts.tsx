@@ -150,13 +150,14 @@ export function GroupedBarChart({
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 text-[12px] tabular-nums">
-          <span className="font-medium text-[var(--admin-text)]">
+          <span className="inline-flex items-center gap-1.5 font-medium text-[var(--admin-text)]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--admin-accent)]" />
             {activePointLabel}: {activePoint.sublabel || activePoint.label}
           </span>
           {series.map((s, idx) => (
             <span
               key={s.key}
-              className="inline-flex items-center gap-1 font-mono-code font-medium text-[var(--admin-text)]"
+              className="inline-flex items-center gap-1 font-medium text-[var(--admin-text)]"
             >
               <span
                 className="h-1.5 w-1.5 rounded-full"
@@ -269,7 +270,7 @@ export function GroupedBarChart({
                       y={barTop}
                       width={barW}
                       height={barH}
-                      rx="3"
+                      rx="4"
                       fill={s.color}
                       fillOpacity={hoveredIdx === null || isHovered ? 0.92 : 0.45}
                       className="transition-opacity duration-150"

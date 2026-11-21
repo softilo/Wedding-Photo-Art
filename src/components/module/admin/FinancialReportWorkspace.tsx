@@ -48,9 +48,9 @@ type DatePreset = 'ALL' | 'THIS_MONTH' | 'LAST_30' | 'THIS_YEAR' | 'CUSTOM';
 const METHOD_META: Record<PaymentMethod, { label: string; color: string }> = {
   BKASH: { label: 'bKash', color: '#E11D48' },
   NAGAD: { label: 'Nagad', color: '#F97316' },
-  BANK: { label: 'Bank Transfer', color: '#2563EB' },
+  BANK: { label: 'Bank Transfer', color: '#CAA650' },
   CASH: { label: 'Cash', color: '#10B981' },
-  OTHER: { label: 'Other', color: '#64748B' },
+  OTHER: { label: 'Other', color: '#8A7F69' },
 };
 
 const EXPENSE_CATEGORY_META: Record<
@@ -60,12 +60,12 @@ const EXPENSE_CATEGORY_META: Record<
   CREW_PAYOUT: {
     label: 'Crew & Freelancer Payout',
     hint: 'Photographers, cinematographers, editors, assistants',
-    color: '#2563EB',
+    color: '#CAA650',
   },
   ALBUM_PRINTING: {
     label: 'Album & Lab Printing',
     hint: 'Story albums, photo frames, pen-drive boxes',
-    color: '#6D28D9',
+    color: '#8B6A21',
   },
   EQUIPMENT_RENTAL: {
     label: 'Camera & Gear Rental',
@@ -559,7 +559,7 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
       displayValue: formatPoisha(et.agreedTotalPoisha, currency),
       percent: (et.agreedTotalPoisha / maxAgreed) * 100,
       subtext: `${et.bookingsCount} bookings • Collected ${formatPoisha(et.collectedPoisha, currency)} • Due ${formatPoisha(et.outstandingDuePoisha, currency)}`,
-      color: ['#2563EB', '#6D28D9', '#10B981', '#F59E0B', '#64748B'][idx % 5],
+      color: ['#CAA650', '#8B6A21', '#10B981', '#E7D1AA', '#6F6130'][idx % 5],
     }));
   }, [report.byEventType, currency]);
 
@@ -749,7 +749,7 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
         <div className="admin-card p-4 sm:p-5 space-y-2">
           <div className="flex items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-[var(--admin-muted)]">
-              <span className="h-[7px] w-[7px] rounded-full bg-[#2563EB] shrink-0" />
+              <span className="h-[7px] w-[7px] rounded-full bg-[#CAA650] shrink-0" />
               <span>Projected Profit</span>
             </span>
             <span className="font-mono-code text-[11px] font-medium text-[var(--admin-muted)] tabular-nums">
@@ -938,8 +938,8 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
                 data={monthlyChartData}
                 series={[
                   { key: 'collected', label: 'Collected', color: '#10B981' },
-                  { key: 'expenses', label: 'Expenses', color: '#F43F5E' },
-                  { key: 'profit', label: 'Net Profit', color: '#2563EB' },
+                  { key: 'expenses', label: 'Expenses', color: '#9E6359' },
+                  { key: 'profit', label: 'Net Profit', color: '#CAA650' },
                 ]}
                 formatValue={(v) => formatPoisha(v, currency)}
                 formatAxis={(v) => formatCompactPoisha(v, currency)}

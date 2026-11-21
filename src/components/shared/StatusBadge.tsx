@@ -18,15 +18,15 @@ const STATUS_DOTS: Record<string, { dot: string; label?: string }> = {
   ACCEPTED: { dot: 'bg-emerald-500' },
   CONVERTED: { dot: 'bg-emerald-500' },
 
-  // Electric Blue — scheduled / active / incoming
-  SCHEDULED: { dot: 'bg-[#2563EB]' },
-  NEW: { dot: 'bg-[#2563EB]' },
-  SENT: { dot: 'bg-[#2563EB]' },
-  IN_PROGRESS: { dot: 'bg-[#2563EB]' },
-  QUALIFIED: { dot: 'bg-[#2563EB]' },
+  // Antique Gold — scheduled / active / incoming
+  SCHEDULED: { dot: 'bg-[#8B6A21]' },
+  NEW: { dot: 'bg-[#CAA650]' },
+  SENT: { dot: 'bg-[#8B6A21]' },
+  IN_PROGRESS: { dot: 'bg-[#CAA650]' },
+  QUALIFIED: { dot: 'bg-[#8B6A21]' },
 
-  // Soft Violet — review
-  IN_REVIEW: { dot: 'bg-[#6D28D9]' },
+  // Champagne Bronze — review
+  IN_REVIEW: { dot: 'bg-[#A67C2E]' },
 
   // Soft Rose — cancelled / rejected
   CANCELLED: { dot: 'bg-rose-400' },

@@ -126,45 +126,47 @@ body {
 }
 
 /* ============================================================================
-   Admin & Staff Dashboard — Low-Eye-Strain Soft Light & Soft Dark Navy Theme
-   Scoped strictly to `.admin-shell` so public pages retain their own palette.
+   Admin & Staff Dashboard — Wedding PhotoArt Atelier Light & Obsidian Cinema Theme
+   Scoped strictly to `.admin-shell` so public pages retain their own layout tokens.
    ============================================================================ */
 
 .admin-shell {
-  --admin-canvas: #f6f7f9;
-  --admin-sidebar: #edf1f7;
-  --admin-surface: #fcfdfd;
-  --admin-surface-subtle: #eff2f6;
-  --admin-surface-hover: #e4e9f2;
-  --admin-border: #e2e6ee;
-  --admin-text: #1e2430;
-  --admin-muted: #5c6575;
-  --admin-accent: #2563eb;
-  --admin-accent-hover: #1d4ed8;
-  --admin-accent-soft: rgba(37, 99, 235, 0.11);
-  --admin-violet: #6d28d9;
-  --admin-violet-soft: rgba(109, 40, 217, 0.1);
-  --admin-header: rgba(252, 253, 253, 0.92);
+  --admin-canvas: #f6f4ee;
+  --admin-sidebar: #efece2;
+  --admin-surface: #fcfbf8;
+  --admin-surface-subtle: #f3efe4;
+  --admin-surface-hover: #ebe5d6;
+  --admin-border: #e2dac7;
+  --admin-text: #181611;
+  --admin-muted: #696150;
+  --admin-accent: #8b6a21;
+  --admin-accent-hover: #755718;
+  --admin-accent-fg: #ffffff;
+  --admin-accent-soft: rgba(202, 166, 80, 0.16);
+  --admin-violet: #caa650;
+  --admin-violet-soft: rgba(202, 166, 80, 0.15);
+  --admin-header: rgba(252, 251, 248, 0.92);
   background-color: var(--admin-canvas);
   color: var(--admin-text);
   color-scheme: light;
 }
 
 .admin-shell[data-theme='dark'] {
-  --admin-canvas: #0b1020;
-  --admin-sidebar: #0e1528;
-  --admin-surface: #11182e;
-  --admin-surface-subtle: #16203c;
-  --admin-surface-hover: #1b2748;
-  --admin-border: #1e294b;
-  --admin-text: #e6eaf2;
-  --admin-muted: #8e9ab3;
-  --admin-accent: #4f7cff;
-  --admin-accent-hover: #3b69f5;
-  --admin-accent-soft: rgba(79, 124, 255, 0.16);
-  --admin-violet: #8b5cf6;
-  --admin-violet-soft: rgba(139, 92, 246, 0.14);
-  --admin-header: rgba(17, 24, 46, 0.92);
+  --admin-canvas: #110f0b;
+  --admin-sidebar: #16130e;
+  --admin-surface: #1b1812;
+  --admin-surface-subtle: #221e16;
+  --admin-surface-hover: #2b251b;
+  --admin-border: #322c20;
+  --admin-text: #f4efe4;
+  --admin-muted: #a89f8b;
+  --admin-accent: #caa650;
+  --admin-accent-hover: #d8b765;
+  --admin-accent-fg: #181611;
+  --admin-accent-soft: rgba(202, 166, 80, 0.16);
+  --admin-violet: #e7d1aa;
+  --admin-violet-soft: rgba(231, 209, 170, 0.12);
+  --admin-header: rgba(27, 24, 18, 0.92);
   color-scheme: dark;
 }
 
@@ -250,21 +252,21 @@ body {
 
 .admin-shell :where(.bg-indigo-600, .bg-primary):not(.album-preview-isolated):not(.album-preview-isolated *) {
   background-color: var(--admin-accent);
-  color: #fcfdfd;
+  color: var(--admin-accent-fg);
 }
 
 .admin-shell :where(.hover\:bg-indigo-700:hover):not(.album-preview-isolated):not(.album-preview-isolated *) {
   background-color: var(--admin-accent-hover);
 }
 
-/* Soft Dark Navy Mode adaptations across nested workspaces */
+/* Obsidian Cinema Dark Mode adaptations across nested workspaces */
 .admin-shell[data-theme='dark'] :where(.hover\:bg-slate-50:hover, .hover\:bg-slate-50\/90:hover, .hover\:bg-slate-100:hover):not(.album-preview-isolated):not(.album-preview-isolated *) {
   background-color: var(--admin-surface-hover);
 }
 
 .admin-shell[data-theme='dark'] :where(.bg-slate-900):not(.album-preview-isolated):not(.album-preview-isolated *) {
   background-color: var(--admin-accent);
-  color: #fcfdfd;
+  color: var(--admin-accent-fg);
 }
 
 .admin-shell[data-theme='dark'] :where(.hover\:bg-slate-800:hover):not(.album-preview-isolated):not(.album-preview-isolated *) {
@@ -276,7 +278,7 @@ body {
 }
 
 .admin-shell[data-theme='dark'] :where(.border-indigo-200, .border-indigo-300):not(.album-preview-isolated):not(.album-preview-isolated *) {
-  border-color: rgba(79, 124, 255, 0.35);
+  border-color: rgba(202, 166, 80, 0.38);
 }
 
 .admin-shell[data-theme='dark'] :where(.bg-emerald-50, .bg-emerald-50\/70, .bg-emerald-50\/40, .bg-emerald-50\/30):not(.album-preview-isolated):not(.album-preview-isolated *) {

@@ -741,7 +741,7 @@ export function CalendarWorkspace({
         </div>
         <div className="atelier-card p-5">
           <p className="admin-meta font-medium">Upcoming Scheduled</p>
-          <p className="text-2xl font-semibold tracking-tight text-[#2563EB] mt-2 tabular-nums">
+          <p className="text-2xl font-semibold tracking-tight text-[var(--admin-accent)] mt-2 tabular-nums">
             {scheduledCount}
           </p>
         </div>
@@ -753,14 +753,14 @@ export function CalendarWorkspace({
         </div>
         <Link
           href="/admin/crew"
-          className="atelier-card p-5 block hover:border-[#2563EB] transition-colors"
+          className="atelier-card p-5 block hover:border-[var(--admin-accent)] transition-colors"
         >
           <p className="admin-meta font-medium">Crew &amp; Equipment Pool</p>
           <div className="flex items-baseline justify-between mt-2">
             <p className="text-2xl font-semibold tracking-tight text-slate-900 tabular-nums">
               {resources.length}
             </p>
-            <span className="text-xs font-medium text-[#2563EB]">Manage →</span>
+            <span className="text-xs font-medium text-[var(--admin-accent)]">Manage →</span>
           </div>
         </Link>
       </div>
@@ -1015,7 +1015,7 @@ export function CalendarWorkspace({
                     )}
                     <Link
                       href="/admin/crew"
-                      className="text-xs font-medium text-[#2563EB] hover:underline"
+                      className="text-xs font-medium text-[var(--admin-accent)] hover:underline"
                     >
                       Manage Pool →
                     </Link>

@@ -169,7 +169,7 @@ export function TeamCrewWorkspace({
   );
 
   const inputClass =
-    'w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#2563EB] focus:bg-white transition-all';
+    'w-full rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-[var(--admin-accent)] focus:bg-white transition-all';
 
   const replaceMemberInState = (updated: StudioMember) => {
     setMembers((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
@@ -566,7 +566,7 @@ export function TeamCrewWorkspace({
       <div className="atelier-card p-4 grid gap-3 sm:grid-cols-3 text-xs">
         <div className="space-y-0.5">
           <p className="font-semibold text-slate-900 flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-[#2563EB]" />
+            <span className="h-2 w-2 rounded-full bg-[#CAA650]" />
             <span>1. Studio Team (Accounts)</span>
           </p>
           <p className="admin-meta">
@@ -584,12 +584,12 @@ export function TeamCrewWorkspace({
         </div>
         <div className="space-y-0.5">
           <p className="font-semibold text-slate-900 flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-[#6D28D9]" />
+            <span className="h-2 w-2 rounded-full bg-[#8B6A21]" />
             <span>3. Crew Dispatch (Shoots &amp; Tasks)</span>
           </p>
           <p className="admin-meta">
             Linked staff see their assigned shoot call sheets &amp; post-production tasks under{' '}
-            <Link href="/staff" className="font-medium text-[#2563EB] hover:underline">
+            <Link href="/staff" className="font-medium text-[var(--admin-accent)] hover:underline">
               Crew Dispatch ↗
             </Link>
             .
@@ -626,7 +626,7 @@ export function TeamCrewWorkspace({
           <div className="atelier-card p-4 sm:p-5 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2.5">
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-[#2563EB]">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
                   <UsersIcon className="w-4 h-4" />
                 </span>
                 <div>
@@ -638,7 +638,7 @@ export function TeamCrewWorkspace({
               </div>
               <Link
                 href="/admin/crew"
-                className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-[#2563EB] hover:bg-slate-50"
+                className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-[var(--admin-accent)] hover:bg-slate-50"
               >
                 Open Dedicated Crew &amp; Gear Page →
               </Link>
@@ -674,7 +674,7 @@ export function TeamCrewWorkspace({
                           />
                           <p className="admin-row-title line-clamp-1">{m.name}</p>
                           {isSelf && (
-                            <span className="text-[11px] font-medium text-[#2563EB]">(You)</span>
+                            <span className="text-[11px] font-medium text-[var(--admin-accent)]">(You)</span>
                           )}
                         </div>
                         <p className="admin-meta line-clamp-1 pl-4">{m.email}</p>
@@ -747,7 +747,7 @@ export function TeamCrewWorkspace({
                             type="button"
                             disabled={isPending}
                             onClick={() => handleLinkResourceToMember(suggestedMatch, m.id)}
-                            className="rounded-md bg-[#2563EB] px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-[#1D4ED8] cursor-pointer"
+                            className="rounded-md bg-[var(--admin-accent)] px-2.5 py-1 text-[11px] font-semibold text-[var(--admin-accent-fg)] hover:opacity-90 cursor-pointer"
                           >
                             Link Profile
                           </button>
@@ -786,7 +786,7 @@ export function TeamCrewWorkspace({
                             value={editingCrewTitle}
                             onChange={(e) => setEditingCrewTitle(e.target.value)}
                             placeholder="Shoot title (e.g. Lead Photographer)"
-                            className="flex-1 min-w-[160px] rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs outline-none focus:border-[#2563EB] focus:bg-white"
+                            className="flex-1 min-w-[160px] rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs outline-none focus:border-[var(--admin-accent)] focus:bg-white"
                           />
                           <button
                             type="submit"
@@ -1071,7 +1071,7 @@ export function TeamCrewWorkspace({
                 value={gearNameInput}
                 onChange={(e) => setGearNameInput(e.target.value)}
                 placeholder="e.g. Sony FX6 + RS4 Kit B / Studio Floor A"
-                className="flex-1 min-w-[200px] rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-[#2563EB]"
+                className="flex-1 min-w-[200px] rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-[var(--admin-accent)]"
               />
               <select
                 value={gearTypeInput}
@@ -1169,7 +1169,7 @@ export function TeamCrewWorkspace({
       {activeTab === 'automation' && (
         <div className="space-y-5">
           <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-700 flex items-center gap-2.5">
-            <SparklesIcon className="w-4 h-4 text-[#2563EB] shrink-0" />
+            <SparklesIcon className="w-4 h-4 text-[var(--admin-accent)] shrink-0" />
             <span>
               <strong>Auto-Provisioning on Confirmation:</strong> When a booking is confirmed,
               matching Deliverables and Crew Tasks below are automatically created for that event category.
@@ -1433,7 +1433,7 @@ export function TeamCrewWorkspace({
                     value={memCrewTitle}
                     onChange={(e) => setMemCrewTitle(e.target.value)}
                     placeholder="Shoot specialty (e.g. Lead Photographer, Drone Pilot)"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs outline-none focus:border-[#2563EB]"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs outline-none focus:border-[var(--admin-accent)]"
                   />
                 )}
               </div>

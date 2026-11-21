@@ -19,7 +19,7 @@ const SEVERITY_DOT: Record<NotificationSeverity, string> = {
   URGENT: 'bg-rose-500',
   ACTION: 'bg-amber-500',
   SUCCESS: 'bg-emerald-500',
-  INFO: 'bg-[#2563EB]',
+  INFO: 'bg-[#CAA650]',
 };
 
 const CATEGORY_LABELS: Record<StudioNotification['category'], string> = {
@@ -173,8 +173,10 @@ export function NotificationBell({
         {feed.unreadCount > 0 && (
           <span
             className={cn(
-              'absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-semibold text-[#FCFDFD] inline-flex items-center justify-center tabular-nums leading-none',
-              feed.urgentUnreadCount > 0 ? 'bg-rose-500' : 'bg-[var(--admin-accent)]',
+              'absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-semibold inline-flex items-center justify-center tabular-nums leading-none',
+              feed.urgentUnreadCount > 0
+                ? 'bg-rose-500 text-white'
+                : 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)]',
             )}
           >
             {feed.unreadCount > 99 ? '99+' : feed.unreadCount}
