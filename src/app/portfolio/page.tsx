@@ -32,7 +32,9 @@ async function AllPortfoliosContent() {
 
 export default function AllPortfoliosPage() {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading client portfolios..." />}>
+    <Suspense
+      fallback={<PageSkeleton variant="portfolios" label="Loading client portfolios..." />}
+    >
       <AllPortfoliosContent />
     </Suspense>
   );

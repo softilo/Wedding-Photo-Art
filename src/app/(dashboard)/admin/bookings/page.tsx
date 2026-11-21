@@ -51,7 +51,7 @@ async function AdminBookingsContent({ searchParams }: AdminBookingsPageProps) {
 
 export default function AdminBookingsPage({ searchParams }: AdminBookingsPageProps) {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading bookings..." />}>
+    <Suspense fallback={<PageSkeleton variant="admin-table" label="Loading bookings..." />}>
       <AdminBookingsContent searchParams={searchParams} />
     </Suspense>
   );

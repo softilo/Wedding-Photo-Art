@@ -30,7 +30,7 @@ export default function LoginPage({
   searchParams: Promise<{ callbackUrl?: string }>;
 }) {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading sign in..." />}>
+    <Suspense fallback={<PageSkeleton variant="auth" label="Loading sign in..." />}>
       <LoginContent searchParams={searchParams} />
     </Suspense>
   );

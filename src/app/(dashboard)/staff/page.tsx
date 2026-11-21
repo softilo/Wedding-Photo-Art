@@ -40,7 +40,7 @@ async function StaffContent() {
 
 export default function StaffPage() {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading crew dispatch & tasks..." />}>
+    <Suspense fallback={<PageSkeleton variant="admin-table" label="Loading crew dispatch & tasks..." />}>
       <StaffContent />
     </Suspense>
   );

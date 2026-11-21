@@ -65,7 +65,7 @@ async function AdminCalendarContent() {
 
 export default function AdminCalendarPage() {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading studio calendar..." />}>
+    <Suspense fallback={<PageSkeleton variant="admin-calendar" label="Loading studio calendar..." />}>
       <AdminCalendarContent />
     </Suspense>
   );

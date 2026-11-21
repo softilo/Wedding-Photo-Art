@@ -345,24 +345,59 @@ export function PublicPortfolioShowcase({
         {/* Strict Viewport Gate: Nothing loads until the user scrolls to #portfolio! */}
         {!hasEnteredSection || isLoadingMedia ? (
           <div
-            aria-label="Gallery loading on scroll"
-            className="space-y-6"
+            role="status"
+            aria-busy="true"
+            aria-label="Loading gallery media"
+            className="space-y-10"
           >
-            <div className="rounded-3xl bg-[#14120E] p-6 grid lg:grid-cols-12 gap-5">
-              <div className="lg:col-span-8 aspect-video rounded-2xl animate-pulse bg-[#252118]" />
-              <div className="lg:col-span-4 space-y-3">
-                <div className="h-20 rounded-xl animate-pulse bg-[#252118]" />
-                <div className="h-20 rounded-xl animate-pulse bg-[#252118]" />
+            <span className="sr-only">Loading photography and highlight films...</span>
+            {/* Cinema Theater Skeleton */}
+            <div className="rounded-3xl border border-[#2E291F] bg-[#14120E] p-5 sm:p-7 space-y-5">
+              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                <div className="h-3.5 w-48 rounded-full skeleton-bone-dark" />
+                <div className="hidden sm:block h-3 w-56 rounded-full skeleton-bone-dark" />
+              </div>
+              <div className="grid lg:grid-cols-12 gap-6 items-start">
+                <div className="lg:col-span-8 space-y-3">
+                  <div className="aspect-video w-full rounded-2xl skeleton-bone-dark border border-white/10" />
+                  <div className="flex items-center justify-between px-1">
+                    <div className="h-3.5 w-24 rounded-md skeleton-bone-dark" />
+                    <div className="h-6 w-20 rounded-full skeleton-bone-dark" />
+                  </div>
+                </div>
+                <div className="lg:col-span-4 space-y-2.5">
+                  <div className="h-3 w-24 rounded-md skeleton-bone-dark mb-1" />
+                  {[1, 2, 3].map((idx) => (
+                    <div
+                      key={idx}
+                      className="rounded-2xl border border-white/10 bg-white/[0.02] p-2.5 flex items-center gap-3"
+                    >
+                      <div className="h-16 w-24 shrink-0 rounded-xl skeleton-bone-dark" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-3 w-16 rounded-md skeleton-bone-dark" />
+                        <div className="h-3.5 w-28 rounded-md skeleton-bone-dark" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-            <div className="columns-1 sm:columns-2 lg:columns-3 gap-5">
-              {['3/4', '4/3', '4/5', '3/2', '3/4', '4/3'].map((ratio, idx) => (
-                <div
-                  key={idx}
-                  style={{ aspectRatio: ratio }}
-                  className="mb-5 break-inside-avoid rounded-2xl animate-pulse bg-[#EFECE3]"
-                />
-              ))}
+
+            {/* Photography Masonry Skeleton */}
+            <div className="space-y-5">
+              <div className="flex items-center justify-between border-b border-[#ECE6D8] pb-3">
+                <div className="h-7 w-44 rounded-lg skeleton-bone" />
+                <div className="hidden sm:block h-3.5 w-52 rounded-md skeleton-bone" />
+              </div>
+              <div className="columns-1 sm:columns-2 lg:columns-3 gap-5">
+                {['3/4', '4/3', '4/5', '3/2', '3/4', '4/3'].map((ratio, idx) => (
+                  <div
+                    key={idx}
+                    style={{ aspectRatio: ratio }}
+                    className="mb-5 break-inside-avoid rounded-2xl border border-[#E5DFD0] skeleton-bone"
+                  />
+                ))}
+              </div>
             </div>
           </div>
         ) : totalMatching === 0 ? (

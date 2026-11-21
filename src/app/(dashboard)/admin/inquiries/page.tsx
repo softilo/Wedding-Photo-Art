@@ -45,7 +45,7 @@ async function AdminInquiriesContent({ searchParams }: AdminInquiriesPageProps) 
 
 export default function AdminInquiriesPage({ searchParams }: AdminInquiriesPageProps) {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading client inquiries..." />}>
+    <Suspense fallback={<PageSkeleton variant="admin-table" label="Loading client inquiries..." />}>
       <AdminInquiriesContent searchParams={searchParams} />
     </Suspense>
   );

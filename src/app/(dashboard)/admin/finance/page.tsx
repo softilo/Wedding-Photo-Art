@@ -31,7 +31,7 @@ async function AdminFinanceContent() {
 
 export default function AdminFinancePage() {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading financial report & ledger analytics..." />}>
+    <Suspense fallback={<PageSkeleton variant="admin-finance" label="Loading financial report & ledger analytics..." />}>
       <AdminFinanceContent />
     </Suspense>
   );

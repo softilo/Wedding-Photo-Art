@@ -70,7 +70,7 @@ export function LazyViewportImage({
       {!isLoaded && (
         <div
           aria-hidden="true"
-          className="absolute inset-0 animate-pulse bg-gradient-to-br from-[#E5DFD0] via-[#F9F8F5] to-[#E5DFD0]"
+          className="absolute inset-0 skeleton-bone"
         />
       )}
 

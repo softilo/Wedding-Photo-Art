@@ -28,7 +28,7 @@ export default function DashboardLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <Suspense fallback={<PageSkeleton label="Verifying session..." />}>
+    <Suspense fallback={<PageSkeleton variant="dashboard-shell" label="Verifying session..." />}>
       <GuardedDashboard>{children}</GuardedDashboard>
     </Suspense>
   );

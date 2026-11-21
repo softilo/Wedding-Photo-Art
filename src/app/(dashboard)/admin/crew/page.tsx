@@ -54,7 +54,7 @@ async function AdminCrewContent() {
 
 export default function AdminCrewPage() {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading crew & gear pool..." />}>
+    <Suspense fallback={<PageSkeleton variant="admin-table" label="Loading crew & gear pool..." />}>
       <AdminCrewContent />
     </Suspense>
   );

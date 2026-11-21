@@ -84,6 +84,47 @@ body {
     0 18px 46px -22px rgba(187, 147, 60, 0.35);
 }
 
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-bone {
+  background: linear-gradient(90deg, #eae5d8 25%, #f6f3ec 50%, #eae5d8 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+.skeleton-bone-dark {
+  background: linear-gradient(90deg, #211d15 25%, #2f291e 50%, #211d15 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+.admin-shell .skeleton-bone {
+  background: linear-gradient(
+    90deg,
+    var(--admin-surface-subtle) 25%,
+    var(--admin-surface-hover) 50%,
+    var(--admin-surface-subtle) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-bone,
+  .skeleton-bone-dark,
+  .admin-shell .skeleton-bone {
+    animation: none;
+    background-size: 100% 100%;
+  }
+}
+
 /* ============================================================================
    Admin & Staff Dashboard — Low-Eye-Strain Soft Light & Soft Dark Navy Theme
    Scoped strictly to `.admin-shell` so public pages retain their own palette.

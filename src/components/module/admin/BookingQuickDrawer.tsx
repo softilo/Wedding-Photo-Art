@@ -285,13 +285,25 @@ export function BookingQuickDrawer({
           )}
 
           {loading && !booking ? (
-            <div className="space-y-3 animate-pulse">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="h-16 rounded-lg bg-[var(--admin-surface-subtle)]" />
-                <div className="h-16 rounded-lg bg-[var(--admin-surface-subtle)]" />
+            <div role="status" aria-busy="true" aria-label="Loading booking details" className="space-y-4">
+              <span className="sr-only">Loading booking details...</span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="rounded-lg border border-[var(--admin-border)] p-3 space-y-2"
+                  >
+                    <div className="h-2.5 w-16 rounded skeleton-bone" />
+                    <div className="h-5 w-20 rounded skeleton-bone" />
+                  </div>
+                ))}
               </div>
-              <div className="h-28 rounded-lg bg-[var(--admin-surface-subtle)]" />
-              <div className="h-28 rounded-lg bg-[var(--admin-surface-subtle)]" />
+              <div className="h-16 rounded-lg skeleton-bone" />
+              <div className="space-y-2">
+                {[1, 2, 3].map((row) => (
+                  <div key={row} className="h-14 rounded-lg skeleton-bone" />
+                ))}
+              </div>
             </div>
           ) : (
             booking && (

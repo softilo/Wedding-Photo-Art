@@ -39,7 +39,7 @@ async function AdminCatalogContent() {
 
 export default function AdminCatalogPage() {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading packages..." />}>
+    <Suspense fallback={<PageSkeleton variant="admin-table" label="Loading packages..." />}>
       <AdminCatalogContent />
     </Suspense>
   );

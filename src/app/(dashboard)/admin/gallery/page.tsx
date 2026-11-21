@@ -25,7 +25,7 @@ async function AdminGalleryContent() {
 
 export default function AdminGalleryPage() {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading gallery..." />}>
+    <Suspense fallback={<PageSkeleton variant="admin-gallery" label="Loading gallery..." />}>
       <AdminGalleryContent />
     </Suspense>
   );

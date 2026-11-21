@@ -58,7 +58,7 @@ async function AdminPortfolioContent({ searchParams }: AdminPortfolioPageProps) 
 
 export default function AdminPortfolioPage({ searchParams }: AdminPortfolioPageProps) {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading client digital portfolios..." />}>
+    <Suspense fallback={<PageSkeleton variant="admin-gallery" label="Loading client digital portfolios..." />}>
       <AdminPortfolioContent searchParams={searchParams} />
     </Suspense>
   );

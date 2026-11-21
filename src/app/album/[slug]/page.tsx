@@ -30,11 +30,7 @@ async function DigitalAlbumContent({ params }: AlbumSlugPageProps) {
 export default function AlbumSlugPage({ params }: AlbumSlugPageProps) {
   return (
     <Suspense
-      fallback={
-        <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center p-6">
-          <PageSkeleton label="Opening digital album..." />
-        </div>
-      }
+      fallback={<PageSkeleton variant="album" label="Opening digital album..." />}
     >
       <DigitalAlbumContent params={params} />
     </Suspense>

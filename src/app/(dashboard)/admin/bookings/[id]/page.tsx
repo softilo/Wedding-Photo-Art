@@ -89,7 +89,7 @@ export default function AdminBookingDetailPage({
   searchParams,
 }: AdminBookingDetailPageProps) {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading booking workspace..." />}>
+    <Suspense fallback={<PageSkeleton variant="admin-detail" label="Loading booking workspace..." />}>
       <AdminBookingDetailContent params={params} searchParams={searchParams} />
     </Suspense>
   );

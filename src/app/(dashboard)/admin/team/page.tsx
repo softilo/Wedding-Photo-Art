@@ -50,7 +50,7 @@ async function AdminTeamContent({ searchParams }: AdminTeamPageProps) {
 
 export default function AdminTeamPage({ searchParams }: AdminTeamPageProps) {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading studio team & crew..." />}>
+    <Suspense fallback={<PageSkeleton variant="admin-table" label="Loading studio team & crew..." />}>
       <AdminTeamContent searchParams={searchParams} />
     </Suspense>
   );

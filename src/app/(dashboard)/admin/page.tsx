@@ -51,7 +51,7 @@ async function AdminOverviewContent() {
 
 export default function AdminOverviewPage() {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading studio overview..." />}>
+    <Suspense fallback={<PageSkeleton variant="admin-overview" label="Loading studio overview..." />}>
       <AdminOverviewContent />
     </Suspense>
   );

@@ -14,11 +14,7 @@ export default function ShortAlbumRedirectPage({
 }) {
   return (
     <Suspense
-      fallback={
-        <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center p-6">
-          <PageSkeleton label="Opening digital album..." />
-        </div>
-      }
+      fallback={<PageSkeleton variant="album" label="Opening digital album..." />}
     >
       <RedirectToAlbum params={params} />
     </Suspense>

@@ -82,10 +82,8 @@ export function LazyAlbumImage({
         <div
           aria-hidden="true"
           className={cn(
-            'absolute inset-0 animate-pulse',
-            darkSurface
-              ? 'bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900'
-              : 'bg-gradient-to-br from-stone-200 via-stone-100 to-stone-200',
+            'absolute inset-0',
+            darkSurface ? 'skeleton-bone-dark' : 'skeleton-bone',
           )}
         />
       )}

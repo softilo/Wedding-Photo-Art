@@ -47,7 +47,7 @@ async function AdminQuotesContent({ searchParams }: AdminQuotesPageProps) {
 
 export default function AdminQuotesPage({ searchParams }: AdminQuotesPageProps) {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading price quotes..." />}>
+    <Suspense fallback={<PageSkeleton variant="admin-table" label="Loading price quotes..." />}>
       <AdminQuotesContent searchParams={searchParams} />
     </Suspense>
   );

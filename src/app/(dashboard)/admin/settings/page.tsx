@@ -25,7 +25,7 @@ async function AdminSettingsContent() {
 
 export default function AdminSettingsPage() {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading branding & studio rules..." />}>
+    <Suspense fallback={<PageSkeleton variant="admin-settings" label="Loading branding & studio rules..." />}>
       <AdminSettingsContent />
     </Suspense>
   );
