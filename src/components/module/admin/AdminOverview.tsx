@@ -433,14 +433,14 @@ export function AdminOverview({
 
   return (
     <div className="space-y-6">
-      {/* Wedding PhotoArt Obsidian & Gold Studio Command Spotlight */}
-      <section className="relative overflow-hidden rounded-2xl border border-[#CAA650]/35 bg-[#14120E] text-[#F9F8F5] shadow-sm">
+      {/* Wedding PhotoArt Obsidian Noir & Gold Studio Command Spotlight */}
+      <section className="relative overflow-hidden rounded-2xl border border-[#D4AF56]/35 bg-gradient-to-br from-[#14141B] via-[#121218] to-[#1D1912] text-[#F7F5EF] shadow-sm">
         <div className="h-[2px] w-full bg-gradient-to-r from-[#8B6A21] via-[#E7D1AA] to-[#8B6A21]" />
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full opacity-20 blur-3xl"
           style={{
-            background: 'radial-gradient(circle, #CAA650 0%, transparent 70%)',
+            background: 'radial-gradient(circle, #D4AF56 0%, transparent 70%)',
           }}
         />
         <div
@@ -463,18 +463,18 @@ export function AdminOverview({
                   className="rounded-xl shadow-sm"
                 />
                 <div className="min-w-0">
-                  <div className="inline-flex items-center gap-1.5 rounded-full border border-[#CAA650]/35 bg-[#CAA650]/10 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider text-[#E7D1AA]">
-                    <StarIcon className="w-3 h-3 text-[#CAA650]" />
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-[#D4AF56]/35 bg-[#D4AF56]/10 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider text-[#E7D1AA]">
+                    <StarIcon className="w-3 h-3 text-[#D4AF56]" />
                     <span>Studio Command Cockpit</span>
                   </div>
-                  <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-[#F9F8F5] mt-1.5 truncate">
+                  <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-[#F7F5EF] mt-1.5 truncate">
                     {settings?.displayName || 'Wedding PhotoArt'}
                   </h1>
                 </div>
               </div>
 
-              <p className="text-[13px] leading-relaxed text-[#E7D1AA]/85 tabular-nums">
-                <span className="text-[#CAA650] font-medium">{formattedAnchorDate}</span> •{' '}
+              <p className="text-[13px] leading-relaxed text-[#D8D4CA] tabular-nums">
+                <span className="text-[#E7D1AA] font-medium">{formattedAnchorDate}</span> •{' '}
                 {confirmedCount} confirmed bookings • {newInquiriesCount} new inquiries •{' '}
                 {upcomingSessions.length} shoots in the next 14 days
                 {totalAlerts > 0 ? ` • ${totalAlerts} items awaiting action` : ''}
@@ -484,14 +484,14 @@ export function AdminOverview({
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
               <Link
                 href="/admin/calendar"
-                className="inline-flex items-center gap-2 rounded-lg border border-[#CAA650]/40 bg-white/5 px-3.5 py-2 text-[13px] font-medium text-[#F9F8F5] hover:bg-white/10 transition-colors"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3.5 py-2 text-[13px] font-medium text-[#F7F5EF] hover:border-[#D4AF56]/55 hover:bg-white/10 transition-colors"
               >
-                <CalendarIcon className="w-4 h-4 text-[#CAA650]" />
+                <CalendarIcon className="w-4 h-4 text-[#D4AF56]" />
                 <span>Shoot Calendar</span>
               </Link>
               <Link
                 href="/admin/bookings"
-                className="inline-flex items-center gap-2 rounded-lg bg-[#CAA650] px-3.5 py-2 text-[13px] font-semibold text-[#181611] hover:bg-[#E7D1AA] transition-colors"
+                className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-b from-[#E2C06C] to-[#CCA449] px-3.5 py-2 text-[13px] font-semibold text-[#12100B] hover:from-[#EBD089] hover:to-[#D4AF56] transition-all"
               >
                 <span>All Bookings</span>
                 <ArrowRightIcon className="w-4 h-4" />
@@ -499,9 +499,9 @@ export function AdminOverview({
               {financialReport && (
                 <Link
                   href="/admin/finance"
-                  className="inline-flex items-center gap-2 rounded-lg border border-[#CAA650]/25 px-3.5 py-2 text-[13px] font-medium text-[#E7D1AA] hover:border-[#CAA650]/55 hover:bg-white/5 transition-colors"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[#D4AF56]/30 px-3.5 py-2 text-[13px] font-medium text-[#E7D1AA] hover:border-[#D4AF56]/60 hover:bg-white/5 transition-colors"
                 >
-                  <ReceiptIcon className="w-4 h-4 text-[#CAA650]" />
+                  <ReceiptIcon className="w-4 h-4 text-[#D4AF56]" />
                   <span>Finance Ledger</span>
                 </Link>
               )}
@@ -520,34 +520,34 @@ export function AdminOverview({
                       focus: 'schedule',
                     })
                   }
-                  className="group w-full text-left rounded-xl border border-[#CAA650]/30 bg-[#1C1913] p-4 flex flex-col justify-between gap-3 hover:border-[#CAA650] hover:bg-[#231F17] transition-all cursor-pointer"
+                  className="group w-full text-left rounded-xl border border-[#D4AF56]/25 bg-[#1A1A22] p-4 flex flex-col justify-between gap-3 hover:border-[#D4AF56]/70 hover:bg-[#22222C] transition-all cursor-pointer"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-[#E7D1AA]">
                       <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                       Next Shoot Countdown
                     </span>
-                    <ClockIcon className="w-4 h-4 text-[#CAA650]" />
+                    <ClockIcon className="w-4 h-4 text-[#D4AF56]" />
                   </div>
 
                   <div>
-                    <p className="text-2xl font-semibold tracking-tight text-[#CAA650] tabular-nums">
+                    <p className="text-2xl font-semibold tracking-tight text-[#D4AF56] tabular-nums">
                       {nextShootSpotlight.countdownLabel}
                     </p>
-                    <p className="text-[13.5px] font-medium text-[#F9F8F5] line-clamp-1 mt-0.5">
+                    <p className="text-[13.5px] font-medium text-[#F7F5EF] line-clamp-1 mt-0.5">
                       {nextShootSpotlight.session.title}
                     </p>
-                    <p className="text-[12px] text-[#E7D1AA]/75 mt-1 tabular-nums line-clamp-1">
+                    <p className="text-[12px] text-[#A1A1AA] mt-1 tabular-nums line-clamp-1">
                       {nextShootSpotlight.dateKey} •{' '}
                       {formatDateTimeInTz(nextShootSpotlight.session.startAt, timezone)}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-[#CAA650]/20 pt-2.5 text-[12px]">
-                    <span className="text-[#E7D1AA]/80 truncate">
+                  <div className="flex items-center justify-between border-t border-white/10 pt-2.5 text-[12px]">
+                    <span className="text-[#C7C5BE] truncate">
                       {nextShootSpotlight.session.booking?.reference || 'Scheduled session'}
                     </span>
-                    <span className="font-medium text-[#CAA650] group-hover:translate-x-0.5 transition-transform">
+                    <span className="font-medium text-[#D4AF56] group-hover:translate-x-0.5 transition-transform">
                       Open slot →
                     </span>
                   </div>
@@ -555,90 +555,90 @@ export function AdminOverview({
               ) : (
                 <Link
                   href="/admin/calendar"
-                  className="group w-full text-left rounded-xl border border-[#CAA650]/30 bg-[#1C1913] p-4 flex flex-col justify-between gap-3 hover:border-[#CAA650] hover:bg-[#231F17] transition-all"
+                  className="group w-full text-left rounded-xl border border-[#D4AF56]/25 bg-[#1A1A22] p-4 flex flex-col justify-between gap-3 hover:border-[#D4AF56]/70 hover:bg-[#22222C] transition-all"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-[#E7D1AA]">
                       <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                       Next Shoot Countdown
                     </span>
-                    <ClockIcon className="w-4 h-4 text-[#CAA650]" />
+                    <ClockIcon className="w-4 h-4 text-[#D4AF56]" />
                   </div>
                   <div>
-                    <p className="text-2xl font-semibold tracking-tight text-[#CAA650] tabular-nums">
+                    <p className="text-2xl font-semibold tracking-tight text-[#D4AF56] tabular-nums">
                       {nextShootSpotlight.countdownLabel}
                     </p>
-                    <p className="text-[13.5px] font-medium text-[#F9F8F5] line-clamp-1 mt-0.5">
+                    <p className="text-[13.5px] font-medium text-[#F7F5EF] line-clamp-1 mt-0.5">
                       {nextShootSpotlight.session.title}
                     </p>
-                    <p className="text-[12px] text-[#E7D1AA]/75 mt-1 tabular-nums line-clamp-1">
+                    <p className="text-[12px] text-[#A1A1AA] mt-1 tabular-nums line-clamp-1">
                       {nextShootSpotlight.dateKey} •{' '}
                       {formatDateTimeInTz(nextShootSpotlight.session.startAt, timezone)}
                     </p>
                   </div>
-                  <div className="flex items-center justify-between border-t border-[#CAA650]/20 pt-2.5 text-[12px]">
-                    <span className="text-[#E7D1AA]/80">Calendar slot</span>
-                    <span className="font-medium text-[#CAA650]">Open calendar →</span>
+                  <div className="flex items-center justify-between border-t border-white/10 pt-2.5 text-[12px]">
+                    <span className="text-[#C7C5BE]">Calendar slot</span>
+                    <span className="font-medium text-[#D4AF56]">Open calendar →</span>
                   </div>
                 </Link>
               )
             ) : (
               <Link
                 href="/admin/calendar"
-                className="group w-full text-left rounded-xl border border-dashed border-[#CAA650]/35 bg-[#1C1913] p-4 flex flex-col justify-between gap-3 hover:border-[#CAA650] transition-colors"
+                className="group w-full text-left rounded-xl border border-dashed border-[#D4AF56]/35 bg-[#1A1A22] p-4 flex flex-col justify-between gap-3 hover:border-[#D4AF56] transition-colors"
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[11px] font-medium uppercase tracking-wider text-[#E7D1AA]">
                     Next Shoot Countdown
                   </span>
-                  <CalendarIcon className="w-4 h-4 text-[#CAA650]" />
+                  <CalendarIcon className="w-4 h-4 text-[#D4AF56]" />
                 </div>
                 <div>
-                  <p className="text-lg font-semibold text-[#F9F8F5]">No Shoots in 14d Window</p>
-                  <p className="text-[12px] text-[#E7D1AA]/75 mt-1">
+                  <p className="text-lg font-semibold text-[#F7F5EF]">No Shoots in 14d Window</p>
+                  <p className="text-[12px] text-[#A1A1AA] mt-1">
                     Assign shoot dates for confirmed weddings and pre-wedding sessions.
                   </p>
                 </div>
-                <span className="text-[12px] font-medium text-[#CAA650]">
+                <span className="text-[12px] font-medium text-[#D4AF56]">
                   Schedule next shoot →
                 </span>
               </Link>
             )}
 
             {/* Studio Pipeline & Collection Meter Card */}
-            <div className="rounded-xl border border-[#CAA650]/30 bg-[#1C1913] p-4 flex flex-col justify-between gap-3">
+            <div className="rounded-xl border border-[#D4AF56]/25 bg-[#1A1A22] p-4 flex flex-col justify-between gap-3">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[11px] font-medium uppercase tracking-wider text-[#E7D1AA]">
                   {financialReport ? 'Collection Health' : 'Pipeline Readiness'}
                 </span>
-                <span className="rounded-full bg-[#CAA650]/15 px-2 py-0.5 text-[11px] font-semibold text-[#CAA650] tabular-nums">
+                <span className="rounded-full bg-[#D4AF56]/15 px-2 py-0.5 text-[11px] font-semibold text-[#E7D1AA] tabular-nums">
                   {meterPercent.toFixed(0)}%
                 </span>
               </div>
 
               <div>
-                <p className="text-2xl font-semibold tracking-tight text-[#F9F8F5] tabular-nums">
+                <p className="text-2xl font-semibold tracking-tight text-[#F7F5EF] tabular-nums">
                   {formatPoisha(totalAgreedPoisha, currency)}
                 </p>
-                <p className="text-[12px] text-[#E7D1AA]/75 mt-0.5 tabular-nums">
+                <p className="text-[12px] text-[#A1A1AA] mt-0.5 tabular-nums">
                   {financialReport
                     ? `${formatPoisha(financialReport.summary.totalOutstandingDuePoisha, currency)} outstanding balance`
                     : `${confirmedCount} confirmed of ${activeBookingsTotal} active bookings`}
                 </p>
               </div>
 
-              <div className="space-y-2 border-t border-[#CAA650]/20 pt-2.5">
+              <div className="space-y-2 border-t border-white/10 pt-2.5">
                 <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
                   <div
                     className="h-full rounded-full transition-all duration-500"
                     style={{
                       width: `${Math.max(4, meterPercent)}%`,
                       background:
-                        'linear-gradient(90deg, #8B6A21 0%, #CAA650 55%, #E7D1AA 100%)',
+                        'linear-gradient(90deg, #8B6A21 0%, #D4AF56 55%, #E7D1AA 100%)',
                     }}
                   />
                 </div>
-                <div className="flex items-center justify-between text-[11.5px] text-[#E7D1AA]/80 tabular-nums">
+                <div className="flex items-center justify-between text-[11.5px] text-[#C7C5BE] tabular-nums">
                   <span>
                     {financialReport
                       ? `${meterPercent.toFixed(1)}% collected`

@@ -166,7 +166,7 @@ export function DashboardShell({
         className={cn(
           'relative flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[13px] transition-all',
           active
-            ? 'font-semibold bg-[var(--admin-surface)] text-[var(--admin-text)] border border-[var(--admin-border)]'
+            ? 'font-semibold bg-[var(--admin-surface-subtle)] text-[var(--admin-text)] border border-[var(--admin-accent)]/35'
             : 'font-medium text-[var(--admin-muted)] hover:bg-[var(--admin-surface-hover)] hover:text-[var(--admin-text)] border border-transparent',
         )}
       >
@@ -253,9 +253,9 @@ export function DashboardShell({
             </button>
           </div>
 
-          <div className="flex items-center justify-between gap-2 px-1.5 py-1">
+          <div className="flex items-center justify-between gap-2 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-2.5 py-2">
             <div className="flex items-center gap-2 min-w-0">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--admin-accent-soft)] border border-[var(--admin-border)] text-[11px] font-semibold text-[var(--admin-accent)] tabular-nums">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--admin-accent-soft)] border border-[var(--admin-accent)]/30 text-[11px] font-semibold text-[var(--admin-accent)] tabular-nums">
                 {initials}
               </span>
               <div className="min-w-0">
