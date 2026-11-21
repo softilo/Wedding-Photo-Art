@@ -16,6 +16,7 @@ import { cn, formatDateTimeInTz, formatLocalDate, formatPoisha } from '@/lib/uti
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { BrandMark } from '@/components/common/BrandMark';
 import {
+  ApertureIcon,
   ArrowRightIcon,
   BarChartIcon,
   CalendarIcon,
@@ -26,7 +27,6 @@ import {
   FilmIcon,
   PlusIcon,
   ReceiptIcon,
-  SparklesIcon,
   StarIcon,
   UsersIcon,
 } from '@/components/shared/Icons';
@@ -754,7 +754,7 @@ export function AdminOverview({
                 Inquiries
               </span>
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
-                <SparklesIcon className="w-4 h-4" />
+                <ApertureIcon className="w-4 h-4" />
               </span>
             </div>
             <p className="text-[24px] font-semibold tracking-tight text-[var(--admin-text)] mt-2.5 tabular-nums">

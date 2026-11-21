@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { PortfolioMediaItem, PortfolioShowcaseEvent } from '@/types/event-management';
 import {
@@ -9,6 +9,7 @@ import {
   buildCloudinaryVideoPosterUrl,
 } from '@/lib/showcaseMedia';
 import { parseAlbumDescriptionAndTheme } from '@/lib/albumTheme';
+import { useModalHistoryBack } from '@/lib/useModalHistoryBack';
 import { cn, formatLocalDate } from '@/lib/utils';
 import { AdaptiveVideoPlayer } from './AdaptiveVideoPlayer';
 import { LazyViewportImage } from './LazyViewportImage';
@@ -33,6 +34,10 @@ export function PortfolioEventDetailModal({
   const [selectedPhoto, setSelectedPhoto] = useState<PortfolioMediaItem | null>(null);
   // Video Play gate: NO <video> element or video file is downloaded until the user clicks Play
   const [playingVideoIds, setPlayingVideoIds] = useState<Record<string, boolean>>({});
+  const touchStartX = useRef<number | null>(null);
+
+  useModalHistoryBack(true, onClose);
+  useModalHistoryBack(Boolean(selectedPhoto), () => setSelectedPhoto(null));
 
   const selectedPhotoIndex = selectedPhoto
     ? photos.findIndex((p) => p.id === selectedPhoto.id)
@@ -131,7 +136,7 @@ export function PortfolioEventDetailModal({
               onClick={onClose}
               className="rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
             >
-              ✕ Close
+              ← Back
             </button>
           </div>
         </div>
@@ -306,32 +311,45 @@ export function PortfolioEventDetailModal({
         <div
           role="dialog"
           aria-modal="true"
+          onTouchStart={(e) => {
+            touchStartX.current = e.touches[0]?.clientX ?? null;
+          }}
+          onTouchEnd={(e) => {
+            if (touchStartX.current === null || photos.length <= 1) return;
+            const endX = e.changedTouches[0]?.clientX ?? touchStartX.current;
+            const diff = touchStartX.current - endX;
+            touchStartX.current = null;
+            if (Math.abs(diff) > 45) {
+              if (diff > 0) goNextPhoto();
+              else goPrevPhoto();
+            }
+          }}
           onClick={(e) => {
             e.stopPropagation();
             if (e.target === e.currentTarget) setSelectedPhoto(null);
           }}
-          className="fixed inset-0 z-60 flex flex-col items-center justify-between bg-slate-950/95 p-4"
+          className="fixed inset-0 z-60 flex flex-col items-center justify-between bg-[#14120E]/95 p-3 sm:p-4 touch-pan-y select-none"
         >
-          <div className="w-full max-w-5xl flex items-center justify-between text-white pb-2">
-            <div>
+          <div className="w-full max-w-5xl flex items-center justify-between text-white pb-2 gap-3">
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-mono-code">
+                <span className="rounded-full bg-[#CAA650]/25 border border-[#CAA650]/40 px-2.5 py-0.5 text-xs font-medium text-[#E7D1AA] shrink-0 tabular-nums">
                   {selectedPhotoIndex + 1} / {photos.length}
                 </span>
-                <p className="text-sm font-semibold">
+                <p className="text-sm font-semibold truncate">
                   {selectedPhoto.caption || event.title}
                 </p>
               </div>
               {selectedPhoto.altText && (
-                <p className="text-xs text-slate-400 mt-0.5">{selectedPhoto.altText}</p>
+                <p className="text-xs text-[#C7BFA9] mt-0.5 truncate">{selectedPhoto.altText}</p>
               )}
             </div>
             <button
               type="button"
               onClick={() => setSelectedPhoto(null)}
-              className="rounded-xl border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-white/20 cursor-pointer"
+              className="shrink-0 rounded-xl border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-white/20 cursor-pointer"
             >
-              ✕ Back to Gallery
+              ← Back to Album
             </button>
           </div>
 

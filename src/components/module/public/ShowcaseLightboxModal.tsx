@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PortfolioItem } from '@/types/event-management';
 import {
   buildCloudinaryImageUrl,
   buildCloudinaryVideoPosterUrl,
   parseShowcaseMedia,
 } from '@/lib/showcaseMedia';
+import { useModalHistoryBack } from '@/lib/useModalHistoryBack';
 
 interface ShowcaseLightboxModalProps {
   item: PortfolioItem;
@@ -17,6 +18,9 @@ export function ShowcaseLightboxModal({ item, onClose }: ShowcaseLightboxModalPr
   const media = parseShowcaseMedia(item.mediaUrl);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+
+  useModalHistoryBack(true, onClose);
 
   const totalPhotos = media.photos.length;
   const activePhoto = media.photos[photoIndex] || media.coverUrl;
@@ -47,37 +51,59 @@ export function ShowcaseLightboxModal({ item, onClose }: ShowcaseLightboxModalPr
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#14120E]/90 p-4 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#14120E]/92 p-3 sm:p-4 backdrop-blur-xs"
     >
       <div className="w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl bg-[#181611] text-white border border-white/10 shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="shrink-0 flex items-center justify-between gap-4 px-5 py-4 border-b border-white/10">
+        <div className="shrink-0 flex items-center justify-between gap-4 px-4 sm:px-5 py-3.5 sm:py-4 border-b border-white/10">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <span className="rounded-full bg-[#CAA650]/20 border border-[#CAA650]/35 px-2.5 py-0.5 text-xs font-medium text-[#E7D1AA]">
                 {media.kind === 'video'
                   ? 'Video Film'
                   : totalPhotos > 1
-                    ? `Photo Gallery (${photoIndex + 1} / ${totalPhotos})`
+                    ? `${photoIndex + 1} / ${totalPhotos}`
                     : 'Photo'}
               </span>
-              <h3 className="text-base font-semibold tracking-tight truncate">{item.title}</h3>
+              <h3 className="text-sm sm:text-base font-semibold tracking-tight truncate">
+                {item.title}
+              </h3>
             </div>
             {item.description && (
-              <p className="text-xs text-slate-400 mt-0.5 truncate">{item.description}</p>
+              <p className="text-xs text-[#C7BFA9] mt-0.5 truncate">{item.description}</p>
             )}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 rounded-xl border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-white/15 transition-colors cursor-pointer"
+            className="shrink-0 rounded-xl border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-white/20 transition-colors cursor-pointer"
           >
-            ✕ Close
+            ← Back
           </button>
         </div>
 
         {/* Media Stage */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col items-center justify-center gap-4">
+        <div
+          onTouchStart={(e) => {
+            touchStartX.current = e.touches[0]?.clientX ?? null;
+          }}
+          onTouchEnd={(e) => {
+            if (media.kind !== 'photo' || totalPhotos <= 1 || touchStartX.current === null) {
+              return;
+            }
+            const endX = e.changedTouches[0]?.clientX ?? touchStartX.current;
+            const diff = touchStartX.current - endX;
+            touchStartX.current = null;
+            if (Math.abs(diff) > 45) {
+              if (diff > 0) {
+                setPhotoIndex((prev) => (prev + 1) % totalPhotos);
+              } else {
+                setPhotoIndex((prev) => (prev - 1 + totalPhotos) % totalPhotos);
+              }
+            }
+          }}
+          className="flex-1 overflow-y-auto p-3 sm:p-6 flex flex-col items-center justify-center gap-4 touch-pan-y"
+        >
           {media.kind === 'video' ? (
             <div className="w-full aspect-video rounded-xl overflow-hidden bg-black relative">
               {!isPlayingVideo ? (

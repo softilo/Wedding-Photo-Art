@@ -9,6 +9,7 @@ import {
 } from '@/types/event-management';
 import { buildCloudinaryVideoPosterUrl } from '@/lib/showcaseMedia';
 import { parseAlbumDescriptionAndTheme } from '@/lib/albumTheme';
+import { useModalHistoryBack } from '@/lib/useModalHistoryBack';
 import { cn } from '@/lib/utils';
 import { BrandMark } from '@/components/common/BrandMark';
 import { AdaptiveVideoPlayer } from './AdaptiveVideoPlayer';
@@ -79,6 +80,11 @@ export function PortfolioEventPageClient({
   const [copiedAlbumUrl, setCopiedAlbumUrl] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const loadMoreSentinelRef = useRef<HTMLDivElement | null>(null);
+
+  useModalHistoryBack(Boolean(selectedPhoto), () => {
+    setSelectedPhoto(null);
+    setIsSlideshowPlaying(false);
+  });
 
   // SSR-safe localStorage Favorites shortlist per album
   const favStorageKey = `album_favorites_${event.id}`;
@@ -930,9 +936,9 @@ export function PortfolioEventPageClient({
                   setSelectedPhoto(null);
                   setIsSlideshowPlaying(false);
                 }}
-                className="rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white hover:bg-white/20 cursor-pointer"
+                className="rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-white/20 cursor-pointer"
               >
-                ✕
+                ← Back
               </button>
             </div>
           </div>

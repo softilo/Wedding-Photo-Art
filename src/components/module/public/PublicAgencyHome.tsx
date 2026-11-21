@@ -16,18 +16,19 @@ import { isNextOptimizableUrl } from '@/lib/showcaseMedia';
 import { BrandMark } from '@/components/common/BrandMark';
 import { formatPoisha, cn } from '@/lib/utils';
 import {
+  ApertureIcon,
   ArrowRightIcon,
   CameraIcon,
   CheckCircleIcon,
   ChevronDownIcon,
   ExternalLinkIcon,
   FilmIcon,
+  LayersIcon,
   MailIcon,
   MapPinIcon,
   MessageCircleIcon,
   PhoneIcon,
   ShieldCheckIcon,
-  SparklesIcon,
   StarIcon,
 } from '@/components/shared/Icons';
 import { InquiryForm } from './InquiryForm';
@@ -158,7 +159,7 @@ export function PublicAgencyHome({
           <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
             <div className="lg:col-span-7 space-y-6">
               <div className="inline-flex flex-wrap items-center gap-2 rounded-full border border-[#DFCEAA] bg-white/95 px-4 py-1.5 text-xs font-semibold text-[#4A4438] shadow-2xs">
-                <SparklesIcon className="w-3.5 h-3.5" style={{ color: accent }} />
+                <ApertureIcon className="w-3.5 h-3.5" style={{ color: accent }} />
                 <span>{branding.displayName}</span>
                 <span className="text-[#C9B996]">•</span>
                 <span className="text-[#7A5E21]">{STUDIO_PROFILE.city}</span>
@@ -564,7 +565,7 @@ export function PublicAgencyHome({
                   body: 'Sculpted lighting for Engagement, Bridal, and Couple portraits inside our Grand Haque Tower studio or your banquet hall.',
                 },
                 {
-                  icon: SparklesIcon,
+                  icon: LayersIcon,
                   label: 'Online Delivery',
                   title: 'Custom-Themed Digital Albums',
                   body: 'Every couple receives a shareable, custom-themed digital gallery with lossless viewing and film streaming.',

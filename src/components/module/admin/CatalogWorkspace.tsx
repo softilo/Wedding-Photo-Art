@@ -23,7 +23,7 @@ import {
   updateTaskTemplate,
 } from '@/service/catalog/catalog.service';
 import { cn, formatPoisha } from '@/lib/utils';
-import { PaletteIcon, PlusIcon, SparklesIcon, UsersIcon } from '@/components/shared/Icons';
+import { PaletteIcon, PlusIcon, SlidersIcon, UsersIcon } from '@/components/shared/Icons';
 
 export type StudioSetupSection = 'catalog' | 'team' | 'settings';
 
@@ -623,7 +623,7 @@ export function CatalogWorkspace({
           {teamTab === 'automation' && (
             <div className="space-y-5">
               <div className="rounded-xl border border-indigo-200 bg-indigo-50/70 px-4 py-3 text-xs text-indigo-950 flex items-center gap-2.5">
-                <SparklesIcon className="w-4 h-4 text-indigo-600 shrink-0" />
+                <SlidersIcon className="w-4 h-4 text-indigo-600 shrink-0" />
                 <span>
                   <strong>Auto-Provisioning on Confirmation:</strong> When a booking is confirmed,
                   matching Deliverables and Crew Tasks below are automatically created for that

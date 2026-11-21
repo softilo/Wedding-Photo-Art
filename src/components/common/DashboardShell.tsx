@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { BrandMark } from './BrandMark';
 import { NotificationBell } from './NotificationBell';
 import {
+  ApertureIcon,
   CalendarIcon,
   CameraIcon,
   CheckCircleIcon,
@@ -19,7 +20,7 @@ import {
   PlusIcon,
   ReceiptIcon,
   ShieldCheckIcon,
-  SparklesIcon,
+  SlidersIcon,
   UsersIcon,
 } from '@/components/shared/Icons';
 
@@ -107,7 +108,7 @@ export function DashboardShell({
   const primaryNav: NavItem[] = isStaffOnly
     ? [{ href: '/staff', label: 'My Shoots & Tasks', icon: CheckCircleIcon }]
     : [
-        { href: '/admin', label: 'Studio Pulse', icon: SparklesIcon, exact: true },
+        { href: '/admin', label: 'Studio Pulse', icon: ApertureIcon, exact: true },
         { href: '/admin/inquiries', label: 'Inquiries', icon: CameraIcon },
         { href: '/admin/quotes', label: 'Quotes', icon: ReceiptIcon },
         { href: '/admin/bookings', label: 'Bookings', icon: ShieldCheckIcon },
@@ -126,7 +127,7 @@ export function DashboardShell({
         { href: '/admin/catalog', label: 'Packages', icon: PaletteIcon },
         { href: '/admin/crew', label: 'Crew & Gear', icon: UsersIcon },
         { href: '/admin/team', label: 'Team & Rules', icon: ShieldCheckIcon },
-        { href: '/admin/settings', label: 'Settings', icon: SparklesIcon },
+        { href: '/admin/settings', label: 'Settings', icon: SlidersIcon },
       ];
 
   const allItems = [...primaryNav, ...studioNav];

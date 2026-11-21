@@ -19,8 +19,16 @@ import {
   parseShowcaseMedia,
 } from '@/lib/showcaseMedia';
 import { parseAlbumDescriptionAndTheme } from '@/lib/albumTheme';
+import { useModalHistoryBack } from '@/lib/useModalHistoryBack';
 import { cn, formatLocalDate } from '@/lib/utils';
-import { ArrowRightIcon, CalendarIcon, CameraIcon, SearchIcon } from '@/components/shared/Icons';
+import {
+  ArrowRightIcon,
+  CalendarIcon,
+  CameraIcon,
+  GalleryHorizontalIcon,
+  LayoutGridIcon,
+  SearchIcon,
+} from '@/components/shared/Icons';
 import { AdaptiveVideoPlayer } from './AdaptiveVideoPlayer';
 import { LazyViewportImage } from './LazyViewportImage';
 import { PortfolioEventDetailModal } from './PortfolioEventDetailModal';
@@ -59,6 +67,9 @@ export function PublicPortfolioShowcase({
   initialGalleryMedia = [],
 }: PublicPortfolioShowcaseProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
+  const mobileRailRef = useRef<HTMLDivElement | null>(null);
+  const lightboxTouchStartX = useRef<number | null>(null);
+
   // Strict section-level gate: DO NOT fetch or mount any gallery media until user scrolls to #portfolio
   const [hasEnteredSection, setHasEnteredSection] = useState(false);
   const [isLoadingMedia, setIsLoadingMedia] = useState(false);
@@ -67,6 +78,8 @@ export function PublicPortfolioShowcase({
   const [showcaseEvents, setShowcaseEvents] = useState<PortfolioShowcaseEvent[]>(initialEvents);
 
   const [mediaFilter, setMediaFilter] = useState<'all' | 'photo' | 'video' | 'stories'>('all');
+  const [mobilePhotoMode, setMobilePhotoMode] = useState<'swipe' | 'grid'>('swipe');
+  const [mobileSlideIndex, setMobileSlideIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [visiblePhotoCount, setVisiblePhotoCount] = useState(INITIAL_PHOTO_BATCH);
 
@@ -80,6 +93,8 @@ export function PublicPortfolioShowcase({
     null,
   );
   const [activeShowcaseItem, setActiveShowcaseItem] = useState<PortfolioItem | null>(null);
+
+  useModalHistoryBack(Boolean(selectedGalleryPhoto), () => setSelectedGalleryPhoto(null));
 
   // 1. Observe when the user scrolls near #portfolio
   useEffect(() => {
@@ -464,13 +479,18 @@ export function PublicPortfolioShowcase({
                     </div>
                   </div>
 
-                  {/* Interactive Reel Switcher Playlist when 2+ films */}
+                  {/* Interactive Reel Switcher Playlist — Horizontal Snap Rail on Mobile, Playlist Column on Desktop */}
                   {filteredVideos.length > 1 && (
                     <div className="lg:col-span-4 space-y-2.5">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#9C937E] px-1">
-                        Film Reels ({filteredVideos.length})
-                      </p>
-                      <div className="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+                      <div className="flex items-center justify-between px-1">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#9C937E]">
+                          Film Reels ({filteredVideos.length})
+                        </p>
+                        <span className="lg:hidden text-[11px] text-[#E7D1AA]/80">
+                          Swipe reels →
+                        </span>
+                      </div>
+                      <div className="flex lg:flex-col gap-2.5 overflow-x-auto lg:overflow-x-visible lg:overflow-y-auto snap-x snap-mandatory lg:max-h-[420px] pb-1 lg:pb-0 lg:pr-1 no-scrollbar">
                         {filteredVideos.map((reel, idx) => {
                           const isCurrent = reel.id === activeFilm.id;
                           const poster =
@@ -487,13 +507,13 @@ export function PublicPortfolioShowcase({
                                 setPlayingVideoIds((prev) => ({ ...prev, [reel.id]: true }));
                               }}
                               className={cn(
-                                'w-full text-left rounded-2xl border p-2.5 flex items-center gap-3 transition-all cursor-pointer',
+                                'w-[70vw] sm:w-[260px] lg:w-full shrink-0 snap-start text-left rounded-2xl border p-2.5 flex items-center gap-3 transition-all cursor-pointer',
                                 isCurrent
                                   ? 'border-[#E7D1AA]/75 bg-white/10 shadow-sm'
                                   : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.07] hover:border-white/25',
                               )}
                             >
-                              <div className="relative h-16 w-24 shrink-0 rounded-xl overflow-hidden bg-black">
+                              <div className="relative h-14 w-20 lg:h-16 lg:w-24 shrink-0 rounded-xl overflow-hidden bg-black">
                                 {poster && (
                                   // eslint-disable-next-line @next/next/no-img-element
                                   <img
@@ -524,7 +544,7 @@ export function PublicPortfolioShowcase({
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-xs font-semibold text-white leading-snug">
+                                <p className="text-xs font-semibold text-white leading-snug truncate">
                                   Highlight Film {String(idx + 1).padStart(2, '0')}
                                 </p>
                               </div>
@@ -538,85 +558,320 @@ export function PublicPortfolioShowcase({
               </div>
             )}
 
-            {/* SUB-STAGE B: EDITORIAL TRUE-ASPECT PHOTOGRAPHY MASONRY */}
-            {visiblePhotos.length > 0 && (
-              <div className="space-y-5">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#ECE6D8] pb-3">
-                  <div className="flex items-center gap-2.5">
-                    <span className="inline-flex h-2 w-2 rounded-full bg-[#CAA650]" />
-                    <h3 className="font-editorial text-2xl font-semibold text-[#181611]">
-                      Photography Wall
-                    </h3>
-                    <span className="rounded-full bg-[#F8F3E6] border border-[#DFCEAA] px-2.5 py-0.5 text-[11px] font-mono-code text-[#6B6352]">
-                      {filteredPhotos.length} frames
-                    </span>
-                  </div>
-                  <p className="text-xs text-[#6B6352]">
-                    Original portrait &amp; landscape framing — click any frame for full resolution
-                  </p>
-                </div>
+            {/* SUB-STAGE B: EDITORIAL PHOTOGRAPHY GALLERY (Distinct Mobile Experience + Desktop Masonry) */}
+            {visiblePhotos.length > 0 && (() => {
+              const clampedMobileSlide = Math.min(mobileSlideIndex, visiblePhotos.length - 1);
+              const progressPct = Math.max(
+                8,
+                Math.round(((clampedMobileSlide + 1) / visiblePhotos.length) * 100),
+              );
 
-                <div className="columns-1 sm:columns-2 lg:columns-3 gap-5">
-                  {visiblePhotos.map((media) => {
-                    const thumbUrl =
-                      buildCloudinaryImageUrl(media.secureUrl, {
-                        width: 960,
-                        crop: 'limit',
-                      }) ||
-                      media.deliveryUrls?.thumbnailUrl ||
-                      media.secureUrl;
-                    const aspectRatio = resolveNaturalAspectRatio(media.width, media.height);
+              const jumpToMobileCard = (targetIdx: number) => {
+                const rail = mobileRailRef.current;
+                if (!rail) return;
+                const clamped = Math.max(0, Math.min(targetIdx, visiblePhotos.length - 1));
+                const card = rail.children.item(clamped) as HTMLElement | null;
+                if (card) {
+                  card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
+                setMobileSlideIndex(clamped);
+              };
 
-                    return (
-                      <button
-                        key={media.id}
-                        type="button"
-                        onClick={() => setSelectedGalleryPhoto(media)}
-                        className="group relative mb-5 break-inside-avoid block w-full text-left rounded-2xl overflow-hidden border border-[#E5DFD0] bg-[#EFECE3] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CAA650] shadow-2xs hover:shadow-[0_18px_40px_-18px_rgba(24,22,17,0.28)] transition-all duration-300"
-                      >
-                        <LazyViewportImage
-                          src={thumbUrl}
-                          srcSet={buildCloudinarySrcSet(media.secureUrl, [480, 800, 1200])}
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
-                          alt={media.altText || media.caption || branding.displayName}
-                          containerStyle={{ aspectRatio }}
-                          containerClassName="w-full"
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                        />
-
-                        {/* Clean Floating Exhibition Scrim Overlay */}
-                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#14120E]/85 via-[#14120E]/30 to-transparent p-4 pt-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between gap-2">
-                          <div className="min-w-0">
-                            <p className="text-xs sm:text-sm font-semibold text-white truncate">
-                              {media.caption || media.altText || 'Full-Resolution Frame'}
-                            </p>
-                          </div>
-                          <span className="shrink-0 rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-bold text-[#181611]">
-                            ⤢ View
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {hasMorePhotos && (
-                  <div className="flex justify-center pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setVisiblePhotoCount((prev) => prev + INITIAL_PHOTO_BATCH)}
-                      className="inline-flex items-center gap-2 rounded-xl border bg-[#F8F3E6] px-6 py-3 text-xs sm:text-sm font-semibold text-[#181611] shadow-2xs hover:bg-white transition-all cursor-pointer"
-                      style={{ borderColor: accent }}
-                    >
-                      <span>
-                        Load More Photography ({filteredPhotos.length - visiblePhotos.length}{' '}
-                        remaining)
+              return (
+                <div className="space-y-4 sm:space-y-5">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#ECE6D8] pb-3">
+                    <div className="flex items-center gap-2.5">
+                      <span className="inline-flex h-2 w-2 rounded-full bg-[#CAA650]" />
+                      <h3 className="font-editorial text-2xl font-semibold text-[#181611]">
+                        Photography Wall
+                      </h3>
+                      <span className="rounded-full bg-[#F8F3E6] border border-[#DFCEAA] px-2.5 py-0.5 text-[11px] font-mono-code text-[#6B6352] tabular-nums">
+                        {filteredPhotos.length} frames
                       </span>
-                    </button>
+                    </div>
+
+                    {/* Desktop caption helper */}
+                    <p className="hidden sm:block text-xs text-[#6B6352]">
+                      Original portrait &amp; landscape framing — click any frame for full resolution
+                    </p>
+
+                    {/* Distinct Mobile Mode Toggle: Story Swipe vs 2-Col Lookbook Grid */}
+                    <div className="sm:hidden inline-flex rounded-xl border border-[#DFCEAA] bg-[#F8F3E6] p-1 gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setMobilePhotoMode('swipe')}
+                        className={cn(
+                          'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer',
+                          mobilePhotoMode === 'swipe'
+                            ? 'bg-[#181611] text-white shadow-2xs'
+                            : 'text-[#4A4438]',
+                        )}
+                      >
+                        <GalleryHorizontalIcon className="w-3.5 h-3.5" />
+                        <span>Story Swipe</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setMobilePhotoMode('grid')}
+                        className={cn(
+                          'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer',
+                          mobilePhotoMode === 'grid'
+                            ? 'bg-[#181611] text-white shadow-2xs'
+                            : 'text-[#4A4438]',
+                        )}
+                      >
+                        <LayoutGridIcon className="w-3.5 h-3.5" />
+                        <span>2-Col Grid</span>
+                      </button>
+                    </div>
                   </div>
-                )}
-              </div>
-            )}
+
+                  {/* MOBILE VIEW A: Thumb-Friendly Horizontal Snap-Scroll Lookbook Deck */}
+                  {mobilePhotoMode === 'swipe' && (
+                    <div className="sm:hidden space-y-3">
+                      <div className="flex items-center justify-between text-[11.5px] text-[#6B6352]">
+                        <span className="font-medium tabular-nums">
+                          Frame <strong className="text-[#181611]">{clampedMobileSlide + 1}</strong> of{' '}
+                          {visiblePhotos.length} • Tap photo for full screen
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => jumpToMobileCard(clampedMobileSlide - 1)}
+                            disabled={clampedMobileSlide === 0}
+                            aria-label="Previous gallery frame"
+                            className="h-7 w-7 rounded-full border border-[#DFCEAA] bg-[#F8F3E6] text-xs font-bold text-[#181611] disabled:opacity-40 cursor-pointer"
+                          >
+                            ‹
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => jumpToMobileCard(clampedMobileSlide + 1)}
+                            disabled={clampedMobileSlide >= visiblePhotos.length - 1}
+                            aria-label="Next gallery frame"
+                            className="h-7 w-7 rounded-full border border-[#DFCEAA] bg-[#F8F3E6] text-xs font-bold text-[#181611] disabled:opacity-40 cursor-pointer"
+                          >
+                            ›
+                          </button>
+                        </div>
+                      </div>
+
+                      <div
+                        ref={mobileRailRef}
+                        onScroll={(e) => {
+                          const rail = e.currentTarget;
+                          const firstCard = rail.firstElementChild as HTMLElement | null;
+                          if (!firstCard) return;
+                          const step = firstCard.offsetWidth + 14;
+                          if (step <= 0) return;
+                          const next = Math.max(
+                            0,
+                            Math.min(Math.round(rail.scrollLeft / step), visiblePhotos.length - 1),
+                          );
+                          if (next !== mobileSlideIndex) {
+                            setMobileSlideIndex(next);
+                          }
+                        }}
+                        className="flex overflow-x-auto snap-x snap-mandatory gap-3.5 px-4 -mx-4 pb-1 no-scrollbar"
+                      >
+                        {visiblePhotos.map((media, idx) => {
+                          const thumbUrl =
+                            buildCloudinaryImageUrl(media.secureUrl, {
+                              width: 900,
+                              crop: 'limit',
+                            }) ||
+                            media.deliveryUrls?.thumbnailUrl ||
+                            media.secureUrl;
+
+                          return (
+                            <button
+                              key={media.id}
+                              type="button"
+                              onClick={() => setSelectedGalleryPhoto(media)}
+                              className="relative w-[82vw] max-w-[330px] shrink-0 snap-center aspect-[4/5] rounded-2xl overflow-hidden border border-[#DFCEAA] bg-[#EFECE3] text-left shadow-sm active:scale-[0.99] transition-transform cursor-pointer"
+                            >
+                              <LazyViewportImage
+                                src={thumbUrl}
+                                srcSet={buildCloudinarySrcSet(media.secureUrl, [480, 800, 1000])}
+                                sizes="82vw"
+                                alt={media.altText || media.caption || branding.displayName}
+                                containerClassName="h-full w-full"
+                                className="h-full w-full object-cover"
+                              />
+
+                              <span className="absolute top-3 left-3 rounded-full bg-[#14120E]/75 backdrop-blur-xs border border-[#CAA650]/40 px-2.5 py-0.5 text-[10.5px] font-semibold text-[#E7D1AA] tabular-nums">
+                                {String(idx + 1).padStart(2, '0')} /{' '}
+                                {String(visiblePhotos.length).padStart(2, '0')}
+                              </span>
+
+                              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#14120E]/90 via-[#14120E]/45 to-transparent p-3.5 pt-10 flex items-end justify-between gap-2">
+                                <p className="text-xs font-semibold text-white truncate">
+                                  {media.caption || media.altText || 'Full-Resolution Frame'}
+                                </p>
+                                <span className="shrink-0 rounded-full bg-[#CAA650] px-2.5 py-1 text-[10px] font-bold text-[#181611] shadow-xs">
+                                  ⤢ View
+                                </span>
+                              </div>
+                            </button>
+                          );
+                        })}
+
+                        {hasMorePhotos && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setVisiblePhotoCount((prev) => prev + INITIAL_PHOTO_BATCH)
+                            }
+                            className="w-[62vw] max-w-[260px] shrink-0 snap-center aspect-[4/5] rounded-2xl border border-dashed border-[#CAA650] bg-[#F8F3E6] p-5 flex flex-col items-center justify-center text-center gap-2 text-[#181611] cursor-pointer"
+                          >
+                            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#181611] text-[#E7D1AA] text-sm font-bold">
+                              +
+                            </span>
+                            <span className="text-xs font-semibold">
+                              Load {Math.min(INITIAL_PHOTO_BATCH, filteredPhotos.length - visiblePhotos.length)} More Photos
+                            </span>
+                            <span className="text-[11px] text-[#6B6352] tabular-nums">
+                              {filteredPhotos.length - visiblePhotos.length} more frames available
+                            </span>
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#EFECE3]">
+                        <div
+                          className="h-full rounded-full transition-all duration-300"
+                          style={{
+                            width: `${progressPct}%`,
+                            background: 'linear-gradient(90deg, #8B6A21 0%, #CAA650 100%)',
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* MOBILE VIEW B: Compact 2-Column Lookbook Thumbnail Grid */}
+                  {mobilePhotoMode === 'grid' && (
+                    <div className="sm:hidden space-y-4">
+                      <div className="grid grid-cols-2 gap-2.5">
+                        {visiblePhotos.map((media) => {
+                          const thumbUrl =
+                            buildCloudinaryImageUrl(media.secureUrl, {
+                              width: 640,
+                              crop: 'limit',
+                            }) ||
+                            media.deliveryUrls?.thumbnailUrl ||
+                            media.secureUrl;
+
+                          return (
+                            <button
+                              key={media.id}
+                              type="button"
+                              onClick={() => setSelectedGalleryPhoto(media)}
+                              className="group relative aspect-[3/4] rounded-xl overflow-hidden border border-[#E5DFD0] bg-[#EFECE3] text-left cursor-pointer active:scale-[0.98] transition-transform"
+                            >
+                              <LazyViewportImage
+                                src={thumbUrl}
+                                srcSet={buildCloudinarySrcSet(media.secureUrl, [400, 720])}
+                                sizes="46vw"
+                                alt={media.altText || media.caption || branding.displayName}
+                                containerClassName="h-full w-full"
+                                className="h-full w-full object-cover"
+                              />
+                              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#14120E]/85 via-transparent to-transparent p-2 pt-6 flex items-end justify-between gap-1">
+                                <span className="text-[10.5px] font-medium text-white truncate">
+                                  {media.caption || 'Frame'}
+                                </span>
+                                <span className="shrink-0 rounded-full bg-white/90 px-1.5 py-0.5 text-[9.5px] font-bold text-[#181611]">
+                                  ⤢
+                                </span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {hasMorePhotos && (
+                        <div className="flex justify-center pt-1">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setVisiblePhotoCount((prev) => prev + INITIAL_PHOTO_BATCH)
+                            }
+                            className="inline-flex items-center gap-2 rounded-xl border bg-[#F8F3E6] px-5 py-2.5 text-xs font-semibold text-[#181611] shadow-2xs"
+                            style={{ borderColor: accent }}
+                          >
+                            Load More ({filteredPhotos.length - visiblePhotos.length} remaining)
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* TABLET & DESKTOP VIEW: Editorial True-Aspect Masonry Wall */}
+                  <div className="hidden sm:block space-y-5">
+                    <div className="sm:columns-2 lg:columns-3 gap-5">
+                      {visiblePhotos.map((media) => {
+                        const thumbUrl =
+                          buildCloudinaryImageUrl(media.secureUrl, {
+                            width: 960,
+                            crop: 'limit',
+                          }) ||
+                          media.deliveryUrls?.thumbnailUrl ||
+                          media.secureUrl;
+                        const aspectRatio = resolveNaturalAspectRatio(media.width, media.height);
+
+                        return (
+                          <button
+                            key={media.id}
+                            type="button"
+                            onClick={() => setSelectedGalleryPhoto(media)}
+                            className="group relative mb-5 break-inside-avoid block w-full text-left rounded-2xl overflow-hidden border border-[#E5DFD0] bg-[#EFECE3] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CAA650] shadow-2xs hover:shadow-[0_18px_40px_-18px_rgba(24,22,17,0.28)] transition-all duration-300"
+                          >
+                            <LazyViewportImage
+                              src={thumbUrl}
+                              srcSet={buildCloudinarySrcSet(media.secureUrl, [480, 800, 1200])}
+                              sizes="(max-width: 1024px) 50vw, 380px"
+                              alt={media.altText || media.caption || branding.displayName}
+                              containerStyle={{ aspectRatio }}
+                              containerClassName="w-full"
+                              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                            />
+
+                            {/* Clean Floating Exhibition Scrim Overlay */}
+                            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#14120E]/85 via-[#14120E]/30 to-transparent p-4 pt-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between gap-2">
+                              <div className="min-w-0">
+                                <p className="text-xs sm:text-sm font-semibold text-white truncate">
+                                  {media.caption || media.altText || 'Full-Resolution Frame'}
+                                </p>
+                              </div>
+                              <span className="shrink-0 rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-bold text-[#181611]">
+                                ⤢ View
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {hasMorePhotos && (
+                      <div className="flex justify-center pt-2">
+                        <button
+                          type="button"
+                          onClick={() => setVisiblePhotoCount((prev) => prev + INITIAL_PHOTO_BATCH)}
+                          className="inline-flex items-center gap-2 rounded-xl border bg-[#F8F3E6] px-6 py-3 text-xs sm:text-sm font-semibold text-[#181611] shadow-2xs hover:bg-white transition-all cursor-pointer"
+                          style={{ borderColor: accent }}
+                        >
+                          <span>
+                            Load More Photography ({filteredPhotos.length - visiblePhotos.length}{' '}
+                            remaining)
+                          </span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* SUB-STAGE C: EVENT STORIES GRID (When Event Stories tab or search matches) */}
             {filteredEvents.length > 0 && (
@@ -780,31 +1035,46 @@ export function PublicPortfolioShowcase({
         <div
           role="dialog"
           aria-modal="true"
+          onTouchStart={(e) => {
+            lightboxTouchStartX.current = e.touches[0]?.clientX ?? null;
+          }}
+          onTouchEnd={(e) => {
+            if (lightboxTouchStartX.current === null || filteredPhotos.length <= 1) return;
+            const endX = e.changedTouches[0]?.clientX ?? lightboxTouchStartX.current;
+            const diff = lightboxTouchStartX.current - endX;
+            lightboxTouchStartX.current = null;
+            if (Math.abs(diff) > 45) {
+              if (diff > 0) goNextGalleryPhoto();
+              else goPrevGalleryPhoto();
+            }
+          }}
           onClick={(e) => {
             if (e.target === e.currentTarget) setSelectedGalleryPhoto(null);
           }}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-between bg-[#14120E]/95 p-4 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-between bg-[#14120E]/95 p-3 sm:p-4 backdrop-blur-xs touch-pan-y select-none"
         >
-          <div className="w-full max-w-5xl flex items-center justify-between text-white pb-2">
-            <div>
+          <div className="w-full max-w-5xl flex items-center justify-between text-white pb-2 gap-3">
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-mono-code">
+                <span className="rounded-full bg-[#CAA650]/20 border border-[#CAA650]/40 px-2.5 py-0.5 text-xs font-mono-code text-[#E7D1AA] shrink-0 tabular-nums">
                   {selectedPhotoIndex + 1} / {filteredPhotos.length}
                 </span>
-                <p className="text-sm font-semibold">
+                <p className="text-sm font-semibold truncate">
                   {selectedGalleryPhoto.caption || branding.displayName}
                 </p>
               </div>
               {selectedGalleryPhoto.altText && (
-                <p className="text-xs text-[#C7BFA9] mt-0.5">{selectedGalleryPhoto.altText}</p>
+                <p className="text-xs text-[#C7BFA9] mt-0.5 truncate">
+                  {selectedGalleryPhoto.altText}
+                </p>
               )}
             </div>
             <button
               type="button"
               onClick={() => setSelectedGalleryPhoto(null)}
-              className="rounded-xl border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-white/20 cursor-pointer"
+              className="shrink-0 rounded-xl border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-white/20 cursor-pointer"
             >
-              ✕ Close
+              ← Back to Gallery
             </button>
           </div>
 

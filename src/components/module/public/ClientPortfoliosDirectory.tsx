@@ -95,12 +95,12 @@ export function ClientPortfoliosDirectory({
 
           {/* Search & Category Filters */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-2">
-            <div className="flex flex-wrap items-center gap-1.5">
+            <div className="flex items-center sm:flex-wrap gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
               <button
                 type="button"
                 onClick={() => setSelectedEventTypeId('ALL')}
                 className={cn(
-                  'rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer',
+                  'rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer shrink-0',
                   selectedEventTypeId === 'ALL'
                     ? 'bg-[#181611] text-white'
                     : 'bg-white border border-[#DFCEAA] text-[#4A4438] hover:border-[#8B6A21]',
@@ -114,7 +114,7 @@ export function ClientPortfoliosDirectory({
                   type="button"
                   onClick={() => setSelectedEventTypeId(et.id)}
                   className={cn(
-                    'rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer',
+                    'rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer shrink-0',
                     selectedEventTypeId === et.id
                       ? 'bg-[#181611] text-white'
                       : 'bg-white border border-[#DFCEAA] text-[#4A4438] hover:border-[#8B6A21]',
@@ -127,7 +127,7 @@ export function ClientPortfoliosDirectory({
                 type="button"
                 onClick={() => setFilmOnly((v) => !v)}
                 className={cn(
-                  'rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer',
+                  'rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer shrink-0',
                   filmOnly
                     ? 'border-[#8B6A21] bg-[#F8F3E6] text-[#8B6A21]'
                     : 'border-[#DFCEAA] bg-white text-[#4A4438] hover:bg-[#F8F3E6]',

@@ -27,7 +27,7 @@ import { cn } from '@/lib/utils';
 import {
   CalendarIcon,
   PlusIcon,
-  SparklesIcon,
+  SlidersIcon,
   UsersIcon,
 } from '@/components/shared/Icons';
 
@@ -1169,7 +1169,7 @@ export function TeamCrewWorkspace({
       {activeTab === 'automation' && (
         <div className="space-y-5">
           <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-700 flex items-center gap-2.5">
-            <SparklesIcon className="w-4 h-4 text-[var(--admin-accent)] shrink-0" />
+            <SlidersIcon className="w-4 h-4 text-[var(--admin-accent)] shrink-0" />
             <span>
               <strong>Auto-Provisioning on Confirmation:</strong> When a booking is confirmed,
               matching Deliverables and Crew Tasks below are automatically created for that event category.
