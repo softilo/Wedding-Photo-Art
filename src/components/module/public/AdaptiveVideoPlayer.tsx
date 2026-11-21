@@ -103,7 +103,7 @@ export function AdaptiveVideoPlayer({
           type="button"
           onClick={handleStartPlay}
           aria-label={`Play video: ${title}`}
-          className="group relative block w-full h-full cursor-pointer overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+          className="group relative block w-full h-full cursor-pointer overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CAA650]"
         >
           {/* Poster fills container cleanly with absolute positioning so play button never pushes sideways */}
           {posterUrl ? (
@@ -111,7 +111,7 @@ export function AdaptiveVideoPlayer({
               src={posterUrl}
               alt={`${title} poster`}
               isHero={eagerPoster}
-              quality={variant === 'featured' ? 92 : 88}
+              quality={variant === 'featured' ? 92 : 85}
               darkSurface
               sizes={
                 variant === 'featured'

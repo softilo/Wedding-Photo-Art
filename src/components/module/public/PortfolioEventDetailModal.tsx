@@ -99,20 +99,20 @@ export function PortfolioEventDetailModal({
                 </span>
               )}
               {event.eventType && (
-                <span className="rounded-full bg-[#FEF7EC] border border-[#F3DEC0] px-2.5 py-0.5 text-xs font-semibold text-[#8E5B17]">
+                <span className="rounded-full bg-[#F8F3E6] border border-[#DFCEAA] px-2.5 py-0.5 text-xs font-semibold text-[#6F5319]">
                   {event.eventType.name}
                 </span>
               )}
               {event.eventDate && (
-                <span className="text-xs font-mono-code text-[#6B5A62]">
+                <span className="text-xs font-mono-code text-[#6B6352]">
                   {formatLocalDate(event.eventDate)}
                 </span>
               )}
               {event.location && (
-                <span className="text-xs text-[#6B5A62]">• {event.location}</span>
+                <span className="text-xs text-[#6B6352]">• {event.location}</span>
               )}
             </div>
-            <h2 className="font-editorial text-xl sm:text-2xl font-semibold text-[#181216] mt-1 truncate">
+            <h2 className="font-editorial text-xl sm:text-2xl font-semibold text-[#181611] mt-1 truncate">
               {event.title}
             </h2>
           </div>
@@ -121,7 +121,7 @@ export function PortfolioEventDetailModal({
             {!isPreview && event.status === 'PUBLISHED' && (
               <Link
                 href={`/album/${event.slug}`}
-                className="rounded-xl border border-[#B91C47]/30 bg-[#FDF2F4] px-3.5 py-1.5 text-xs font-semibold text-[#B91C47] hover:bg-[#B91C47] hover:text-white transition-colors"
+                className="rounded-xl border border-[#8B6A21]/35 bg-[#F8F3E6] px-3.5 py-1.5 text-xs font-semibold text-[#8B6A21] hover:bg-[#8B6A21] hover:text-white transition-colors"
               >
                 Open Full Page ↗
               </Link>
@@ -279,7 +279,7 @@ export function PortfolioEventDetailModal({
                       key={photo.id}
                       type="button"
                       onClick={() => setSelectedPhoto(photo)}
-                      className="group text-left rounded-xl overflow-hidden border border-slate-200 bg-slate-50 flex flex-col cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                      className="group text-left rounded-xl overflow-hidden border border-stone-200 bg-stone-50 flex flex-col cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CAA650]"
                     >
                       <LazyViewportImage
                         src={thumbUrl}
@@ -399,7 +399,7 @@ export function PortfolioEventDetailModal({
                     className={cn(
                       'h-12 w-16 shrink-0 rounded-lg overflow-hidden border-2 transition-all cursor-pointer',
                       isActive
-                        ? 'border-indigo-400 opacity-100 scale-105'
+                        ? 'border-[#CAA650] opacity-100 scale-105'
                         : 'border-transparent opacity-50 hover:opacity-85',
                     )}
                   >

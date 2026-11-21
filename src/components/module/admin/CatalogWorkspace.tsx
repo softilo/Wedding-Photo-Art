@@ -73,10 +73,10 @@ export function CatalogWorkspace({
   const [brandName, setBrandName] = useState(initialSettings?.displayName || '');
   const [logoUrl, setLogoUrl] = useState(initialSettings?.logoUrl || '');
   const [primaryColor, setPrimaryColor] = useState(
-    initialSettings?.themeTokens?.primaryColor || '#0F172A',
+    initialSettings?.themeTokens?.primaryColor || '#181611',
   );
   const [accentColor, setAccentColor] = useState(
-    initialSettings?.themeTokens?.accentColor || '#4F46E5',
+    initialSettings?.themeTokens?.accentColor || '#8B6A21',
   );
   const [timezone, setTimezone] = useState(initialSettings?.timezone || 'Asia/Dhaka');
   const [advancePolicyType, setAdvancePolicyType] = useState<'NONE' | 'PERCENTAGE' | 'FIXED'>(
@@ -1039,11 +1039,11 @@ export function CatalogWorkspace({
               </p>
               <div
                 className="rounded-2xl p-6 text-white space-y-4 shadow-sm"
-                style={{ backgroundColor: primaryColor || '#0F172A' }}
+                style={{ backgroundColor: primaryColor || '#181611' }}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-lg font-semibold tracking-tight">
-                    {brandName || 'Your Studio Name'}
+                    {brandName || 'Wedding PhotoArt'}
                   </span>
                   <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-[11px] font-mono-code">
                     {timezone}
@@ -1055,7 +1055,7 @@ export function CatalogWorkspace({
                 <div className="flex items-center justify-between pt-2">
                   <span
                     className="rounded-xl px-4 py-2 text-xs font-semibold text-white shadow-xs"
-                    style={{ backgroundColor: accentColor || '#4F46E5' }}
+                    style={{ backgroundColor: accentColor || '#8B6A21' }}
                   >
                     Request a Quote →
                   </span>

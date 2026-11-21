@@ -58,7 +58,7 @@ export async function login(
       email: result.user.email,
       name: result.user.name,
       role: result.user.role,
-      studioName: result.studio?.name || 'Softilo Studio',
+      studioName: result.studio?.name || 'Wedding PhotoArt',
       timezone: result.studio?.timezone || 'Asia/Dhaka',
       currency: result.studio?.currency || 'BDT',
     };

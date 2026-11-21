@@ -27,7 +27,7 @@ async function RootStorefrontContent() {
 
 export default function RootPage() {
   return (
-    <Suspense fallback={<PageSkeleton label="Loading event storefront..." />}>
+    <Suspense fallback={<PageSkeleton label="Loading Wedding PhotoArt studio..." />}>
       <RootStorefrontContent />
     </Suspense>
   );

@@ -10,6 +10,7 @@ import {
 import { buildCloudinaryVideoPosterUrl } from '@/lib/showcaseMedia';
 import { parseAlbumDescriptionAndTheme } from '@/lib/albumTheme';
 import { cn } from '@/lib/utils';
+import { BrandMark } from '@/components/common/BrandMark';
 import { AdaptiveVideoPlayer } from './AdaptiveVideoPlayer';
 import { isNextOptimizableUrl, LazyAlbumImage } from './LazyAlbumImage';
 
@@ -277,16 +278,13 @@ export function PortfolioEventPageClient({
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <span
-              className={cn(
-                'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border font-editorial text-sm font-bold',
-                darkGallery
-                  ? 'border-[#C98A2C]/40 bg-[#C98A2C]/15 text-[#E9BE78]'
-                  : 'border-[#E2D5C1] bg-white text-[#B91C47] shadow-2xs',
-              )}
-            >
-              {(branding.displayName || 'R').slice(0, 1).toUpperCase()}
-            </span>
+            <BrandMark
+              logoUrl={branding.logoUrl}
+              alt={branding.displayName}
+              size={34}
+              variant={darkGallery ? 'dark' : 'light'}
+              className="rounded-full"
+            />
             <div className="min-w-0">
               <p
                 className={cn(
@@ -294,7 +292,7 @@ export function PortfolioEventPageClient({
                   darkGallery ? 'text-stone-400' : 'text-stone-500',
                 )}
               >
-                Digital Album
+                {branding.displayName} • Digital Album
               </p>
               <p className="text-xs sm:text-sm font-semibold truncate">{event.title}</p>
             </div>
@@ -786,7 +784,7 @@ export function PortfolioEventPageClient({
                               className={cn(
                                 'h-8 w-8 rounded-full backdrop-blur-md flex items-center justify-center text-xs transition-colors cursor-pointer',
                                 isFav
-                                  ? 'bg-rose-500 text-white'
+                                  ? 'bg-[#8B6A21] text-white'
                                   : 'bg-black/45 text-white hover:bg-black/70',
                               )}
                             >
@@ -900,7 +898,7 @@ export function PortfolioEventPageClient({
                 className={cn(
                   'rounded-full border px-3.5 py-1.5 text-xs font-medium cursor-pointer',
                   favoriteIds.includes(selectedPhoto.id)
-                    ? 'border-rose-400/50 bg-rose-500/20 text-rose-200'
+                    ? 'border-[#CAA650]/70 bg-[#CAA650]/25 text-[#E7D1AA]'
                     : 'border-white/20 bg-white/10 text-white hover:bg-white/20',
                 )}
               >

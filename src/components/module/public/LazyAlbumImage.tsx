@@ -2,24 +2,13 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { isNextOptimizableUrl } from '@/lib/showcaseMedia';
 import { cn } from '@/lib/utils';
+
+export { isNextOptimizableUrl };
 
 const SHIMMER_BLUR_DATA_URL =
   'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjEwIiBmaWxsPSIjZTdlMmRhIi8+PC9zdmc+';
-
-export function isNextOptimizableUrl(url?: string | null): boolean {
-  if (!url) return false;
-  if (url.startsWith('/')) return true;
-  try {
-    const parsed = new URL(url);
-    return (
-      parsed.protocol === 'https:' &&
-      (parsed.hostname === 'res.cloudinary.com' || parsed.hostname === 'img.youtube.com')
-    );
-  } catch {
-    return false;
-  }
-}
 
 interface LazyAlbumImageProps {
   src: string;

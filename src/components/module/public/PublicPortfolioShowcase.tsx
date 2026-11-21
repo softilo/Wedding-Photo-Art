@@ -261,33 +261,33 @@ export function PublicPortfolioShowcase({
     filteredEvents.length +
     filteredLegacyItems.length;
 
-  const accent = branding.themeTokens.accentColor || '#B91C47';
+  const accent = branding.themeTokens.accentColor || '#8B6A21';
 
   return (
     <section
       id="portfolio"
       ref={sectionRef}
-      className="border-y border-[#EAE2D6] bg-white scroll-mt-16"
+      className="border-y border-[#E5DFD0] bg-white scroll-mt-16"
     >
       <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20 sm:px-6 space-y-10">
         {/* Section Header & Medium Switcher */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#F3DEC0] bg-[#FEF7EC] px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8E5B17]">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#DFCEAA] bg-[#F8F3E6] px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6F5319]">
               <CameraIcon className="w-3.5 h-3.5" />
               <span>Visual Exhibition &amp; Cinema</span>
             </div>
-            <h2 className="font-editorial text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-[#181216] mt-2">
+            <h2 className="font-editorial text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-[#181611] mt-2">
               Captured Moments &amp; Highlight Films
             </h2>
-            <p className="text-sm text-[#54474E] mt-1.5 max-w-xl">
+            <p className="text-sm text-[#4A4438] mt-1.5 max-w-xl">
               Cinema reels play on their dedicated widescreen theater stage, while photographs
               preserve their original uncropped portrait &amp; editorial proportions.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
-            <div className="inline-flex flex-wrap rounded-xl border border-[#E5DCCD] bg-[#FAF6EE] p-1 gap-1">
+            <div className="inline-flex flex-wrap rounded-xl border border-[#DFCEAA] bg-[#F8F3E6] p-1 gap-1">
               {[
                 { id: 'all' as const, label: 'All Showcase' },
                 {
@@ -317,8 +317,8 @@ export function PublicPortfolioShowcase({
                   className={cn(
                     'rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer',
                     mediaFilter === tab.id
-                      ? 'bg-[#181216] text-white shadow-2xs'
-                      : 'text-[#54474E] hover:text-[#181216]',
+                      ? 'bg-[#181611] text-white shadow-2xs'
+                      : 'text-[#4A4438] hover:text-[#181611]',
                   )}
                 >
                   {tab.label}
@@ -327,7 +327,7 @@ export function PublicPortfolioShowcase({
             </div>
 
             <div className="relative w-full sm:w-52">
-              <SearchIcon className="w-3.5 h-3.5 text-[#8A756B] absolute left-3 top-1/2 -translate-y-1/2" />
+              <SearchIcon className="w-3.5 h-3.5 text-[#8A7F69] absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="search"
                 value={searchQuery}
@@ -336,7 +336,7 @@ export function PublicPortfolioShowcase({
                   setVisiblePhotoCount(INITIAL_PHOTO_BATCH);
                 }}
                 placeholder="Search moments or films..."
-                className="w-full rounded-xl border border-[#DFD5C7] bg-[#FDFBF7] pl-8 pr-3 py-1.5 text-xs text-[#181216] placeholder:text-[#9A8A80] outline-none focus:border-[#B91C47] focus:bg-white"
+                className="w-full rounded-xl border border-[#D8CCB2] bg-[#F9F8F5] pl-8 pr-3 py-1.5 text-xs text-[#181611] placeholder:text-[#8A7F69] outline-none focus:border-[#8B6A21] focus:bg-white"
               />
             </div>
           </div>
@@ -348,11 +348,11 @@ export function PublicPortfolioShowcase({
             aria-label="Gallery loading on scroll"
             className="space-y-6"
           >
-            <div className="rounded-3xl bg-[#141013] p-6 grid lg:grid-cols-12 gap-5">
-              <div className="lg:col-span-8 aspect-video rounded-2xl animate-pulse bg-[#241D22]" />
+            <div className="rounded-3xl bg-[#14120E] p-6 grid lg:grid-cols-12 gap-5">
+              <div className="lg:col-span-8 aspect-video rounded-2xl animate-pulse bg-[#252118]" />
               <div className="lg:col-span-4 space-y-3">
-                <div className="h-20 rounded-xl animate-pulse bg-[#241D22]" />
-                <div className="h-20 rounded-xl animate-pulse bg-[#241D22]" />
+                <div className="h-20 rounded-xl animate-pulse bg-[#252118]" />
+                <div className="h-20 rounded-xl animate-pulse bg-[#252118]" />
               </div>
             </div>
             <div className="columns-1 sm:columns-2 lg:columns-3 gap-5">
@@ -360,13 +360,13 @@ export function PublicPortfolioShowcase({
                 <div
                   key={idx}
                   style={{ aspectRatio: ratio }}
-                  className="mb-5 break-inside-avoid rounded-2xl animate-pulse bg-[#EFE8DC]"
+                  className="mb-5 break-inside-avoid rounded-2xl animate-pulse bg-[#EFECE3]"
                 />
               ))}
             </div>
           </div>
         ) : totalMatching === 0 ? (
-          <div className="atelier-card p-12 text-center text-sm text-[#6B5A62] bg-[#FAF6EE]">
+          <div className="atelier-card p-12 text-center text-sm text-[#6B6352] bg-[#F8F3E6]">
             {galleryMedia.length === 0 && showcaseEvents.length === 0 && portfolio.length === 0
               ? 'Photos and highlight films uploaded in Admin → Gallery will appear here automatically.'
               : 'No gallery items match your selected filter or search.'}
@@ -375,15 +375,15 @@ export function PublicPortfolioShowcase({
           <div className="space-y-12">
             {/* SUB-STAGE A: DEDICATED CINEMA THEATER (Separated from Photos!) */}
             {activeFilm && (
-              <div className="rounded-3xl border border-[#2D232A] bg-[#141013] p-5 sm:p-7 text-[#FAF6F0] space-y-5 shadow-[0_28px_64px_-24px_rgba(20,16,19,0.55)]">
+              <div className="rounded-3xl border border-[#2E291F] bg-[#14120E] p-5 sm:p-7 text-[#F4EFE4] space-y-5 shadow-[0_28px_64px_-24px_rgba(20,18,14,0.55)]">
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
                   <div className="flex items-center gap-3">
-                    <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#B91C47]" />
-                    <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#E9BE78]">
+                    <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#CAA650]" />
+                    <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#E7D1AA]">
                       Signature Highlight Films ({filteredVideos.length})
                     </span>
                   </div>
-                  <p className="text-xs text-[#A89A8E]">
+                  <p className="text-xs text-[#9C937E]">
                     Dedicated widescreen theater — click any reel to stream on demand
                   </p>
                 </div>
@@ -422,10 +422,10 @@ export function PublicPortfolioShowcase({
                           {activeFilm.caption || activeFilm.altText || 'Event Highlight Film'}
                         </h3>
                         {activeFilm.altText && activeFilm.caption && (
-                          <p className="text-xs text-[#A89A8E] mt-0.5">{activeFilm.altText}</p>
+                          <p className="text-xs text-[#9C937E] mt-0.5">{activeFilm.altText}</p>
                         )}
                       </div>
-                      <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-mono-code text-[#E9BE78] uppercase">
+                      <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-mono-code text-[#E7D1AA] uppercase">
                         {activeFilm.format}
                         {formatFilmDuration(activeFilm.durationSeconds)
                           ? ` • ${formatFilmDuration(activeFilm.durationSeconds)}`
@@ -437,7 +437,7 @@ export function PublicPortfolioShowcase({
                   {/* Interactive Reel Switcher Playlist when 2+ films */}
                   {filteredVideos.length > 1 && (
                     <div className="lg:col-span-4 space-y-2.5">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#A89A8E] px-1">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#9C937E] px-1">
                         Film Reels ({filteredVideos.length})
                       </p>
                       <div className="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
@@ -459,7 +459,7 @@ export function PublicPortfolioShowcase({
                               className={cn(
                                 'w-full text-left rounded-2xl border p-2.5 flex items-center gap-3 transition-all cursor-pointer',
                                 isCurrent
-                                  ? 'border-[#E9BE78]/70 bg-white/10 shadow-sm'
+                                  ? 'border-[#E7D1AA]/75 bg-white/10 shadow-sm'
                                   : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.07] hover:border-white/25',
                               )}
                             >
@@ -483,13 +483,13 @@ export function PublicPortfolioShowcase({
                                   <span
                                     className={cn(
                                       'text-[10px] font-bold uppercase tracking-wider',
-                                      isCurrent ? 'text-[#E9BE78]' : 'text-[#A89A8E]',
+                                      isCurrent ? 'text-[#E7D1AA]' : 'text-[#9C937E]',
                                     )}
                                   >
                                     {isCurrent ? 'Now Selected' : `Reel 0${idx + 1}`}
                                   </span>
                                   {duration && (
-                                    <span className="text-[10px] font-mono-code text-[#A89A8E]">
+                                    <span className="text-[10px] font-mono-code text-[#9C937E]">
                                       {duration}
                                     </span>
                                   )}
@@ -511,17 +511,17 @@ export function PublicPortfolioShowcase({
             {/* SUB-STAGE B: EDITORIAL TRUE-ASPECT PHOTOGRAPHY MASONRY */}
             {visiblePhotos.length > 0 && (
               <div className="space-y-5">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#EFE8DC] pb-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#ECE6D8] pb-3">
                   <div className="flex items-center gap-2.5">
-                    <span className="inline-flex h-2 w-2 rounded-full bg-[#C98A2C]" />
-                    <h3 className="font-editorial text-2xl font-semibold text-[#181216]">
+                    <span className="inline-flex h-2 w-2 rounded-full bg-[#CAA650]" />
+                    <h3 className="font-editorial text-2xl font-semibold text-[#181611]">
                       Photography Wall
                     </h3>
-                    <span className="rounded-full bg-[#F7F3EB] border border-[#E5DCCD] px-2.5 py-0.5 text-[11px] font-mono-code text-[#6B5A62]">
+                    <span className="rounded-full bg-[#F8F3E6] border border-[#DFCEAA] px-2.5 py-0.5 text-[11px] font-mono-code text-[#6B6352]">
                       {filteredPhotos.length} frames
                     </span>
                   </div>
-                  <p className="text-xs text-[#7D6860]">
+                  <p className="text-xs text-[#6B6352]">
                     Original portrait &amp; landscape framing — click any frame for full resolution
                   </p>
                 </div>
@@ -542,7 +542,7 @@ export function PublicPortfolioShowcase({
                         key={media.id}
                         type="button"
                         onClick={() => setSelectedGalleryPhoto(media)}
-                        className="group relative mb-5 break-inside-avoid block w-full text-left rounded-2xl overflow-hidden border border-[#E6DDD0] bg-[#EFE8DC] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B91C47] shadow-2xs hover:shadow-[0_18px_40px_-18px_rgba(24,18,22,0.28)] transition-all duration-300"
+                        className="group relative mb-5 break-inside-avoid block w-full text-left rounded-2xl overflow-hidden border border-[#E5DFD0] bg-[#EFECE3] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CAA650] shadow-2xs hover:shadow-[0_18px_40px_-18px_rgba(24,22,17,0.28)] transition-all duration-300"
                       >
                         <LazyViewportImage
                           src={thumbUrl}
@@ -555,13 +555,13 @@ export function PublicPortfolioShowcase({
                         />
 
                         {/* Clean Floating Exhibition Scrim Overlay */}
-                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#141013]/85 via-[#141013]/30 to-transparent p-4 pt-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between gap-2">
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#14120E]/85 via-[#14120E]/30 to-transparent p-4 pt-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between gap-2">
                           <div className="min-w-0">
                             <p className="text-xs sm:text-sm font-semibold text-white truncate">
                               {media.caption || media.altText || 'Full-Resolution Frame'}
                             </p>
                           </div>
-                          <span className="shrink-0 rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-bold text-[#181216]">
+                          <span className="shrink-0 rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-bold text-[#181611]">
                             ⤢ View
                           </span>
                         </div>
@@ -575,7 +575,7 @@ export function PublicPortfolioShowcase({
                     <button
                       type="button"
                       onClick={() => setVisiblePhotoCount((prev) => prev + INITIAL_PHOTO_BATCH)}
-                      className="inline-flex items-center gap-2 rounded-xl border bg-[#FAF6EE] px-6 py-3 text-xs sm:text-sm font-semibold text-[#181216] shadow-2xs hover:bg-white transition-all cursor-pointer"
+                      className="inline-flex items-center gap-2 rounded-xl border bg-[#F8F3E6] px-6 py-3 text-xs sm:text-sm font-semibold text-[#181611] shadow-2xs hover:bg-white transition-all cursor-pointer"
                       style={{ borderColor: accent }}
                     >
                       <span>
@@ -591,8 +591,8 @@ export function PublicPortfolioShowcase({
             {/* SUB-STAGE C: EVENT STORIES GRID (When Event Stories tab or search matches) */}
             {filteredEvents.length > 0 && (
               <div className="space-y-5">
-                <div className="flex items-center justify-between border-b border-[#EFE8DC] pb-3">
-                  <h3 className="font-editorial text-2xl font-semibold text-[#181216]">
+                <div className="flex items-center justify-between border-b border-[#ECE6D8] pb-3">
+                  <h3 className="font-editorial text-2xl font-semibold text-[#181611]">
                     Event Stories ({filteredEvents.length})
                   </h3>
                   <Link
@@ -622,7 +622,7 @@ export function PublicPortfolioShowcase({
                           onClick={() => setActiveShowcaseEvent(ev)}
                           className="text-left flex-1 flex flex-col cursor-pointer focus-visible:outline-none"
                         >
-                          <div className="aspect-[4/3] w-full bg-[#EFE8DC] relative overflow-hidden">
+                          <div className="aspect-[4/3] w-full bg-[#EFECE3] relative overflow-hidden">
                             {coverUrl ? (
                               <LazyViewportImage
                                 src={coverUrl}
@@ -633,18 +633,18 @@ export function PublicPortfolioShowcase({
                                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                               />
                             ) : (
-                              <div className="h-full w-full flex items-center justify-center bg-[#181216] text-[#BFB2A7] text-xs font-medium">
+                              <div className="h-full w-full flex items-center justify-center bg-[#181611] text-[#C7BFA9] text-xs font-medium">
                                 Showcase Event
                               </div>
                             )}
 
                             <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
-                              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#141013]/80 backdrop-blur-xs px-3 py-1 text-[11px] font-semibold text-white">
+                              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#14120E]/80 backdrop-blur-xs px-3 py-1 text-[11px] font-semibold text-white">
                                 {photoCount > 0 ? `${photoCount} Photos` : 'Story'}
                                 {videoCount > 0 ? ` • ${videoCount} Film` : ''}
                               </span>
                               {ev.eventType && (
-                                <span className="rounded-full bg-white/95 backdrop-blur-xs px-2.5 py-0.5 text-[11px] font-bold text-[#181216]">
+                                <span className="rounded-full bg-white/95 backdrop-blur-xs px-2.5 py-0.5 text-[11px] font-bold text-[#181611]">
                                   {ev.eventType.name}
                                 </span>
                               )}
@@ -653,34 +653,34 @@ export function PublicPortfolioShowcase({
 
                           <div className="p-5 flex-1">
                             {ev.eventDate && (
-                              <div className="flex items-center gap-1.5 text-xs text-[#7D6860] mb-1 font-mono-code">
-                                <CalendarIcon className="w-3.5 h-3.5 text-[#C98A2C]" />
+                              <div className="flex items-center gap-1.5 text-xs text-[#6B6352] mb-1 font-mono-code">
+                                <CalendarIcon className="w-3.5 h-3.5 text-[#CAA650]" />
                                 <span>{formatLocalDate(ev.eventDate)}</span>
                               </div>
                             )}
-                            <h3 className="font-editorial text-xl font-semibold text-[#181216] group-hover:text-[#B91C47] transition-colors">
+                            <h3 className="font-editorial text-xl font-semibold text-[#181611] group-hover:text-[#8B6A21] transition-colors">
                               {ev.title}
                             </h3>
                             {parseAlbumDescriptionAndTheme(ev.description).cleanDescription && (
-                              <p className="mt-1 text-xs sm:text-sm text-[#54474E] line-clamp-2">
+                              <p className="mt-1 text-xs sm:text-sm text-[#4A4438] line-clamp-2">
                                 {parseAlbumDescriptionAndTheme(ev.description).cleanDescription}
                               </p>
                             )}
                           </div>
                         </button>
 
-                        <div className="px-5 py-3 border-t border-[#EFE8DC] bg-[#FAF6EE]/60 flex items-center justify-between gap-2">
+                        <div className="px-5 py-3 border-t border-[#ECE6D8] bg-[#F8F3E6]/60 flex items-center justify-between gap-2">
                           <button
                             type="button"
                             onClick={() => setActiveShowcaseEvent(ev)}
-                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#181216] hover:text-[#B91C47] cursor-pointer"
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#181611] hover:text-[#8B6A21] cursor-pointer"
                           >
                             <span>Explore Story</span>
                             <ArrowRightIcon className="w-3.5 h-3.5" />
                           </button>
                           <Link
                             href={`/album/${ev.slug}`}
-                            className="text-xs font-semibold text-[#6B5A62] hover:text-[#181216]"
+                            className="text-xs font-semibold text-[#6B6352] hover:text-[#181611]"
                           >
                             Full Page ↗
                           </Link>
@@ -704,7 +704,7 @@ export function PublicPortfolioShowcase({
                       onClick={() => setActiveShowcaseItem(item)}
                       className="group text-left atelier-card atelier-card-hover overflow-hidden flex flex-col cursor-pointer bg-white"
                     >
-                      <div className="aspect-[4/3] w-full bg-[#EFE8DC] relative overflow-hidden">
+                      <div className="aspect-[4/3] w-full bg-[#EFECE3] relative overflow-hidden">
                         {parsed.coverUrl ? (
                           <LazyViewportImage
                             src={buildCloudinaryImageUrl(parsed.coverUrl, {
@@ -718,20 +718,20 @@ export function PublicPortfolioShowcase({
                             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                           />
                         ) : (
-                          <div className="h-full w-full flex items-center justify-center bg-[#181216] text-[#BFB2A7] text-xs font-medium">
+                          <div className="h-full w-full flex items-center justify-center bg-[#181611] text-[#C7BFA9] text-xs font-medium">
                             Video Film
                           </div>
                         )}
-                        <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-[#141013]/80 backdrop-blur-xs px-3 py-1 text-xs font-medium text-white pointer-events-none">
+                        <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-[#14120E]/80 backdrop-blur-xs px-3 py-1 text-xs font-medium text-white pointer-events-none">
                           {parsed.kind === 'video' ? '▶ Video Film' : 'Photo Gallery'}
                         </span>
                       </div>
                       <div className="p-5 flex-1">
-                        <h3 className="font-editorial text-xl font-semibold text-[#181216] group-hover:text-[#B91C47]">
+                        <h3 className="font-editorial text-xl font-semibold text-[#181611] group-hover:text-[#8B6A21]">
                           {item.title}
                         </h3>
                         {item.description && (
-                          <p className="mt-1 text-xs text-[#54474E] line-clamp-2">
+                          <p className="mt-1 text-xs text-[#4A4438] line-clamp-2">
                             {item.description}
                           </p>
                         )}
@@ -753,7 +753,7 @@ export function PublicPortfolioShowcase({
           onClick={(e) => {
             if (e.target === e.currentTarget) setSelectedGalleryPhoto(null);
           }}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-between bg-[#141013]/95 p-4 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-between bg-[#14120E]/95 p-4 backdrop-blur-xs"
         >
           <div className="w-full max-w-5xl flex items-center justify-between text-white pb-2">
             <div>
@@ -766,7 +766,7 @@ export function PublicPortfolioShowcase({
                 </p>
               </div>
               {selectedGalleryPhoto.altText && (
-                <p className="text-xs text-[#BFB2A7] mt-0.5">{selectedGalleryPhoto.altText}</p>
+                <p className="text-xs text-[#C7BFA9] mt-0.5">{selectedGalleryPhoto.altText}</p>
               )}
             </div>
             <button
@@ -810,7 +810,7 @@ export function PublicPortfolioShowcase({
                     goPrevGalleryPhoto();
                   }}
                   aria-label="Previous photo"
-                  className="absolute left-2 sm:left-4 rounded-full bg-[#181216]/85 border border-white/20 px-4 py-2.5 text-sm font-bold text-white hover:bg-[#B91C47] transition-colors cursor-pointer"
+                  className="absolute left-2 sm:left-4 rounded-full bg-[#181611]/85 border border-white/20 px-4 py-2.5 text-sm font-bold text-white hover:bg-[#8B6A21] transition-colors cursor-pointer"
                 >
                   ←
                 </button>
@@ -821,7 +821,7 @@ export function PublicPortfolioShowcase({
                     goNextGalleryPhoto();
                   }}
                   aria-label="Next photo"
-                  className="absolute right-2 sm:right-4 rounded-full bg-[#181216]/85 border border-white/20 px-4 py-2.5 text-sm font-bold text-white hover:bg-[#B91C47] transition-colors cursor-pointer"
+                  className="absolute right-2 sm:right-4 rounded-full bg-[#181611]/85 border border-white/20 px-4 py-2.5 text-sm font-bold text-white hover:bg-[#8B6A21] transition-colors cursor-pointer"
                 >
                   →
                 </button>
@@ -852,7 +852,7 @@ export function PublicPortfolioShowcase({
                     className={cn(
                       'h-12 w-16 shrink-0 rounded-lg overflow-hidden border-2 transition-all cursor-pointer',
                       isActive
-                        ? 'border-[#E9BE78] opacity-100 scale-105'
+                        ? 'border-[#E7D1AA] opacity-100 scale-105'
                         : 'border-transparent opacity-50 hover:opacity-85',
                     )}
                   >

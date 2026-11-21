@@ -47,7 +47,7 @@ export function InquiryForm({
 
   const [copied, setCopied] = useState(false);
 
-  const accent = branding.themeTokens.accentColor || '#B91C47';
+  const accent = branding.themeTokens.accentColor || '#8B6A21';
   const selectedPkg = packages.find((p) => p.id === packageId);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -101,37 +101,37 @@ export function InquiryForm({
 
   if (confirmation) {
     return (
-      <div className="atelier-card p-8 sm:p-10 text-center space-y-4 bg-white">
+      <div className="atelier-card p-8 sm:p-10 text-center space-y-4 bg-white shadow-[0_24px_60px_-24px_rgba(24,22,17,0.12)]">
         <div
           className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-sm"
           style={{ backgroundColor: accent }}
         >
           <CheckCircleIcon className="w-6 h-6" />
         </div>
-        <h3 className="font-editorial text-3xl font-semibold text-[#181216]">
-          Request Received
+        <h3 className="font-editorial text-3xl font-semibold text-[#181611]">
+          Booking Request Received
         </h3>
-        <p className="text-sm text-[#54474E] max-w-md mx-auto leading-relaxed">
-          Thank you. {branding.displayName} has logged your celebration inquiry and will send an
-          itemized quote shortly.
+        <p className="text-sm text-[#4A4438] max-w-md mx-auto leading-relaxed">
+          Thank you. Our {branding.displayName} coordinator has logged your shoot inquiry and will
+          follow up shortly with date availability and a tailored quote.
         </p>
-        <div className="inline-flex items-center gap-2 rounded-xl border border-[#E5DCCD] bg-[#FAF6EE] px-4 py-2">
-          <span className="text-xs text-[#7D6860]">Reference:</span>
-          <span className="font-mono-code text-sm font-semibold text-[#181216]">
+        <div className="inline-flex items-center gap-2 rounded-xl border border-[#DFCEAA] bg-[#F8F3E6] px-4 py-2">
+          <span className="text-xs text-[#6B6352]">Reference:</span>
+          <span className="font-mono-code text-sm font-semibold text-[#181611]">
             {confirmation.reference}
           </span>
           <button
             type="button"
             onClick={() => handleCopyRef(confirmation.reference)}
-            className="ml-1 rounded-md bg-white px-2.5 py-0.5 text-xs font-semibold border border-[#DFD5C7] hover:bg-[#FEF7EC] transition-colors cursor-pointer"
+            className="ml-1 rounded-md bg-white px-2.5 py-0.5 text-xs font-semibold border border-[#D8CCB2] hover:bg-[#F3EFE6] transition-colors cursor-pointer"
             style={{ color: accent }}
           >
             {copied ? 'Copied' : 'Copy'}
           </button>
         </div>
-        <p className="text-xs text-[#7D6860] max-w-md mx-auto">
-          Submitting an inquiry requests availability review; dates are locked once you accept your
-          quote and confirm the booking deposit.
+        <p className="text-xs text-[#6B6352] max-w-md mx-auto">
+          Submitting an inquiry initiates availability review; shoot dates are locked once you
+          accept your quote and confirm the booking deposit.
         </p>
         <div>
           <button
@@ -148,37 +148,46 @@ export function InquiryForm({
   }
 
   const inputClass =
-    'w-full rounded-xl border border-[#DFD5C7] bg-[#FDFBF7] px-3.5 py-2.5 text-sm text-[#181216] placeholder:text-[#9A8A80] outline-none focus:border-[#B91C47] focus:bg-white focus:ring-2 focus:ring-[#B91C47]/15 transition-all';
+    'w-full rounded-xl border border-[#D8CCB2] bg-[#F9F8F5] px-3.5 py-2.5 text-sm text-[#181611] placeholder:text-[#8A7F69] outline-none focus:border-[#8B6A21] focus:bg-white focus:ring-2 focus:ring-[#CAA650]/25 transition-all';
 
   return (
-    <form onSubmit={handleSubmit} className="atelier-card p-6 sm:p-8 space-y-5 bg-white">
-      <div className="flex items-start justify-between gap-4 border-b border-[#EFE8DC] pb-4">
+    <form
+      onSubmit={handleSubmit}
+      className="atelier-card p-6 sm:p-8 space-y-5 bg-white shadow-[0_24px_60px_-24px_rgba(24,22,17,0.12)]"
+    >
+      <div className="flex items-start justify-between gap-4 border-b border-[#ECE6D8] pb-4">
         <div>
-          <h3 className="font-editorial text-2xl sm:text-3xl font-semibold text-[#181216]">
-            Ask for a Quote
+          <p
+            className="text-[10.5px] font-bold uppercase tracking-[0.2em]"
+            style={{ color: accent }}
+          >
+            Direct Studio Booking
+          </p>
+          <h3 className="font-editorial text-2xl sm:text-3xl font-semibold text-[#181611] mt-0.5">
+            Reserve Your Shoot &amp; Quote
           </h3>
-          <p className="text-sm text-[#54474E] mt-1">
-            Tell us your event date, venue, and the collection you have in mind.
+          <p className="text-sm text-[#4A4438] mt-1">
+            Share your Wedding, Holud, Reception, or Pre-Wedding date and venue details.
           </p>
         </div>
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F7F3EB] text-[#8E5B17] border border-[#EAE2D6] shrink-0">
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F8F3E6] text-[#7A5E21] border border-[#DFCEAA] shrink-0">
           <CalendarIcon className="w-4 h-4" />
         </span>
       </div>
 
       {selectedPkg && (
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-[#F3DEC0] bg-[#FEF7EC] px-4 py-2.5 text-sm">
-          <div className="flex items-center gap-2 text-[#181216]">
-            <span className="font-semibold">Selected Package:</span>
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-[#DFCEAA] bg-[#F8F3E6] px-4 py-2.5 text-sm">
+          <div className="flex flex-wrap items-center gap-2 text-[#181611]">
+            <span className="font-semibold">Selected Collection:</span>
             <span>{selectedPkg.name}</span>
-            <span className="font-mono-code font-semibold text-[#B91C47]">
+            <span className="font-mono-code font-semibold text-[#8B6A21]">
               ({formatPoisha(selectedPkg.basePricePoisha, branding.currency)})
             </span>
           </div>
           <button
             type="button"
             onClick={() => setPackageId('')}
-            className="font-semibold text-[#8E5B17] hover:text-[#181216] cursor-pointer"
+            className="font-semibold text-[#6F5319] hover:text-[#181611] cursor-pointer shrink-0"
           >
             Clear
           </button>
@@ -186,36 +195,36 @@ export function InquiryForm({
       )}
 
       {error && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+        <div className="rounded-xl border border-[#B8933C] bg-[#F8F3E6] px-4 py-3 text-sm font-medium text-[#5C4414]">
           {error}
         </div>
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
-            Event Title *
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#4A4438] mb-1.5">
+            Celebration / Shoot Title *
           </label>
           <input
             type="text"
             required
             value={eventTitle}
             onChange={(e) => setEventTitle(e.target.value)}
-            placeholder="e.g. Autumn Reception or Annual Leadership Summit"
+            placeholder="e.g. Nusrat & Tanvir — Wedding & Holud"
             className={inputClass}
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
-            Event Category
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#4A4438] mb-1.5">
+            Event Specialty
           </label>
           <select
             value={eventTypeId || selectedPkg?.eventTypeId || ''}
             onChange={(e) => setEventTypeId(e.target.value)}
             className={inputClass}
           >
-            <option value="">Select event type</option>
+            <option value="">Select event category</option>
             {eventTypes.map((et) => (
               <option key={et.id} value={et.id}>
                 {et.name}
@@ -225,8 +234,8 @@ export function InquiryForm({
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
-            Preferred Date
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#4A4438] mb-1.5">
+            Preferred Event Date
           </label>
           <input
             type="date"
@@ -237,7 +246,7 @@ export function InquiryForm({
         </div>
 
         <div className="sm:col-span-2">
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#4A4438] mb-1.5">
             Collection / Package
           </label>
           <select
@@ -245,7 +254,7 @@ export function InquiryForm({
             onChange={(e) => setPackageId(e.target.value)}
             className={inputClass}
           >
-            <option value="">Custom / Discuss with coordinator</option>
+            <option value="">Custom Photography &amp; Cinema Quote</option>
             {packages.map((pkg) => (
               <option key={pkg.id} value={pkg.id}>
                 {pkg.name} ({formatPoisha(pkg.basePricePoisha, branding.currency)})
@@ -255,7 +264,7 @@ export function InquiryForm({
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#4A4438] mb-1.5">
             Your Name *
           </label>
           <input
@@ -263,27 +272,27 @@ export function InquiryForm({
             required
             value={clientName}
             onChange={(e) => setClientName(e.target.value)}
-            placeholder="Full name or organization contact"
+            placeholder="Bride, Groom, or Family Contact"
             className={inputClass}
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
-            Phone Number *
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#4A4438] mb-1.5">
+            Phone / WhatsApp *
           </label>
           <input
             type="tel"
             required
             value={clientPhone}
             onChange={(e) => setClientPhone(e.target.value)}
-            placeholder="+880 17XX-XXXXXX"
+            placeholder="01855-XXXXXX"
             className={inputClass}
           />
         </div>
 
         <div className="sm:col-span-2">
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#4A4438] mb-1.5">
             Email Address
           </label>
           <input
@@ -296,14 +305,14 @@ export function InquiryForm({
         </div>
 
         <div className="sm:col-span-2">
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
-            Venue, Schedule &amp; Notes
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[#4A4438] mb-1.5">
+            Venue, Schedule &amp; Shoot Notes
           </label>
           <textarea
             rows={3}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Share venue details, estimated guest count, or multi-day schedule needs..."
+            placeholder="Share your venue in Feni or destination, indoor/outdoor shoot preferences, or multi-day Holud + Wedding + Reception schedule..."
             className={inputClass}
           />
         </div>
@@ -312,10 +321,10 @@ export function InquiryForm({
       <button
         type="submit"
         disabled={isPending}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-90 active:scale-[0.99] disabled:opacity-60"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-95 active:scale-[0.99] disabled:opacity-60 cursor-pointer"
         style={{ backgroundColor: accent }}
       >
-        <span>{isPending ? 'Sending...' : 'Send Request'}</span>
+        <span>{isPending ? 'Sending Request...' : 'Request Date & Quote'}</span>
         <ArrowRightIcon className="w-4 h-4" />
       </button>
     </form>

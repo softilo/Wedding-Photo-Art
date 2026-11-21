@@ -47,14 +47,14 @@ export function ShowcaseLightboxModal({ item, onClose }: ShowcaseLightboxModalPr
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 p-4 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#14120E]/90 p-4 backdrop-blur-xs"
     >
-      <div className="w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl bg-slate-900 text-white border border-white/10 shadow-2xl overflow-hidden">
+      <div className="w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl bg-[#181611] text-white border border-white/10 shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="shrink-0 flex items-center justify-between gap-4 px-5 py-4 border-b border-white/10">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="rounded-full bg-[#C98A2C]/20 border border-[#C98A2C]/35 px-2.5 py-0.5 text-xs font-medium text-[#E9BE78]">
+              <span className="rounded-full bg-[#CAA650]/20 border border-[#CAA650]/35 px-2.5 py-0.5 text-xs font-medium text-[#E7D1AA]">
                 {media.kind === 'video'
                   ? 'Video Film'
                   : totalPhotos > 1
@@ -169,7 +169,7 @@ export function ShowcaseLightboxModal({ item, onClose }: ShowcaseLightboxModalPr
                       onClick={() => setPhotoIndex(idx)}
                       className={`h-14 w-20 shrink-0 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
                         idx === photoIndex
-                          ? 'border-indigo-400 opacity-100 scale-105'
+                          ? 'border-[#CAA650] opacity-100 scale-105'
                           : 'border-transparent opacity-55 hover:opacity-90'
                       }`}
                     >

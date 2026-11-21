@@ -2,9 +2,13 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Rongilo Event Management — Bespoke Celebrations, Photography & Studio Craft',
+  title: 'Wedding PhotoArt — Wedding Photography & Cinematography | Feni, Bangladesh',
   description:
-    'Rongilo Event Management: curated wedding & corporate event design, transparent quotes, date-locked bookings, and signature digital albums.',
+    'Wedding PhotoArt is a professional Wedding Photography & Cinematography team based in Feni, Bangladesh. Specializing in Wedding, Holud, Reception, Engagement, Couple, and Pre-Wedding Photography.',
+  icons: {
+    icon: '/brand/wedding-photoart-logo.png',
+    apple: '/brand/wedding-photoart-logo.png',
+  },
 };
 
 export default function RootLayout({
@@ -14,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col bg-[#FDFBF7] text-[#181216] font-sans selection:bg-[#B91C47]/15 selection:text-[#181216]">
+      <body className="min-h-full flex flex-col bg-[#F9F8F5] text-[#181611] font-sans selection:bg-[#CAA650]/25 selection:text-[#181611]">
         {children}
       </body>
     </html>

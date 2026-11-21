@@ -64,13 +64,13 @@ export function LazyViewportImage({
     <div
       ref={containerRef}
       style={containerStyle}
-      className={cn('relative overflow-hidden bg-[#EFE8DC]', containerClassName)}
+      className={cn('relative overflow-hidden bg-[#EFECE3]', containerClassName)}
     >
       {/* Shimmer skeleton shown before entering viewport and while image bytes load */}
       {!isLoaded && (
         <div
           aria-hidden="true"
-          className="absolute inset-0 animate-pulse bg-gradient-to-br from-[#EAE2D6] via-[#FAF6EE] to-[#EAE2D6]"
+          className="absolute inset-0 animate-pulse bg-gradient-to-br from-[#E5DFD0] via-[#F9F8F5] to-[#E5DFD0]"
         />
       )}
 

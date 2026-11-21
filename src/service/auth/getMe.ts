@@ -50,7 +50,7 @@ export async function getMe(): Promise<AuthUserSession | null> {
       email: data.email,
       name: data.name,
       role: data.role,
-      studioName: data.studio?.name || 'Softilo Studio',
+      studioName: data.studio?.name || 'Wedding PhotoArt',
       timezone: data.studio?.timezone || 'Asia/Dhaka',
       currency: data.studio?.currency || 'BDT',
     };

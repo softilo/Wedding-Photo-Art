@@ -140,6 +140,24 @@ export function buildCloudinarySrcSet(
 }
 
 /**
+ * Returns true when an image URL is safe to pass through Next.js Image Optimization
+ * (local assets or hosts configured in next.config.ts remotePatterns).
+ */
+export function isNextOptimizableUrl(url?: string | null): boolean {
+  if (!url) return false;
+  if (url.startsWith('/')) return true;
+  try {
+    const parsed = new URL(url);
+    return (
+      parsed.protocol === 'https:' &&
+      (parsed.hostname === 'res.cloudinary.com' || parsed.hostname === 'img.youtube.com')
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Generates a lightweight JPEG poster frame from a Cloudinary video URL without downloading the video.
  */
 export function buildCloudinaryVideoPosterUrl(videoUrl: string, width = 960): string {
