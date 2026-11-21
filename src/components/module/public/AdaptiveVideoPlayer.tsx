@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { LazyAlbumImage } from './LazyAlbumImage';
 
@@ -31,8 +31,8 @@ function formatDuration(seconds?: number | null): string | null {
 
 /**
  * Responsive video player with strict play-gated streaming (zero video download before Play),
- * dead-center overlay controls (`absolute inset-0`), and full-width bottom native controls
- * across landscape, square, ultrawide, and vertical/portrait (9:16) videos.
+ * auto-pause when scrolled out of the viewport, dead-center overlay controls (`absolute inset-0`),
+ * and full-width bottom native controls across landscape, square, and portrait (9:16) videos.
  */
 export function AdaptiveVideoPlayer({
   src,
@@ -48,6 +48,8 @@ export function AdaptiveVideoPlayer({
   eagerPoster = false,
   className,
 }: AdaptiveVideoPlayerProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [internalPlaying, setInternalPlaying] = useState(false);
   const [detectedDims, setDetectedDims] = useState<{ w: number; h: number } | null>(null);
 
@@ -57,6 +59,53 @@ export function AdaptiveVideoPlayer({
   const isPortrait = Boolean(
     effectiveWidth && effectiveHeight && effectiveHeight > effectiveWidth,
   );
+
+  // Auto-pause whenever the user scrolls a playing video out of view or hides the tab
+  useEffect(() => {
+    if (!isPlaying) return;
+    const container = containerRef.current;
+    let hasBeenVisible = false;
+
+    const pauseIfPlaying = () => {
+      const vid = videoRef.current;
+      if (vid && !vid.paused) {
+        vid.pause();
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        pauseIfPlaying();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    if (!container || typeof IntersectionObserver === 'undefined') {
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.2) {
+            hasBeenVisible = true;
+          } else if (hasBeenVisible && (!entry.isIntersecting || entry.intersectionRatio < 0.2)) {
+            pauseIfPlaying();
+          }
+        }
+      },
+      { threshold: [0, 0.2] },
+    );
+
+    observer.observe(container);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isPlaying]);
 
   const formattedDuration = formatDuration(durationSeconds);
   const handleStartPlay = () => {
@@ -76,6 +125,7 @@ export function AdaptiveVideoPlayer({
 
   return (
     <div
+      ref={containerRef}
       className={cn(
         'relative overflow-hidden bg-black',
         stageClassName,
@@ -84,6 +134,7 @@ export function AdaptiveVideoPlayer({
     >
       {isPlaying ? (
         <video
+          ref={videoRef}
           src={src}
           poster={posterUrl || undefined}
           controls

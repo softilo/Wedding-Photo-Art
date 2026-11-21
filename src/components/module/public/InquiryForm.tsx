@@ -12,6 +12,10 @@ interface InquiryFormProps {
   packages: StudioPackage[];
   selectedPackageId?: string;
   onPackageChange?: (id: string) => void;
+  eventTitle?: string;
+  onEventTitleChange?: (val: string) => void;
+  notes?: string;
+  onNotesChange?: (val: string) => void;
 }
 
 export function InquiryForm({
@@ -20,6 +24,10 @@ export function InquiryForm({
   packages,
   selectedPackageId,
   onPackageChange,
+  eventTitle: controlledEventTitle,
+  onEventTitleChange,
+  notes: controlledNotes,
+  onNotesChange,
 }: InquiryFormProps) {
   const [isPending, startTransition] = useTransition();
   const [localPackageId, setLocalPackageId] = useState(selectedPackageId || '');
@@ -33,12 +41,26 @@ export function InquiryForm({
       setEventTypeId(matchedPkg.eventTypeId);
     }
   };
-  const [eventTitle, setEventTitle] = useState('');
+
+  const [localEventTitle, setLocalEventTitle] = useState('');
+  const eventTitle =
+    controlledEventTitle !== undefined ? controlledEventTitle : localEventTitle;
+  const setEventTitle = (val: string) => {
+    setLocalEventTitle(val);
+    onEventTitleChange?.(val);
+  };
+
+  const [localNotes, setLocalNotes] = useState('');
+  const notes = controlledNotes !== undefined ? controlledNotes : localNotes;
+  const setNotes = (val: string) => {
+    setLocalNotes(val);
+    onNotesChange?.(val);
+  };
+
   const [requestedDate, setRequestedDate] = useState('');
   const [clientName, setClientName] = useState('');
   const [clientPhone, setClientPhone] = useState('');
   const [clientEmail, setClientEmail] = useState('');
-  const [notes, setNotes] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<{
     reference: string;
@@ -113,7 +135,7 @@ export function InquiryForm({
         </h3>
         <p className="text-sm text-[#4A4438] max-w-md mx-auto leading-relaxed">
           Thank you. Our {branding.displayName} coordinator has logged your shoot inquiry and will
-          follow up shortly with date availability and a tailored quote.
+          follow up shortly with date availability and an itemized quote.
         </p>
         <div className="inline-flex items-center gap-2 rounded-xl border border-[#DFCEAA] bg-[#F8F3E6] px-4 py-2">
           <span className="text-xs text-[#6B6352]">Reference:</span>
@@ -130,8 +152,8 @@ export function InquiryForm({
           </button>
         </div>
         <p className="text-xs text-[#6B6352] max-w-md mx-auto">
-          Submitting an inquiry initiates availability review; shoot dates are locked once you
-          accept your quote and confirm the booking deposit.
+          Submitting an inquiry starts availability verification with zero obligation; shoot dates
+          are locked once you approve your quote and confirm the booking deposit.
         </p>
         <div>
           <button
@@ -161,13 +183,13 @@ export function InquiryForm({
             className="text-[10.5px] font-bold uppercase tracking-[0.2em]"
             style={{ color: accent }}
           >
-            Direct Studio Booking
+            Step 05 • Free Date Check &amp; Quote
           </p>
           <h3 className="font-editorial text-2xl sm:text-3xl font-semibold text-[#181611] mt-0.5">
             Reserve Your Shoot &amp; Quote
           </h3>
           <p className="text-sm text-[#4A4438] mt-1">
-            Share your Wedding, Holud, Reception, or Pre-Wedding date and venue details.
+            No payment required to inquire—share your date and venue for a tailored proposal.
           </p>
         </div>
         <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F8F3E6] text-[#7A5E21] border border-[#DFCEAA] shrink-0">
@@ -324,7 +346,7 @@ export function InquiryForm({
         className="inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-95 active:scale-[0.99] disabled:opacity-60 cursor-pointer"
         style={{ backgroundColor: accent }}
       >
-        <span>{isPending ? 'Sending Request...' : 'Request Date & Quote'}</span>
+        <span>{isPending ? 'Sending Request...' : 'Check Date & Request Free Quote'}</span>
         <ArrowRightIcon className="w-4 h-4" />
       </button>
     </form>

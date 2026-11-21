@@ -96,6 +96,90 @@ export const STUDIO_PROFILE = {
       source: 'Client Album Showcase • Feni',
     },
   ],
+  guarantees: [
+    {
+      title: 'Date-Locked Crew Guarantee',
+      summary:
+        'Once your deposit is verified, our photographers, cinematographers, and gear are locked exclusively for your event date—zero double-booking.',
+    },
+    {
+      title: 'Clear Itemized BDT Quotes',
+      summary:
+        'Review every deliverable, crew count, and shoot day in a written quote before confirming—no surprise charges after your ceremony.',
+    },
+    {
+      title: 'Custom Digital Albums & 4K Reels',
+      summary:
+        'Relive your memories in a shareable online Digital Album with lossless full-resolution photos and on-demand highlight cinema.',
+    },
+    {
+      title: 'Physical Studio in Feni',
+      summary:
+        'Visit us face-to-face at Grand Haque Tower (5th Floor), Mizan Rd, Feni to review prints, discuss schedules, and meet the team.',
+    },
+  ],
+  bookingSteps: [
+    {
+      step: '01',
+      title: 'Check Date & Get Custom Quote',
+      desc: 'Choose a collection or tell us your Wedding, Holud & Reception schedule to receive an itemized proposal.',
+    },
+    {
+      step: '02',
+      title: 'Confirm Advance & Lock Crew',
+      desc: 'Verify your booking deposit to exclusively reserve your dedicated photography & cinematography team.',
+    },
+    {
+      step: '03',
+      title: 'Shoot Day & Digital Album Delivery',
+      desc: 'Enjoy your celebration stress-free while we capture every ritual, then receive your digital album & highlight film.',
+    },
+  ],
+  comboPresets: [
+    {
+      id: 'combo-3day',
+      label: 'Holud + Wedding + Reception',
+      title: 'Full 3-Day Wedding, Holud & Reception Coverage',
+      notes:
+        'Interested in a complete 3-day combo covering Holud, Wedding Ceremony, and Reception (photography + cinematography). Please share custom pricing and crew plan.',
+    },
+    {
+      id: 'combo-2day',
+      label: 'Wedding + Reception',
+      title: '2-Day Wedding & Reception Photography + Cinema',
+      notes:
+        'Looking for 2-day coverage for Wedding and Reception including couple portraits, stage lighting, and highlight film.',
+    },
+    {
+      id: 'combo-prewedding',
+      label: 'Pre-Wedding + Couple Shoot',
+      title: 'Pre-Wedding & Couple Editorial Session',
+      notes:
+        'Interested in an outdoor/indoor Pre-Wedding & Couple photography and teaser reel session in or around Feni.',
+    },
+  ],
+  faqs: [
+    {
+      question: 'How far in advance should we reserve our Wedding or Holud date?',
+      answer:
+        'Peak wedding dates in Feni fill quickly. We recommend reaching out 3 to 8 weeks before your event so we can check crew availability and lock your preferred dates.',
+    },
+    {
+      question: 'Do you shoot both indoor and outdoor, and travel outside Feni?',
+      answer:
+        'Yes. Our studio is based at Grand Haque Tower, Mizan Rd, Feni, and our team regularly covers indoor banquet halls, home ceremonies, and outdoor destination shoots across Feni, Chattogram, Dhaka, and nearby districts.',
+    },
+    {
+      question: 'Can we customize packages for multi-day Holud, Wedding & Reception events?',
+      answer:
+        'Every collection is a transparent starting point. You can select any package—or choose a multi-day combo—and our coordinator will adjust hours, photographers, cinematographers, and albums in an itemized quote.',
+    },
+    {
+      question: 'How do we receive our finished photos and wedding highlight films?',
+      answer:
+        'Every completed celebration can be delivered as a custom-themed Digital Album on our platform where you and your family can view full-resolution stills, stream highlight films, mark favorites, and download.',
+    },
+  ],
 } as const;
 
 export const STUDIO_DEFAULT_THEME = {

@@ -275,14 +275,14 @@ export function PublicPortfolioShowcase({
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-[#DFCEAA] bg-[#F8F3E6] px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6F5319]">
               <CameraIcon className="w-3.5 h-3.5" />
-              <span>Visual Exhibition &amp; Cinema</span>
+              <span>Step 02B • Visual Exhibition &amp; Cinema</span>
             </div>
             <h2 className="font-editorial text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-[#181611] mt-2">
               Captured Moments &amp; Highlight Films
             </h2>
             <p className="text-sm text-[#4A4438] mt-1.5 max-w-xl">
-              Cinema reels play on their dedicated widescreen theater stage, while photographs
-              preserve their original uncropped portrait &amp; editorial proportions.
+              Stream real wedding highlight reels and browse uncropped photographs to judge our
+              framing, color grading, and storytelling before you book.
             </p>
           </div>
 
@@ -417,14 +417,9 @@ export function PublicPortfolioShowcase({
                       />
                     </div>
                     <div className="flex flex-wrap items-center justify-between gap-2 px-1">
-                      <div>
-                        <h3 className="font-editorial text-2xl font-semibold text-white">
-                          {activeFilm.caption || activeFilm.altText || 'Event Highlight Film'}
-                        </h3>
-                        {activeFilm.altText && activeFilm.caption && (
-                          <p className="text-xs text-[#9C937E] mt-0.5">{activeFilm.altText}</p>
-                        )}
-                      </div>
+                      <span className="text-xs font-medium text-[#C7BFA9]">
+                        Highlight Film
+                      </span>
                       <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-mono-code text-[#E7D1AA] uppercase">
                         {activeFilm.format}
                         {formatFilmDuration(activeFilm.durationSeconds)
@@ -468,7 +463,7 @@ export function PublicPortfolioShowcase({
                                   // eslint-disable-next-line @next/next/no-img-element
                                   <img
                                     src={poster}
-                                    alt={reel.caption || `Reel ${idx + 1}`}
+                                    alt={`Highlight Reel ${idx + 1}`}
                                     loading="lazy"
                                     decoding="async"
                                     className="h-full w-full object-cover opacity-90"
@@ -486,7 +481,7 @@ export function PublicPortfolioShowcase({
                                       isCurrent ? 'text-[#E7D1AA]' : 'text-[#9C937E]',
                                     )}
                                   >
-                                    {isCurrent ? 'Now Selected' : `Reel 0${idx + 1}`}
+                                    {isCurrent ? 'Now Playing' : `Reel ${String(idx + 1).padStart(2, '0')}`}
                                   </span>
                                   {duration && (
                                     <span className="text-[10px] font-mono-code text-[#9C937E]">
@@ -494,8 +489,8 @@ export function PublicPortfolioShowcase({
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-xs font-semibold text-white line-clamp-2 leading-snug">
-                                  {reel.caption || reel.altText || `Highlight Film ${idx + 1}`}
+                                <p className="text-xs font-semibold text-white leading-snug">
+                                  Highlight Film {String(idx + 1).padStart(2, '0')}
                                 </p>
                               </div>
                             </button>
