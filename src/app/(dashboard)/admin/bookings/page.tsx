@@ -39,6 +39,7 @@ async function AdminBookingsContent({ searchParams }: AdminBookingsPageProps) {
       initialInquiries={[]}
       initialQuotes={[]}
       initialBookings={bookingsRes.ok && bookingsRes.data ? bookingsRes.data.data : []}
+      initialLoadError={!bookingsRes.ok ? bookingsRes.message || 'Unable to load bookings from backend.' : undefined}
       packages={[]}
       eventTypes={[]}
       initialResources={[]}

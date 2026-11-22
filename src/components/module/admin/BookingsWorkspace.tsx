@@ -202,6 +202,15 @@ export function BookingsWorkspace({
   const [feedback, setFeedback] = useState<{ type: 'ok' | 'err'; text: string } | null>(
     initialLoadError ? { type: 'err', text: initialLoadError } : null,
   );
+  const [prevInitialLoadError, setPrevInitialLoadError] = useState<string | undefined>(
+    initialLoadError,
+  );
+  if (initialLoadError !== prevInitialLoadError) {
+    setPrevInitialLoadError(initialLoadError);
+    if (initialLoadError) {
+      setFeedback({ type: 'err', text: initialLoadError });
+    }
+  }
   const [isPending, startTransition] = useTransition();
   const [renderNowMs] = useState(() => Date.now());
 

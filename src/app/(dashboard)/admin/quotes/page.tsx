@@ -27,10 +27,17 @@ async function AdminQuotesContent({ searchParams }: AdminQuotesPageProps) {
     listEventTypes(),
   ]);
 
+  const loadError = !quotesRes.ok
+    ? quotesRes.message || 'Unable to load quotes from backend.'
+    : !inqRes.ok
+      ? inqRes.message || 'Unable to load inquiries from backend.'
+      : undefined;
+
   return (
     <BookingsWorkspace
       mode="quotes"
       initialInquiries={inqRes.ok && inqRes.data ? inqRes.data.data : []}
+      initialLoadError={loadError}
       initialQuotes={quotesRes.ok && quotesRes.data ? quotesRes.data.data : []}
       initialBookings={[]}
       packages={pkgRes.ok && pkgRes.data ? pkgRes.data.data : []}
