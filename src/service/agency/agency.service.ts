@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { serverFetch } from '@/lib/serverFetch';
 import {
   PublicBranding,
@@ -11,7 +11,9 @@ import {
 import { ActionResult, parseApiResponse } from '../shared/apiResult';
 
 export async function getPublicBranding(): Promise<ActionResult<PublicBranding>> {
-  const res = await serverFetch.get('/public/branding');
+  const res = await serverFetch.get('/public/branding', {
+    next: { revalidate: 30, tags: ['public-storefront'] },
+  });
   return parseApiResponse<PublicBranding>(res);
 }
 
@@ -36,6 +38,7 @@ export async function updateAgencyBranding(payload: {
   });
   const result = await parseApiResponse<StudioSettings>(res);
   if (result.ok) {
+    updateTag('public-storefront');
     revalidatePath('/admin/catalog');
     revalidatePath('/admin');
     revalidatePath('/');

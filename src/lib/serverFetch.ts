@@ -33,11 +33,18 @@ const buildRequestUrl = (endpoint: string): string | null => {
   }
 };
 
+type NextFetchRequestInit = RequestInit & {
+  next?: {
+    revalidate?: number | false;
+    tags?: string[];
+  };
+};
+
 const serverFetchHelper = async (
   endpoint: string,
-  options: RequestInit,
+  options: NextFetchRequestInit,
 ): Promise<Response> => {
-  const { headers, ...restOptions } = options;
+  const { headers, cache, next, ...restOptions } = options;
   const requestUrl = buildRequestUrl(endpoint);
 
   if (!requestUrl) {
@@ -51,22 +58,25 @@ const serverFetchHelper = async (
   }
 
   const requestHeaders = new Headers(headers);
+  const isPublicEndpoint = endpoint.startsWith('/public/') || endpoint.startsWith('public/');
 
-  try {
-    const accessToken = await getCookies('accessToken');
-    if (accessToken && !requestHeaders.has('Authorization')) {
-      requestHeaders.set('Authorization', `Bearer ${accessToken}`);
+  if (!isPublicEndpoint) {
+    try {
+      const accessToken = await getCookies('accessToken');
+      if (accessToken && !requestHeaders.has('Authorization')) {
+        requestHeaders.set('Authorization', `Bearer ${accessToken}`);
+      }
+    } catch {
+      // Public static/edge contexts without cookie access
     }
-  } catch {
-    // Public static/edge contexts without cookie access
   }
 
   try {
     return await fetch(requestUrl, {
       headers: requestHeaders,
-      cache: restOptions.cache ?? 'no-store',
+      ...(next ? { next } : { cache: cache ?? 'no-store' }),
       ...restOptions,
-    });
+    } as RequestInit);
   } catch {
     return new Response(
       JSON.stringify({
@@ -79,14 +89,14 @@ const serverFetchHelper = async (
 };
 
 export const serverFetch = {
-  get: async (endpoint: string, options: RequestInit = {}): Promise<Response> =>
+  get: async (endpoint: string, options: NextFetchRequestInit = {}): Promise<Response> =>
     serverFetchHelper(endpoint, { ...options, method: 'GET' }),
-  post: async (endpoint: string, options: RequestInit = {}): Promise<Response> =>
+  post: async (endpoint: string, options: NextFetchRequestInit = {}): Promise<Response> =>
     serverFetchHelper(endpoint, { ...options, method: 'POST' }),
-  put: async (endpoint: string, options: RequestInit = {}): Promise<Response> =>
+  put: async (endpoint: string, options: NextFetchRequestInit = {}): Promise<Response> =>
     serverFetchHelper(endpoint, { ...options, method: 'PUT' }),
-  patch: async (endpoint: string, options: RequestInit = {}): Promise<Response> =>
+  patch: async (endpoint: string, options: NextFetchRequestInit = {}): Promise<Response> =>
     serverFetchHelper(endpoint, { ...options, method: 'PATCH' }),
-  delete: async (endpoint: string, options: RequestInit = {}): Promise<Response> =>
+  delete: async (endpoint: string, options: NextFetchRequestInit = {}): Promise<Response> =>
     serverFetchHelper(endpoint, { ...options, method: 'DELETE' }),
 };

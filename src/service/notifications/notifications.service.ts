@@ -8,9 +8,11 @@ import { ActionResult, parseApiResponse } from '../shared/apiResult';
 export async function getNotifications(
   limit = 30,
   unreadOnly = false,
+  sync = true,
 ): Promise<ActionResult<NotificationsFeed>> {
   const qs = new URLSearchParams({ limit: String(limit) });
   if (unreadOnly) qs.set('unreadOnly', 'true');
+  if (!sync) qs.set('sync', 'false');
   const res = await serverFetch.get(`/notifications?${qs.toString()}`);
 
   // Graceful fallback if an older backend instance is still running prior to restart

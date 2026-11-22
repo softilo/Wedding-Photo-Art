@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { serverFetch } from '@/lib/serverFetch';
 import {
   CloudinaryStatusSummary,
@@ -21,21 +21,27 @@ import {
 import { ActionResult, parseApiResponse } from '../shared/apiResult';
 
 export async function getPublicEventTypes(): Promise<ActionResult<EventType[]>> {
-  const res = await serverFetch.get('/public/event-types');
+  const res = await serverFetch.get('/public/event-types', {
+    next: { revalidate: 60, tags: ['public-storefront'] },
+  });
   return parseApiResponse<EventType[]>(res);
 }
 
 export async function getPublicPackages(): Promise<
   ActionResult<PaginatedResponse<StudioPackage>>
 > {
-  const res = await serverFetch.get('/public/packages');
+  const res = await serverFetch.get('/public/packages', {
+    next: { revalidate: 30, tags: ['public-storefront'] },
+  });
   return parseApiResponse<PaginatedResponse<StudioPackage>>(res);
 }
 
 export async function getPublicPortfolio(): Promise<
   ActionResult<PaginatedResponse<PortfolioItem>>
 > {
-  const res = await serverFetch.get('/public/portfolio');
+  const res = await serverFetch.get('/public/portfolio', {
+    next: { revalidate: 30, tags: ['public-storefront'] },
+  });
   return parseApiResponse<PaginatedResponse<PortfolioItem>>(res);
 }
 
@@ -54,7 +60,10 @@ export async function createEventType(payload: {
     body: JSON.stringify(payload),
   });
   const result = await parseApiResponse<EventType>(res);
-  if (result.ok) revalidatePath('/admin/catalog');
+  if (result.ok) {
+    updateTag('public-storefront');
+    revalidatePath('/admin/catalog');
+  }
   return result;
 }
 
@@ -96,7 +105,10 @@ export async function createPackage(payload: {
     body: JSON.stringify(payload),
   });
   const result = await parseApiResponse<StudioPackage>(res);
-  if (result.ok) revalidatePath('/admin/catalog');
+  if (result.ok) {
+    updateTag('public-storefront');
+    revalidatePath('/admin/catalog');
+  }
   return result;
 }
 
@@ -115,7 +127,10 @@ export async function updatePackage(
     body: JSON.stringify(payload),
   });
   const result = await parseApiResponse<StudioPackage>(res);
-  if (result.ok) revalidatePath('/admin/catalog');
+  if (result.ok) {
+    updateTag('public-storefront');
+    revalidatePath('/admin/catalog');
+  }
   return result;
 }
 
@@ -132,7 +147,10 @@ export async function createPortfolioItem(payload: {
     body: JSON.stringify(payload),
   });
   const result = await parseApiResponse<PortfolioItem>(res);
-  if (result.ok) revalidatePath('/admin/catalog');
+  if (result.ok) {
+    updateTag('public-storefront');
+    revalidatePath('/admin/catalog');
+  }
   return result;
 }
 
@@ -204,6 +222,7 @@ export async function updateTaskTemplate(
 }
 
 function revalidatePortfolioPaths(slug?: string) {
+  updateTag('public-storefront');
   revalidatePath('/', 'layout');
   revalidatePath('/portfolio');
   revalidatePath('/showcase');
@@ -220,7 +239,9 @@ function revalidatePortfolioPaths(slug?: string) {
 export async function getPublicPortfolioEvents(): Promise<
   ActionResult<PaginatedResponse<PortfolioShowcaseEvent>>
 > {
-  const res = await serverFetch.get('/public/portfolio/events?limit=50');
+  const res = await serverFetch.get('/public/portfolio/events?limit=50', {
+    next: { revalidate: 30, tags: ['public-storefront'] },
+  });
   return parseApiResponse<PaginatedResponse<PortfolioShowcaseEvent>>(res);
 }
 
@@ -228,14 +249,18 @@ export async function getPublicGalleryMedia(
   resourceType?: PortfolioMediaType,
 ): Promise<ActionResult<GalleryMediaListResponse>> {
   const qs = resourceType ? `?resourceType=${encodeURIComponent(resourceType)}` : '';
-  const res = await serverFetch.get(`/public/gallery${qs}`);
+  const res = await serverFetch.get(`/public/gallery${qs}`, {
+    next: { revalidate: 30, tags: ['public-storefront'] },
+  });
   return parseApiResponse<GalleryMediaListResponse>(res);
 }
 
 export async function getPublicPortfolioEventBySlug(
   slug: string,
 ): Promise<ActionResult<PortfolioShowcaseEvent>> {
-  const res = await serverFetch.get(`/public/portfolio/events/${encodeURIComponent(slug)}`);
+  const res = await serverFetch.get(`/public/portfolio/events/${encodeURIComponent(slug)}`, {
+    next: { revalidate: 30, tags: ['public-storefront'] },
+  });
   return parseApiResponse<PortfolioShowcaseEvent>(res);
 }
 

@@ -11,7 +11,7 @@ async function GuardedDashboard({ children }: { children: React.ReactNode }) {
     redirect('/login');
   }
 
-  const notifRes = await getNotifications(30);
+  const notifRes = await getNotifications(30, false, false);
   const initialNotifications =
     notifRes.ok && notifRes.data
       ? notifRes.data

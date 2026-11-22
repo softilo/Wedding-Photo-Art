@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { PortfolioMediaItem, PortfolioShowcaseEvent } from '@/types/event-management';
+import { getPublicPortfolioEventBySlug } from '@/service/catalog/catalog.service';
 import {
   buildCloudinaryImageUrl,
   buildCloudinarySrcSet,
@@ -25,9 +26,35 @@ export function PortfolioEventDetailModal({
   onClose,
   isPreview = false,
 }: PortfolioEventDetailModalProps) {
-  const readyMedia = (event.media || []).filter((m) => m.status === 'READY');
+  const [loadedEventMedia, setLoadedEventMedia] = useState<{
+    slug: string;
+    media: PortfolioMediaItem[];
+  } | null>(null);
+  const rawMedia =
+    (loadedEventMedia?.slug === event.slug ? loadedEventMedia.media : null) ??
+    event.media ??
+    [];
+  const readyMedia = rawMedia.filter((m) => m.status === 'READY');
   const photos = readyMedia.filter((m) => m.resourceType === 'IMAGE');
   const videos = readyMedia.filter((m) => m.resourceType === 'VIDEO');
+
+  useEffect(() => {
+    if (isPreview || (event.media && event.media.length > 0)) {
+      return;
+    }
+    if ((event.counts?.totalReady ?? 0) === 0 || !event.slug) {
+      return;
+    }
+    let cancelled = false;
+    void getPublicPortfolioEventBySlug(event.slug).then((res) => {
+      if (!cancelled && res.ok && res.data?.media) {
+        setLoadedEventMedia({ slug: event.slug, media: res.data.media });
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [event.slug, event.media, event.counts?.totalReady, isPreview]);
 
   const [activeTab, setActiveTab] = useState<'all' | 'photos' | 'videos'>('all');
   // High-res photo lightbox state (only fetched when a thumbnail is clicked!)

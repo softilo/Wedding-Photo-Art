@@ -52,6 +52,41 @@ interface NotificationBellProps {
   align?: 'right' | 'left';
 }
 
+const MIN_REVALIDATE_MS = 15_000;
+let sharedInflightFetch: Promise<NotificationsFeed | null> | null = null;
+let sharedLastFetchedAt = 0;
+const feedSubscribers = new Set<(feed: NotificationsFeed) => void>();
+
+function publishFeed(next: NotificationsFeed) {
+  for (const notify of feedSubscribers) {
+    notify(next);
+  }
+}
+
+async function fetchNotificationsShared(force = false): Promise<NotificationsFeed | null> {
+  const now = Date.now();
+  if (!force && now - sharedLastFetchedAt < MIN_REVALIDATE_MS) {
+    return null;
+  }
+  if (sharedInflightFetch) {
+    return sharedInflightFetch;
+  }
+  sharedInflightFetch = (async () => {
+    try {
+      const res = await getNotifications(30, false, true);
+      if (res.ok && res.data) {
+        sharedLastFetchedAt = Date.now();
+        publishFeed(res.data);
+        return res.data;
+      }
+      return null;
+    } finally {
+      sharedInflightFetch = null;
+    }
+  })();
+  return sharedInflightFetch;
+}
+
 export function NotificationBell({
   initialFeed = { unreadCount: 0, urgentUnreadCount: 0, items: [] },
   align = 'right',
@@ -64,31 +99,39 @@ export function NotificationBell({
   const [isPending, startTransition] = useTransition();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const loadFeed = useCallback(async () => {
-    setRefreshing(true);
-    const res = await getNotifications(30, false);
-    setRefreshing(false);
-    if (res.ok && res.data) {
-      setFeed(res.data);
-    }
+  useEffect(() => {
+    const onUpdate = (next: NotificationsFeed) => setFeed(next);
+    feedSubscribers.add(onUpdate);
+    return () => {
+      feedSubscribers.delete(onUpdate);
+    };
   }, []);
 
-  // Periodic background sync + refresh on focus or mutation events
+  const loadFeed = useCallback(async (force = false) => {
+    setRefreshing(true);
+    await fetchNotificationsShared(force);
+    setRefreshing(false);
+  }, []);
+
+  // Periodic background sync + refresh on focus or mutation events (deduplicated across desktop/mobile bells)
   useEffect(() => {
     const interval = window.setInterval(() => {
-      void loadFeed();
-    }, 45_000);
+      void loadFeed(false);
+    }, 60_000);
 
-    const onRefresh = () => {
-      void loadFeed();
+    const onFocus = () => {
+      void loadFeed(false);
     };
-    window.addEventListener('focus', onRefresh);
-    window.addEventListener('rongilo-notifications-refresh', onRefresh);
+    const onMutationRefresh = () => {
+      void loadFeed(true);
+    };
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('rongilo-notifications-refresh', onMutationRefresh);
 
     return () => {
       window.clearInterval(interval);
-      window.removeEventListener('focus', onRefresh);
-      window.removeEventListener('rongilo-notifications-refresh', onRefresh);
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('rongilo-notifications-refresh', onMutationRefresh);
     };
   }, [loadFeed]);
 
@@ -208,7 +251,7 @@ export function NotificationBell({
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
-                onClick={() => void loadFeed()}
+                onClick={() => void loadFeed(true)}
                 disabled={refreshing}
                 title="Refresh alerts"
                 className="rounded-lg p-1.5 text-[var(--admin-muted)] hover:bg-[var(--admin-surface-subtle)] hover:text-[var(--admin-text)] cursor-pointer disabled:opacity-50"
