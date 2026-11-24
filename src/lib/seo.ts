@@ -28,6 +28,7 @@ export function toAbsoluteUrl(pathOrUrl: string): string {
 
 export const STUDIO_SEO_KEYWORDS = [
   'Wedding PhotoArt',
+  'wedding photography Bangladesh',
   'Wedding Photo Art',
   'wedding photography Feni',
   'wedding photographer in Feni Bangladesh',
@@ -202,12 +203,12 @@ export function buildStudioJsonLdGraph(params: {
         sameAs: sameAsUrl ? [sameAsUrl] : undefined,
         ...(offers.length > 0
           ? {
-              hasOfferCatalog: {
-                '@type': 'OfferCatalog',
-                name: 'Wedding Photography & Cinematography Packages',
-                itemListElement: offers,
-              },
-            }
+            hasOfferCatalog: {
+              '@type': 'OfferCatalog',
+              name: 'Wedding Photography & Cinematography Packages',
+              itemListElement: offers,
+            },
+          }
           : {}),
       },
       {
@@ -324,11 +325,11 @@ export function buildAlbumJsonLd(params: {
         ...(event.updatedAt ? { dateModified: event.updatedAt } : {}),
         ...(event.location
           ? {
-              contentLocation: {
-                '@type': 'Place',
-                name: event.location,
-              },
-            }
+            contentLocation: {
+              '@type': 'Place',
+              name: event.location,
+            },
+          }
           : {}),
         creator: {
           '@type': 'ProfessionalService',

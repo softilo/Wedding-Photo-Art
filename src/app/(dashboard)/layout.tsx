@@ -1,5 +1,14 @@
 import React, { Suspense } from 'react';
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = {
+  title: 'Studio Workspace',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 import { getMe } from '@/service/auth';
 import { getNotifications } from '@/service/notifications/notifications.service';
 import { DashboardShell } from '@/components/common/DashboardShell';

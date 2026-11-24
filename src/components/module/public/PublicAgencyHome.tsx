@@ -120,7 +120,7 @@ export function PublicAgencyHome({
   };
 
   return (
-    <div className="flex-1 bg-[#F9F8F5] text-[#181611] overflow-x-clip">
+    <main className="flex-1 bg-[#F9F8F5] text-[#181611] overflow-x-clip">
       {!isBackendConnected && (
         <div className="bg-[#F8F3E6] border-b border-[#DFCEAA] px-4 py-2 text-center text-xs font-medium text-[#6F5319]">
           Preview Mode: Connect the backend server to load live {branding.displayName} packages,
@@ -877,6 +877,6 @@ export function PublicAgencyHome({
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

@@ -1,5 +1,15 @@
 import React, { Suspense } from 'react';
+import type { Metadata } from 'next';
 import { LoginForm } from '@/components/module/auth/LoginForm';
+
+export const metadata: Metadata = {
+  title: 'Team Portal Sign In',
+  description: 'Sign in to the Wedding PhotoArt studio workspace.',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 import { PageSkeleton } from '@/components/shared/PageSkeleton';
 import { resolvePublicBranding } from '@/lib/publicStorefront';
 import { getPublicBranding } from '@/service/agency/agency.service';

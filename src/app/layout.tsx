@@ -1,5 +1,6 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Cormorant_Garamond, Plus_Jakarta_Sans } from 'next/font/google';
+import { buildRootMetadata } from '@/lib/seo';
 import './globals.css';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -16,14 +17,13 @@ const cormorantGaramond = Cormorant_Garamond({
   display: 'swap',
 });
 
-export const metadata: Metadata = {
-  title: 'Wedding PhotoArt — Wedding Photography & Cinematography | Feni, Bangladesh',
-  description:
-    'Wedding PhotoArt is a professional Wedding Photography & Cinematography team based in Feni, Bangladesh. Specializing in Wedding, Holud, Reception, Engagement, Couple, and Pre-Wedding Photography.',
-  icons: {
-    icon: '/brand/wedding-photoart-logo.png',
-    apple: '/brand/wedding-photoart-logo.png',
-  },
+export const metadata: Metadata = buildRootMetadata();
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#F9F8F5',
+  colorScheme: 'light',
 };
 
 export default function RootLayout({
