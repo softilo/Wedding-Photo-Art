@@ -146,13 +146,15 @@ export function PageSkeleton({
           </div>
         </div>
 
-        {/* Decision Path Strip Skeleton */}
-        <div className="border-b border-[#E5DFD0] bg-white">
-          <div className="mx-auto max-w-6xl px-4 py-3.5 sm:px-6 flex items-center gap-2 overflow-hidden">
-            <div className="h-4 w-28 rounded-md skeleton-bone shrink-0" />
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-8 w-36 rounded-full skeleton-bone shrink-0" />
-            ))}
+        {/* Editorial Bento Mosaic Below Intro Skeleton */}
+        <div className="border-b border-[#E5DFD0] bg-[#F9F8F5]">
+          <div className="mx-auto max-w-6xl px-3 py-5 sm:px-6 sm:py-8">
+            <div className="grid grid-cols-2 sm:grid-cols-12 gap-2 sm:gap-3.5">
+              <div className="col-span-2 sm:col-span-8 aspect-[16/10] sm:aspect-auto sm:h-[245px] md:h-[295px] lg:h-[360px] rounded-xl sm:rounded-2xl skeleton-bone" />
+              <div className="col-span-1 sm:col-span-4 aspect-square sm:aspect-auto sm:h-[245px] md:h-[295px] lg:h-[360px] rounded-xl sm:rounded-2xl skeleton-bone" />
+              <div className="col-span-1 sm:col-span-4 aspect-square sm:aspect-auto sm:h-[245px] md:h-[295px] lg:h-[360px] rounded-xl sm:rounded-2xl skeleton-bone" />
+              <div className="col-span-2 sm:col-span-8 aspect-[16/10] sm:aspect-auto sm:h-[245px] md:h-[295px] lg:h-[360px] rounded-xl sm:rounded-2xl skeleton-bone" />
+            </div>
           </div>
         </div>
 

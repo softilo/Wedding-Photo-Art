@@ -31,6 +31,7 @@ import {
   ShieldCheckIcon,
   StarIcon,
 } from '@/components/shared/Icons';
+import { EditorialBentoShowcase } from './EditorialBentoShowcase';
 import { HeroPhotoSlider } from './HeroPhotoSlider';
 import { InquiryForm } from './InquiryForm';
 import { PublicPortfolioShowcase } from './PublicPortfolioShowcase';
@@ -42,6 +43,7 @@ interface PublicAgencyHomeProps {
   portfolio: PortfolioItem[];
   portfolioEvents?: PortfolioShowcaseEvent[];
   heroEvent?: PortfolioShowcaseEvent | null;
+  editorialGridEvent?: PortfolioShowcaseEvent | null;
   galleryImages?: PortfolioMediaItem[];
   isBackendConnected: boolean;
   initialPackageId?: string;
@@ -54,6 +56,7 @@ export function PublicAgencyHome({
   portfolio,
   portfolioEvents = [],
   heroEvent = null,
+  editorialGridEvent = null,
   galleryImages = [],
   isBackendConnected,
   initialPackageId = '',
@@ -187,6 +190,17 @@ export function PublicAgencyHome({
           </div>
         </div>
       </section>
+
+      {/* =====================================================================
+          EDITORIAL MOSAIC: 4-Frame Asymmetric Quality Photo Showcase
+      ===================================================================== */}
+      <EditorialBentoShowcase
+        branding={branding}
+        editorialEvent={editorialGridEvent}
+        portfolioEvents={allClientPortfolios}
+        galleryImages={galleryImages}
+        legacyPortfolio={portfolio}
+      />
 
       {/* =====================================================================
           STEP 01: SERVICES & CEREMONIES WE COVER

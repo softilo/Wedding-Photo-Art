@@ -22,28 +22,39 @@ import {
 } from '@/service/catalog/catalog.service';
 import {
   classifyPhotoFraming,
+  EDITORIAL_GRID_SLOTS,
   getHeroSlideImageUrl,
   getHeroSlideSrcSet,
   getHeroSlideThumbUrl,
   HeroColumnCount,
   HeroSlideSpeed,
   HeroSliderSettings,
+  parseEditorialGridSettings,
   parseHeroSliderSettings,
   serializeHeroSliderDescription,
 } from '@/lib/heroSlider';
-import { useModalHistoryBack } from '@/lib/useModalHistoryBack';
+import {
+  detectImageFormat,
+  formatBytes,
+  measureImageDimensions,
+  uploadImageToCloudinary,
+} from '@/lib/cloudinaryClientUpload';
 import { cn, formatLocalDate } from '@/lib/utils';
 import {
   CameraIcon,
-  CheckCircleIcon,
   ExternalLinkIcon,
   GalleryHorizontalIcon,
+  LayersIcon,
   PlusIcon,
-  SearchIcon,
 } from '@/components/shared/Icons';
+import { EditorialMosaicSetup } from './EditorialMosaicSetup';
+import { StudioGalleryPickerModal } from './StudioGalleryPickerModal';
+
+type SetupSectionTab = 'hero' | 'editorial';
 
 interface HeroSliderManagerProps {
   initialHeroEvent: PortfolioShowcaseEvent | null;
+  initialEditorialEvent?: PortfolioShowcaseEvent | null;
   galleryImages: PortfolioMediaItem[];
   cloudinaryStatus: CloudinaryStatusSummary | null;
   studioName: string;
@@ -78,55 +89,18 @@ const SPEED_OPTIONS: Array<{ value: HeroSlideSpeed; label: string; hint: string 
   { value: 8000, label: '8.0s', hint: 'Gentle' },
 ];
 
-function detectImageFormat(file: File): { valid: boolean; format: string } {
-  const isImage =
-    file.type.startsWith('image/') ||
-    /\.(jpe?g|png|webp|avif|heic|heif)$/i.test(file.name);
-  if (!isImage) {
-    return { valid: false, format: '' };
-  }
-  const extFromName = file.name.split('.').pop()?.toLowerCase() || '';
-  const extFromMime = file.type.split('/').pop()?.toLowerCase() || '';
-  const raw = extFromName || extFromMime || 'jpg';
-  const format = raw === 'jpeg' ? 'jpg' : raw;
-  return { valid: true, format };
-}
-
-function measureImageDimensions(
-  file: File,
-): Promise<{ width?: number; height?: number }> {
-  if (typeof window === 'undefined' || typeof URL === 'undefined') {
-    return Promise.resolve({});
-  }
-  return new Promise((resolve) => {
-    const objectUrl = URL.createObjectURL(file);
-    const img = new window.Image();
-    img.onload = () => {
-      const dims = { width: img.naturalWidth, height: img.naturalHeight };
-      URL.revokeObjectURL(objectUrl);
-      resolve(dims);
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      resolve({});
-    };
-    img.src = objectUrl;
-  });
-}
-
-function formatBytes(bytes: number): string {
-  if (!bytes || bytes <= 0) return '0 B';
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
 export function HeroSliderManager({
   initialHeroEvent,
+  initialEditorialEvent = null,
   galleryImages,
   cloudinaryStatus,
   studioName,
 }: HeroSliderManagerProps) {
+  const [activeTab, setActiveTab] = useState<SetupSectionTab>('hero');
   const [heroEvent, setHeroEvent] = useState<PortfolioShowcaseEvent | null>(initialHeroEvent);
+  const [editorialEventState, setEditorialEventState] = useState<PortfolioShowcaseEvent | null>(
+    initialEditorialEvent,
+  );
   const [galleryPool, setGalleryPool] = useState<PortfolioMediaItem[]>(galleryImages);
   const [settingsDraft, setSettingsDraft] = useState<HeroSliderSettings>(() =>
     parseHeroSliderSettings(initialHeroEvent?.description),
@@ -146,8 +120,6 @@ export function HeroSliderManager({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const heroEventRef = useRef<PortfolioShowcaseEvent | null>(initialHeroEvent);
   const ensureHeroPromiseRef = useRef<Promise<PortfolioShowcaseEvent | null> | null>(null);
-
-  useModalHistoryBack(showGalleryPicker, () => setShowGalleryPicker(false));
 
   const syncHeroEventState = (nextEvent: PortfolioShowcaseEvent | null) => {
     heroEventRef.current = nextEvent;
@@ -183,29 +155,22 @@ export function HeroSliderManager({
     [orderedSlides],
   );
 
-  const filteredGalleryPool = useMemo(() => {
-    const q = gallerySearch.trim().toLowerCase();
-    return galleryPool
-      .filter((item) => {
-        if (item.resourceType !== 'IMAGE' || item.status !== 'READY') return false;
-        if (
-          landscapeOnlyFilter &&
-          item.width &&
-          item.height &&
-          item.height >= item.width
-        ) {
-          return false;
-        }
-        if (!q) return true;
-        const label = (item.caption || item.altText || item.publicId || '').toLowerCase();
-        return label.includes(q) || item.format.toLowerCase().includes(q);
-      })
-      .sort((a, b) => {
-        const aLand = a.width && a.height && a.width > a.height ? 1 : 0;
-        const bLand = b.width && b.height && b.width > b.height ? 1 : 0;
-        return bLand - aLand;
-      });
-  }, [galleryPool, gallerySearch, landscapeOnlyFilter]);
+  const editorialSettings = useMemo(
+    () => parseEditorialGridSettings(editorialEventState?.description),
+    [editorialEventState?.description],
+  );
+
+  const editorialCustomCount = useMemo(() => {
+    const readyIds = new Set(
+      (editorialEventState?.media || [])
+        .filter((m) => m.resourceType === 'IMAGE' && m.status === 'READY')
+        .map((m) => m.id),
+    );
+    return EDITORIAL_GRID_SLOTS.filter((slot) => {
+      const id = editorialSettings.slots[slot.key];
+      return Boolean(id && readyIds.has(id));
+    }).length;
+  }, [editorialEventState?.media, editorialSettings.slots]);
 
   const previewSlots =
     previewViewport === 'desktop'
@@ -317,55 +282,12 @@ export function HeroSliderManager({
         return;
       }
 
-      const signed = signRes.data;
       updateQueueItem(item.localId, { state: 'UPLOADING', progress: 12 });
 
       try {
-        cld = await new Promise<NonNullable<UploadQueueItem['cloudinaryResult']>>(
-          (resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', signed.uploadUrl, true);
-
-            xhr.upload.onprogress = (ev) => {
-              if (ev.lengthComputable && ev.total > 0) {
-                const pct = Math.min(94, Math.max(12, Math.round((ev.loaded / ev.total) * 90)));
-                updateQueueItem(item.localId, { progress: pct });
-              }
-            };
-
-            xhr.onload = () => {
-              try {
-                const body = JSON.parse(xhr.responseText || '{}');
-                if (xhr.status >= 200 && xhr.status < 300 && body.asset_id && body.public_id) {
-                  resolve(body);
-                } else {
-                  reject(
-                    new Error(
-                      body?.error?.message || `Cloudinary upload failed (${xhr.status}).`,
-                    ),
-                  );
-                }
-              } catch {
-                reject(new Error(`Cloudinary upload failed (${xhr.status}).`));
-              }
-            };
-
-            xhr.onerror = () => reject(new Error('Network error while uploading to Cloudinary.'));
-
-            const form = new FormData();
-            form.append('file', item.file);
-            form.append('api_key', signed.apiKey);
-            form.append('timestamp', String(signed.timestamp));
-            form.append('signature', signed.signature);
-            form.append('folder', signed.folder);
-            form.append('allowed_formats', signed.allowedFormats.join(','));
-            form.append('context', signed.context);
-            if (signed.uploadPreset) {
-              form.append('upload_preset', signed.uploadPreset);
-            }
-            xhr.send(form);
-          },
-        );
+        cld = await uploadImageToCloudinary(item.file, signRes.data, (pct) => {
+          updateQueueItem(item.localId, { progress: pct });
+        });
 
         updateQueueItem(item.localId, {
           cloudinaryResult: cld,
@@ -690,34 +612,54 @@ export function HeroSliderManager({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1.5">
           <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="admin-page-title">Hero Section Slideshow Manager</h1>
-            <span
-              className={cn(
-                'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold',
-                isHeroPublished && visibleReadySlides.length > 0
-                  ? 'border-emerald-500/35 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300'
-                  : 'border-[var(--admin-accent)]/35 bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]',
-              )}
-            >
+            <h1 className="admin-page-title">Public Page Setup</h1>
+            {activeTab === 'hero' ? (
               <span
                 className={cn(
-                  'h-1.5 w-1.5 rounded-full',
+                  'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold',
                   isHeroPublished && visibleReadySlides.length > 0
-                    ? 'bg-emerald-500'
-                    : 'bg-[var(--admin-accent)]',
+                    ? 'border-emerald-500/35 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300'
+                    : 'border-[var(--admin-accent)]/35 bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]',
                 )}
-              />
-              {isHeroPublished && visibleReadySlides.length > 0
-                ? `Live • ${visibleReadySlides.length} Active Slide${visibleReadySlides.length === 1 ? '' : 's'}`
-                : heroEvent?.status === 'DRAFT' && orderedSlides.length > 0
-                  ? 'Paused (Draft)'
-                  : 'Fallback Mode Active'}
-            </span>
+              >
+                <span
+                  className={cn(
+                    'h-1.5 w-1.5 rounded-full',
+                    isHeroPublished && visibleReadySlides.length > 0
+                      ? 'bg-emerald-500'
+                      : 'bg-[var(--admin-accent)]',
+                  )}
+                />
+                {isHeroPublished && visibleReadySlides.length > 0
+                  ? `Hero Live • ${visibleReadySlides.length} Slide${visibleReadySlides.length === 1 ? '' : 's'}`
+                  : heroEvent?.status === 'DRAFT' && orderedSlides.length > 0
+                    ? 'Hero Paused (Draft)'
+                    : 'Hero Auto-Fallback'}
+              </span>
+            ) : (
+              <span
+                className={cn(
+                  'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold',
+                  editorialSettings.enabled
+                    ? 'border-emerald-500/35 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300'
+                    : 'border-amber-500/35 bg-amber-500/10 text-amber-700 dark:text-amber-300',
+                )}
+              >
+                <span
+                  className={cn(
+                    'h-1.5 w-1.5 rounded-full',
+                    editorialSettings.enabled ? 'bg-emerald-500' : 'bg-amber-500',
+                  )}
+                />
+                {editorialSettings.enabled
+                  ? `${editorialCustomCount}/4 Custom Frames`
+                  : 'Section Hidden'}
+              </span>
+            )}
           </div>
           <p className="admin-meta">
-            Upload full-resolution landscape wedding photos (16:9 / 3:2). Photos render in
-            original / 4K <span className="font-mono-code">q_100</span> quality with zero text
-            overlay.
+            Manage your public homepage photography section-by-section in original / 4K{' '}
+            <span className="font-mono-code">q_100</span> quality.
           </p>
         </div>
 
@@ -731,23 +673,107 @@ export function HeroSliderManager({
             <span>View Live Homepage</span>
             <ExternalLinkIcon className="w-3.5 h-3.5" />
           </Link>
-          <button
-            type="button"
-            onClick={handleOpenGalleryPicker}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-2 text-xs font-semibold text-[var(--admin-text)] hover:bg-[var(--admin-surface-hover)] transition-colors cursor-pointer"
-          >
-            <CameraIcon className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
-            <span>Pick From Gallery</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--admin-accent)] px-4 py-2 text-xs font-semibold text-[var(--admin-accent-fg)] shadow-xs hover:opacity-95 transition-opacity cursor-pointer"
-          >
-            <PlusIcon className="w-3.5 h-3.5" />
-            <span>Upload Landscape Photos</span>
-          </button>
+          {activeTab === 'hero' && (
+            <>
+              <button
+                type="button"
+                onClick={handleOpenGalleryPicker}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-2 text-xs font-semibold text-[var(--admin-text)] hover:bg-[var(--admin-surface-hover)] transition-colors cursor-pointer"
+              >
+                <CameraIcon className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
+                <span>Pick From Gallery</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--admin-accent)] px-4 py-2 text-xs font-semibold text-[var(--admin-accent-fg)] shadow-xs hover:opacity-95 transition-opacity cursor-pointer"
+              >
+                <PlusIcon className="w-3.5 h-3.5" />
+                <span>Upload Landscape Photos</span>
+              </button>
+            </>
+          )}
         </div>
+      </div>
+
+      {/* Section Categories Bar (Just Hero Slider & Showcase Bento Grid) */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        <button
+          type="button"
+          onClick={() => setActiveTab('hero')}
+          className={cn(
+            'text-left rounded-2xl border p-4 transition-all flex items-center justify-between gap-3 cursor-pointer',
+            activeTab === 'hero'
+              ? 'border-[var(--admin-accent)] bg-[var(--admin-accent-soft)] shadow-2xs'
+              : 'border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-surface-subtle)]',
+          )}
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <span
+              className={cn(
+                'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border',
+                activeTab === 'hero'
+                  ? 'border-[var(--admin-accent)]/40 bg-[var(--admin-accent)] text-[var(--admin-accent-fg)]'
+                  : 'border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] text-[var(--admin-accent)]',
+              )}
+            >
+              <GalleryHorizontalIcon className="w-5 h-5" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[10.5px] font-bold uppercase tracking-wider text-[var(--admin-accent)]">
+                Section 01
+              </p>
+              <p className="text-sm font-semibold text-[var(--admin-text)] truncate">
+                Hero Slideshow Carousel
+              </p>
+              <p className="text-[11px] text-[var(--admin-muted)] truncate">
+                Full-width top slider • {settingsDraft.desktopColumns}/{settingsDraft.tabletColumns}/
+                {settingsDraft.mobileColumns} view mode
+              </p>
+            </div>
+          </div>
+          <span className="font-mono-code text-xs font-bold text-[var(--admin-muted)] shrink-0">
+            {orderedSlides.length} slides
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('editorial')}
+          className={cn(
+            'text-left rounded-2xl border p-4 transition-all flex items-center justify-between gap-3 cursor-pointer',
+            activeTab === 'editorial'
+              ? 'border-[var(--admin-accent)] bg-[var(--admin-accent-soft)] shadow-2xs'
+              : 'border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-surface-subtle)]',
+          )}
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <span
+              className={cn(
+                'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border',
+                activeTab === 'editorial'
+                  ? 'border-[var(--admin-accent)]/40 bg-[var(--admin-accent)] text-[var(--admin-accent-fg)]'
+                  : 'border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] text-[var(--admin-accent)]',
+              )}
+            >
+              <LayersIcon className="w-5 h-5" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[10.5px] font-bold uppercase tracking-wider text-[var(--admin-accent)]">
+                Section 02
+              </p>
+              <p className="text-sm font-semibold text-[var(--admin-text)] truncate">
+                Showcase Bento Mosaic (4 Frames)
+              </p>
+              <p className="text-[11px] text-[var(--admin-muted)] truncate">
+                Row 1 Wide+Square &amp; Row 2 Square+Wide below Intro
+              </p>
+            </div>
+          </div>
+          <span className="font-mono-code text-xs font-bold text-[var(--admin-muted)] shrink-0">
+            {editorialCustomCount}/4 set
+          </span>
+        </button>
       </div>
 
       {!isCloudinaryReady && cloudinaryStatus && (
@@ -782,7 +808,18 @@ export function HeroSliderManager({
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-12 items-start">
+      {activeTab === 'editorial' ? (
+        <EditorialMosaicSetup
+          initialEditorialEvent={editorialEventState}
+          galleryPool={galleryPool}
+          onGalleryPoolUpdate={setGalleryPool}
+          studioName={studioName}
+          onNotify={notify}
+          onEditorialEventChange={setEditorialEventState}
+        />
+      ) : (
+        <>
+          <div className="grid gap-6 lg:grid-cols-12 items-start">
         {/* LEFT COLUMN: Upload Zone + Curated Slides Queue */}
         <div className="lg:col-span-7 space-y-5 min-w-0">
           {/* Drag & Drop Direct Upload Zone */}
@@ -1484,145 +1521,23 @@ export function HeroSliderManager({
         </div>
       </div>
 
-      {/* Studio Gallery Picker Modal */}
-      {showGalleryPicker && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-6"
-          onClick={() => setShowGalleryPicker(false)}
-        >
-          <div
-            className="admin-card w-full max-w-4xl max-h-[88vh] flex flex-col overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-4 sm:p-5 border-b border-[var(--admin-border)] flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h2 className="admin-section-title">Add Existing Photos from Studio Gallery</h2>
-                <p className="text-xs text-[var(--admin-muted)]">
-                  Landscape photos are listed first. Click any photo below to add it to the Hero
-                  slideshow at full quality.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowGalleryPicker(false)}
-                className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] px-3 py-1.5 text-xs font-semibold text-[var(--admin-text)] hover:bg-[var(--admin-surface-hover)] cursor-pointer"
-              >
-                Close ✕
-              </button>
-            </div>
-
-            <div className="p-4 border-b border-[var(--admin-border-subtle)] flex flex-wrap items-center gap-3">
-              <div className="relative flex-1 min-w-[200px]">
-                <SearchIcon className="w-4 h-4 text-[var(--admin-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  value={gallerySearch}
-                  onChange={(e) => setGallerySearch(e.target.value)}
-                  placeholder="Search studio gallery photos..."
-                  className="w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-input)] pl-9 pr-3 py-2 text-xs text-[var(--admin-text)] outline-none focus:border-[var(--admin-accent)]"
-                />
-              </div>
-
-              <label className="inline-flex items-center gap-2 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] px-3 py-2 text-xs font-semibold text-[var(--admin-text)] cursor-pointer shrink-0">
-                <input
-                  type="checkbox"
-                  checked={landscapeOnlyFilter}
-                  onChange={(e) => setLandscapeOnlyFilter(e.target.checked)}
-                  className="h-3.5 w-3.5 accent-[var(--admin-accent)] cursor-pointer"
-                />
-                <span>Landscape Only</span>
-              </label>
-
-              <span className="text-xs font-mono-code text-[var(--admin-muted)] shrink-0">
-                {filteredGalleryPool.length} photos
-              </span>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-4 sm:p-5">
-              {filteredGalleryPool.length === 0 ? (
-                <div className="py-12 text-center space-y-2">
-                  <p className="text-sm font-medium text-[var(--admin-text)]">
-                    No matching gallery photos found
-                  </p>
-                  <p className="text-xs text-[var(--admin-muted)]">
-                    {landscapeOnlyFilter
-                      ? 'Uncheck "Landscape Only" to see vertical photos, or upload wide photos above.'
-                      : 'Upload photos directly on this page or in Studio Craft → Gallery first.'}
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
-                  {filteredGalleryPool.map((img) => {
-                    const alreadyAdded = existingHeroPublicIds.has(img.publicId);
-                    const framing = classifyPhotoFraming(img.width, img.height);
-                    return (
-                      <div
-                        key={img.id}
-                        className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] overflow-hidden flex flex-col justify-between"
-                      >
-                        <div className="relative aspect-[16/10] bg-[#14120E]">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={getHeroSlideThumbUrl(img)}
-                            alt={img.caption || img.altText || 'Gallery photo'}
-                            className="w-full h-full object-contain"
-                            loading="lazy"
-                          />
-                          {img.width && img.height && (
-                            <span className="absolute bottom-1.5 right-1.5 rounded-md bg-[#14120E]/80 px-1.5 py-0.5 font-mono-code text-[10px] font-semibold text-[#E7D1AA]">
-                              {img.width}×{img.height}
-                            </span>
-                          )}
-                        </div>
-                        <div className="p-2.5 space-y-2">
-                          <div className="flex items-center justify-between gap-2">
-                            <p className="text-[11px] font-medium text-[var(--admin-text)] truncate">
-                              {img.caption || img.altText || 'Studio Photo'}
-                            </p>
-                            <span
-                              className={cn(
-                                'shrink-0 text-[10px] font-semibold',
-                                framing.tone === 'emerald'
-                                  ? 'text-emerald-600 dark:text-emerald-300'
-                                  : framing.tone === 'amber'
-                                    ? 'text-amber-600 dark:text-amber-300'
-                                    : 'text-[var(--admin-muted)]',
-                              )}
-                            >
-                              {framing.isLandscape ? 'Landscape' : 'Portrait'}
-                            </span>
-                          </div>
-                          <button
-                            type="button"
-                            disabled={isPending || alreadyAdded}
-                            onClick={() => handleAttachGalleryImage(img)}
-                            className={cn(
-                              'w-full inline-flex items-center justify-center gap-1 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-colors cursor-pointer',
-                              alreadyAdded
-                                ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 cursor-default'
-                                : 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)] hover:opacity-95',
-                            )}
-                          >
-                            {alreadyAdded ? (
-                              <>
-                                <CheckCircleIcon className="w-3.5 h-3.5" />
-                                <span>In Hero</span>
-                              </>
-                            ) : (
-                              <>
-                                <PlusIcon className="w-3.5 h-3.5" />
-                                <span>Add to Hero</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+      <StudioGalleryPickerModal
+        open={showGalleryPicker}
+        onClose={() => setShowGalleryPicker(false)}
+        title="Add Existing Photos from Studio Gallery"
+        subtitle="Landscape photos are listed first. Click any photo below to add it to the Hero slideshow at full quality."
+        actionLabel="Add to Hero"
+        activeLabel="In Hero"
+        galleryImages={galleryPool}
+        activePublicIds={existingHeroPublicIds}
+        searchQuery={gallerySearch}
+        onSearchChange={setGallerySearch}
+        landscapeOnly={landscapeOnlyFilter}
+        onLandscapeOnlyChange={setLandscapeOnlyFilter}
+        isBusy={isPending}
+        onPickImage={handleAttachGalleryImage}
+      />
+        </>
       )}
     </div>
   );

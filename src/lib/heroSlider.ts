@@ -11,10 +11,12 @@ import {
 
 export const STUDIO_GALLERY_SLUG = 'studio-media-gallery';
 export const HERO_SLIDER_SLUG = 'studio-hero-slider';
+export const EDITORIAL_GRID_SLUG = 'studio-editorial-grid';
 
 const SYSTEM_PORTFOLIO_EVENT_SLUGS = new Set([
   STUDIO_GALLERY_SLUG,
   HERO_SLIDER_SLUG,
+  EDITORIAL_GRID_SLUG,
 ]);
 
 export function isSystemPortfolioEventSlug(slug?: string | null): boolean {
@@ -373,5 +375,304 @@ export function resolveHeroSlides(params: {
     slides: collected,
     settings,
     usingFallback: true,
+  };
+}
+
+// ============================================================================
+// EDITORIAL BENTO SHOWCASE (4-SLOT ASYMMETRIC MOSAIC BELOW INTRO)
+// ============================================================================
+
+export type EditorialGridSlotKey =
+  | 'row1WideLeft'
+  | 'row1SquareRight'
+  | 'row2SquareLeft'
+  | 'row2WideRight';
+
+export interface EditorialGridSlotMeta {
+  key: EditorialGridSlotKey;
+  order: number;
+  rowLabel: string;
+  title: string;
+  recommendedShape: 'wide' | 'square';
+  orientationHint: string;
+  aspectSummary: string;
+}
+
+export const EDITORIAL_GRID_SLOTS: EditorialGridSlotMeta[] = [
+  {
+    key: 'row1WideLeft',
+    order: 1,
+    rowLabel: 'Row 1 • Left',
+    title: 'Wide Landscape Feature',
+    recommendedShape: 'wide',
+    orientationHint: 'Landscape 16:9 / 3:2 (1920px+ recommended)',
+    aspectSummary: 'Top Wide Frame',
+  },
+  {
+    key: 'row1SquareRight',
+    order: 2,
+    rowLabel: 'Row 1 • Right',
+    title: 'Square Portrait Frame',
+    recommendedShape: 'square',
+    orientationHint: 'Portrait 4:5 or Square 1:1 (1200px+ recommended)',
+    aspectSummary: 'Top Square Frame',
+  },
+  {
+    key: 'row2SquareLeft',
+    order: 3,
+    rowLabel: 'Row 2 • Left',
+    title: 'Square Portrait Frame',
+    recommendedShape: 'square',
+    orientationHint: 'Portrait 4:5 or Square 1:1 (1200px+ recommended)',
+    aspectSummary: 'Bottom Square Frame',
+  },
+  {
+    key: 'row2WideRight',
+    order: 4,
+    rowLabel: 'Row 2 • Right',
+    title: 'Wide Landscape Feature',
+    recommendedShape: 'wide',
+    orientationHint: 'Landscape 16:9 / 3:2 (1920px+ recommended)',
+    aspectSummary: 'Bottom Wide Frame',
+  },
+];
+
+export interface EditorialGridSettings {
+  enabled: boolean;
+  slots: Partial<Record<EditorialGridSlotKey, string>>;
+}
+
+export const DEFAULT_EDITORIAL_GRID_SETTINGS: EditorialGridSettings = {
+  enabled: true,
+  slots: {},
+};
+
+const EDITORIAL_CONFIG_OPEN = '<!-- WPA_EDITORIAL_CONFIG:';
+const EDITORIAL_CONFIG_CLOSE = ' -->';
+const VALID_EDITORIAL_SLOT_KEYS = new Set<EditorialGridSlotKey>([
+  'row1WideLeft',
+  'row1SquareRight',
+  'row2SquareLeft',
+  'row2WideRight',
+]);
+
+function normalizeEditorialGridSettings(raw: unknown): EditorialGridSettings {
+  if (!raw || typeof raw !== 'object') {
+    return { enabled: true, slots: {} };
+  }
+  const obj = raw as Record<string, unknown>;
+  const enabled = typeof obj.enabled === 'boolean' ? obj.enabled : true;
+  const slots: Partial<Record<EditorialGridSlotKey, string>> = {};
+
+  if (obj.slots && typeof obj.slots === 'object') {
+    const rawSlots = obj.slots as Record<string, unknown>;
+    for (const key of VALID_EDITORIAL_SLOT_KEYS) {
+      const val = rawSlots[key];
+      if (typeof val === 'string' && val.trim().length > 0) {
+        slots[key] = val.trim();
+      }
+    }
+  }
+
+  return { enabled, slots };
+}
+
+export function parseEditorialGridSettings(description?: string | null): EditorialGridSettings {
+  if (!description) return { enabled: true, slots: {} };
+  const start = description.indexOf(EDITORIAL_CONFIG_OPEN);
+  if (start === -1) return { enabled: true, slots: {} };
+  const jsonStart = start + EDITORIAL_CONFIG_OPEN.length;
+  const end = description.indexOf(EDITORIAL_CONFIG_CLOSE, jsonStart);
+  if (end === -1) return { enabled: true, slots: {} };
+
+  try {
+    return normalizeEditorialGridSettings(JSON.parse(description.slice(jsonStart, end)));
+  } catch {
+    return { enabled: true, slots: {} };
+  }
+}
+
+export function serializeEditorialGridDescription(settings: EditorialGridSettings): string {
+  const normalized = normalizeEditorialGridSettings(settings);
+  return `Managed Homepage Editorial Mosaic Grid\n${EDITORIAL_CONFIG_OPEN}${JSON.stringify(normalized)}${EDITORIAL_CONFIG_CLOSE}`;
+}
+
+export interface ResolvedEditorialSlot {
+  meta: EditorialGridSlotMeta;
+  slide: HeroSlide | null;
+  mediaItem?: PortfolioMediaItem;
+  isCustom: boolean;
+}
+
+export function resolveEditorialGridSlots(params: {
+  editorialEvent?: PortfolioShowcaseEvent | null;
+  brandingName: string;
+  portfolioEvents: PortfolioShowcaseEvent[];
+  galleryImages: PortfolioMediaItem[];
+  legacyPortfolio: PortfolioItem[];
+}): {
+  enabled: boolean;
+  slots: ResolvedEditorialSlot[];
+  hasAnyImage: boolean;
+  usingFallback: boolean;
+} {
+  const { editorialEvent, brandingName, portfolioEvents, galleryImages, legacyPortfolio } = params;
+  const settings = parseEditorialGridSettings(editorialEvent?.description);
+
+  if (!settings.enabled) {
+    return {
+      enabled: false,
+      slots: EDITORIAL_GRID_SLOTS.map((meta) => ({ meta, slide: null, isCustom: false })),
+      hasAnyImage: false,
+      usingFallback: false,
+    };
+  }
+
+  const readyMediaById = new Map<string, PortfolioMediaItem>();
+  if (editorialEvent && editorialEvent.status === 'PUBLISHED') {
+    for (const m of editorialEvent.media || []) {
+      if (m.resourceType === 'IMAGE' && m.status === 'READY' && m.secureUrl) {
+        readyMediaById.set(m.id, m);
+      }
+    }
+  }
+
+  // Collect fallback pool separating landscape vs portrait/square shots cleanly
+  const landscapeFallbacks: Array<{ slide: HeroSlide; media?: PortfolioMediaItem }> = [];
+  const portraitOrSquareFallbacks: Array<{ slide: HeroSlide; media?: PortfolioMediaItem }> = [];
+  const seenUrls = new Set<string>();
+
+  const pushFallbackMedia = (img: PortfolioMediaItem, fallbackLabel: string) => {
+    if (img.resourceType !== 'IMAGE' || img.status !== 'READY' || !img.secureUrl) return;
+    const url = getHeroSlideImageUrl(img);
+    if (!url || seenUrls.has(url)) return;
+    seenUrls.add(url);
+
+    const entry = {
+      slide: {
+        id: `ed-fb-${img.id}`,
+        imageUrl: url,
+        srcSet: getHeroSlideSrcSet(img),
+        ambientUrl: getHeroSlideAmbientUrl(img.secureUrl),
+        alt: img.altText || img.caption || fallbackLabel,
+        width: img.width,
+        height: img.height,
+      },
+      media: img,
+    };
+    const isLandscape = img.width && img.height ? img.width > img.height : true;
+    if (isLandscape) {
+      landscapeFallbacks.push(entry);
+    } else {
+      portraitOrSquareFallbacks.push(entry);
+    }
+  };
+
+  for (const img of galleryImages) {
+    pushFallbackMedia(img, `${brandingName} photography`);
+  }
+
+  for (const ev of portfolioEvents) {
+    if (isSystemPortfolioEventSlug(ev.slug)) continue;
+    for (const img of ev.media || []) {
+      pushFallbackMedia(img, ev.title || `${brandingName} album`);
+    }
+    if (ev.coverMedia) {
+      pushFallbackMedia(ev.coverMedia, ev.title || `${brandingName} cover`);
+    }
+  }
+
+  for (const item of legacyPortfolio) {
+    const parsed = parseShowcaseMedia(item.mediaUrl);
+    if (parsed.kind !== 'photo' || !parsed.coverUrl) continue;
+    const url = buildCloudinaryImageUrl(parsed.coverUrl, {
+      width: 3840,
+      crop: 'limit',
+      quality: '100',
+    });
+    if (!url || seenUrls.has(url)) continue;
+    seenUrls.add(url);
+    landscapeFallbacks.push({
+      slide: {
+        id: `ed-leg-${item.id}`,
+        imageUrl: url,
+        srcSet: buildCloudinarySrcSet(parsed.coverUrl, HERO_SRCSET_WIDTHS, '100'),
+        ambientUrl: getHeroSlideAmbientUrl(parsed.coverUrl),
+        alt: item.title || `${brandingName} portfolio`,
+      },
+    });
+  }
+
+  // Track custom URLs already chosen so fallback avoids repeating an assigned shot
+  for (const key of VALID_EDITORIAL_SLOT_KEYS) {
+    const mid = settings.slots[key];
+    const media = mid ? readyMediaById.get(mid) : undefined;
+    if (media) {
+      seenUrls.add(getHeroSlideImageUrl(media));
+    }
+  }
+
+  const usedFallbackIds = new Set<string>();
+  const takeFallback = (shape: 'wide' | 'square'): { slide: HeroSlide; media?: PortfolioMediaItem } | null => {
+    const preferredPool = shape === 'wide' ? landscapeFallbacks : portraitOrSquareFallbacks;
+    const secondaryPool = shape === 'wide' ? portraitOrSquareFallbacks : landscapeFallbacks;
+
+    for (const candidate of [...preferredPool, ...secondaryPool]) {
+      if (!usedFallbackIds.has(candidate.slide.id)) {
+        usedFallbackIds.add(candidate.slide.id);
+        return candidate;
+      }
+    }
+    return null;
+  };
+
+  let customCount = 0;
+  let fallbackCount = 0;
+
+  const resolvedSlots: ResolvedEditorialSlot[] = EDITORIAL_GRID_SLOTS.map((meta) => {
+    const assignedId = settings.slots[meta.key];
+    const customMedia = assignedId ? readyMediaById.get(assignedId) : undefined;
+
+    if (customMedia) {
+      customCount += 1;
+      return {
+        meta,
+        slide: {
+          id: `ed-${meta.key}-${customMedia.id}`,
+          imageUrl: getHeroSlideImageUrl(customMedia),
+          srcSet: getHeroSlideSrcSet(customMedia),
+          ambientUrl: getHeroSlideAmbientUrl(customMedia.secureUrl),
+          alt: customMedia.altText || customMedia.caption || `${brandingName} ${meta.aspectSummary}`,
+          width: customMedia.width,
+          height: customMedia.height,
+        },
+        mediaItem: customMedia,
+        isCustom: true,
+      };
+    }
+
+    const fb = takeFallback(meta.recommendedShape);
+    if (fb) {
+      fallbackCount += 1;
+      return {
+        meta,
+        slide: fb.slide,
+        mediaItem: fb.media,
+        isCustom: false,
+      };
+    }
+
+    return {
+      meta,
+      slide: null,
+      isCustom: false,
+    };
+  });
+
+  return {
+    enabled: true,
+    slots: resolvedSlots,
+    hasAnyImage: resolvedSlots.some((s) => Boolean(s.slide)),
+    usingFallback: customCount === 0 && fallbackCount > 0,
   };
 }

@@ -3,8 +3,11 @@
 import { revalidatePath, updateTag } from 'next/cache';
 import { serverFetch } from '@/lib/serverFetch';
 import {
+  DEFAULT_EDITORIAL_GRID_SETTINGS,
   DEFAULT_HERO_SLIDER_SETTINGS,
+  EDITORIAL_GRID_SLUG,
   HERO_SLIDER_SLUG,
+  serializeEditorialGridDescription,
   serializeHeroSliderDescription,
 } from '@/lib/heroSlider';
 import {
@@ -585,14 +588,14 @@ export async function createPortfolioEventFromBooking(
   return result;
 }
 
-export async function getAdminHeroSliderEvent(): Promise<
-  ActionResult<PortfolioShowcaseEvent | null>
-> {
+async function getAdminSystemPortfolioEvent(
+  slug: string,
+): Promise<ActionResult<PortfolioShowcaseEvent | null>> {
   const eventsRes = await listAdminPortfolioEvents();
   if (!eventsRes.ok || !eventsRes.data) {
     return { ok: false, message: eventsRes.message || 'Failed to load portfolio events' };
   }
-  const match = eventsRes.data.data.find((ev) => ev.slug === HERO_SLIDER_SLUG);
+  const match = eventsRes.data.data.find((ev) => ev.slug === slug);
   if (!match) {
     return { ok: true, data: null };
   }
@@ -603,57 +606,64 @@ export async function getAdminHeroSliderEvent(): Promise<
   return { ok: true, data: match };
 }
 
-export async function ensureHeroSliderEvent(): Promise<ActionResult<PortfolioShowcaseEvent>> {
-  const existing = await getAdminHeroSliderEvent();
+async function ensureSystemPortfolioEvent(params: {
+  slug: string;
+  title: string;
+  description: string;
+  fallbackMessage: string;
+}): Promise<ActionResult<PortfolioShowcaseEvent>> {
+  const existing = await getAdminSystemPortfolioEvent(params.slug);
   if (existing.ok && existing.data) {
     return { ok: true, data: existing.data };
   }
 
   const created = await createPortfolioEvent({
-    title: 'Homepage Hero Slideshow',
-    slug: HERO_SLIDER_SLUG,
-    description: serializeHeroSliderDescription(DEFAULT_HERO_SLIDER_SETTINGS),
+    title: params.title,
+    slug: params.slug,
+    description: params.description,
   });
   if (created.ok && created.data) {
-    revalidatePortfolioPaths(HERO_SLIDER_SLUG);
+    revalidatePortfolioPaths(params.slug);
     return created;
   }
 
   // Recover cleanly if a concurrent upload already initialized the slug
-  const retry = await getAdminHeroSliderEvent();
+  const retry = await getAdminSystemPortfolioEvent(params.slug);
   if (retry.ok && retry.data) {
     return { ok: true, data: retry.data };
   }
   return {
     ok: false,
-    message: created.message || 'Could not initialize hero slideshow record',
+    message: created.message || params.fallbackMessage,
   };
 }
 
-export async function activateHeroSliderMedia(
+async function activateSystemPortfolioMedia(
+  slug: string,
   eventId: string,
   leadMediaId: string,
   publishNow = true,
 ): Promise<ActionResult<PortfolioShowcaseEvent>> {
   const coverRes = await updatePortfolioMedia(eventId, leadMediaId, { isCover: true });
   if (!coverRes.ok) {
-    return { ok: false, message: coverRes.message || 'Could not set hero lead photo' };
+    return { ok: false, message: coverRes.message || 'Could not set section lead photo' };
   }
 
   if (publishNow) {
     const pubRes = await publishPortfolioEvent(eventId);
     if (!pubRes.ok || !pubRes.data) {
-      return { ok: false, message: pubRes.message || 'Could not publish hero slideshow' };
+      return { ok: false, message: pubRes.message || 'Could not publish public section' };
     }
     revalidatePortfolioPaths(pubRes.data.slug);
     return pubRes;
   }
 
-  revalidatePortfolioPaths(HERO_SLIDER_SLUG);
+  revalidatePortfolioPaths(slug);
   return getAdminPortfolioEvent(eventId);
 }
 
-export async function removeHeroSliderMedia(
+async function removeSystemPortfolioMedia(
+  slug: string,
   eventId: string,
   mediaId: string,
 ): Promise<ActionResult<PortfolioShowcaseEvent | null>> {
@@ -673,10 +683,70 @@ export async function removeHeroSliderMedia(
 
   const removeRes = await removePortfolioMedia(eventId, mediaId);
   if (!removeRes.ok) {
-    return { ok: false, message: removeRes.message || 'Failed to remove hero slide' };
+    return { ok: false, message: removeRes.message || 'Failed to remove photo' };
   }
 
-  revalidatePortfolioPaths(HERO_SLIDER_SLUG);
+  revalidatePortfolioPaths(slug);
   const refreshed = await getAdminPortfolioEvent(eventId);
   return { ok: true, data: refreshed.ok && refreshed.data ? refreshed.data : null };
+}
+
+export async function getAdminHeroSliderEvent(): Promise<
+  ActionResult<PortfolioShowcaseEvent | null>
+> {
+  return getAdminSystemPortfolioEvent(HERO_SLIDER_SLUG);
+}
+
+export async function ensureHeroSliderEvent(): Promise<ActionResult<PortfolioShowcaseEvent>> {
+  return ensureSystemPortfolioEvent({
+    slug: HERO_SLIDER_SLUG,
+    title: 'Homepage Hero Slideshow',
+    description: serializeHeroSliderDescription(DEFAULT_HERO_SLIDER_SETTINGS),
+    fallbackMessage: 'Could not initialize hero slideshow record',
+  });
+}
+
+export async function activateHeroSliderMedia(
+  eventId: string,
+  leadMediaId: string,
+  publishNow = true,
+): Promise<ActionResult<PortfolioShowcaseEvent>> {
+  return activateSystemPortfolioMedia(HERO_SLIDER_SLUG, eventId, leadMediaId, publishNow);
+}
+
+export async function removeHeroSliderMedia(
+  eventId: string,
+  mediaId: string,
+): Promise<ActionResult<PortfolioShowcaseEvent | null>> {
+  return removeSystemPortfolioMedia(HERO_SLIDER_SLUG, eventId, mediaId);
+}
+
+export async function getAdminEditorialGridEvent(): Promise<
+  ActionResult<PortfolioShowcaseEvent | null>
+> {
+  return getAdminSystemPortfolioEvent(EDITORIAL_GRID_SLUG);
+}
+
+export async function ensureEditorialGridEvent(): Promise<ActionResult<PortfolioShowcaseEvent>> {
+  return ensureSystemPortfolioEvent({
+    slug: EDITORIAL_GRID_SLUG,
+    title: 'Homepage Editorial Photo Mosaic',
+    description: serializeEditorialGridDescription(DEFAULT_EDITORIAL_GRID_SETTINGS),
+    fallbackMessage: 'Could not initialize editorial mosaic section record',
+  });
+}
+
+export async function activateEditorialGridMedia(
+  eventId: string,
+  leadMediaId: string,
+  publishNow = true,
+): Promise<ActionResult<PortfolioShowcaseEvent>> {
+  return activateSystemPortfolioMedia(EDITORIAL_GRID_SLUG, eventId, leadMediaId, publishNow);
+}
+
+export async function removeEditorialGridMedia(
+  eventId: string,
+  mediaId: string,
+): Promise<ActionResult<PortfolioShowcaseEvent | null>> {
+  return removeSystemPortfolioMedia(EDITORIAL_GRID_SLUG, eventId, mediaId);
 }
