@@ -167,7 +167,7 @@ export function PublicAgencyHome({
         <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-7 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="min-w-0 space-y-1">
             <h1 className="font-editorial text-2xl sm:text-3xl font-semibold text-[#181611] tracking-tight">
-              Timeless Wedding Photography{' '}
+              Wedding Photography{' '}
               <span className="italic" style={{ color: accent }}>
                 &amp; Cinema.
               </span>
@@ -196,33 +196,7 @@ export function PublicAgencyHome({
         </div>
       </section>
 
-      {/* =====================================================================
-          DECISION GUIDE BAR: Let visitors jump through the 5 evaluation steps
-      ===================================================================== */}
-      <section
-        aria-label="Step-by-step decision guide"
-        className="border-b border-[#E5DFD0] bg-white"
-      >
-        <div className="mx-auto max-w-6xl px-4 py-3.5 sm:px-6">
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-            <span className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-[#7A5E21] whitespace-nowrap shrink-0 mr-1">
-              Your Decision Path:
-            </span>
-            {DECISION_STEPS.map((item) => (
-              <a
-                key={item.step}
-                href={item.href}
-                className="inline-flex items-center gap-2 rounded-full border border-[#DFCEAA] bg-[#F8F3E6] px-3 py-1.5 text-xs font-semibold text-[#181611] hover:border-[#8B6A21] hover:bg-white transition-colors whitespace-nowrap shrink-0"
-              >
-                <span className="font-mono-code text-[11px] font-bold text-[#8B6A21]">
-                  {item.step}
-                </span>
-                <span>{item.label}</span>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
       {/* =====================================================================
           STEP 01: SERVICES & CEREMONIES WE COVER
