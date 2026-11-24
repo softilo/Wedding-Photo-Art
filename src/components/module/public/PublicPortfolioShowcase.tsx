@@ -8,31 +8,21 @@ import {
   PortfolioShowcaseEvent,
   PublicBranding,
 } from '@/types/event-management';
-import {
-  getPublicGalleryMedia,
-  getPublicPortfolioEvents,
-} from '@/service/catalog/catalog.service';
+import { getPublicGalleryMedia } from '@/service/catalog/catalog.service';
 import {
   buildCloudinaryImageUrl,
   buildCloudinarySrcSet,
   buildCloudinaryVideoPosterUrl,
   parseShowcaseMedia,
 } from '@/lib/showcaseMedia';
-import { parseAlbumDescriptionAndTheme } from '@/lib/albumTheme';
-import { isSystemPortfolioEventSlug } from '@/lib/heroSlider';
 import { useModalHistoryBack } from '@/lib/useModalHistoryBack';
-import { cn, formatLocalDate } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import {
-  ArrowRightIcon,
-  CalendarIcon,
-  CameraIcon,
   GalleryHorizontalIcon,
   LayoutGridIcon,
-  SearchIcon,
 } from '@/components/shared/Icons';
 import { AdaptiveVideoPlayer } from './AdaptiveVideoPlayer';
 import { LazyViewportImage } from './LazyViewportImage';
-import { PortfolioEventDetailModal } from './PortfolioEventDetailModal';
 import { ShowcaseLightboxModal } from './ShowcaseLightboxModal';
 
 interface PublicPortfolioShowcaseProps {
@@ -64,7 +54,6 @@ function resolveNaturalAspectRatio(width?: number | null, height?: number | null
 export function PublicPortfolioShowcase({
   branding,
   portfolio,
-  portfolioEvents: initialEvents = [],
   initialGalleryMedia = [],
 }: PublicPortfolioShowcaseProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -76,12 +65,9 @@ export function PublicPortfolioShowcase({
   const [isLoadingMedia, setIsLoadingMedia] = useState(false);
 
   const [galleryMedia, setGalleryMedia] = useState<PortfolioMediaItem[]>(initialGalleryMedia);
-  const [showcaseEvents, setShowcaseEvents] = useState<PortfolioShowcaseEvent[]>(initialEvents);
 
-  const [mediaFilter, setMediaFilter] = useState<'all' | 'photo' | 'video' | 'stories'>('all');
   const [mobilePhotoMode, setMobilePhotoMode] = useState<'swipe' | 'grid'>('swipe');
   const [mobileSlideIndex, setMobileSlideIndex] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
   const [visiblePhotoCount, setVisiblePhotoCount] = useState(INITIAL_PHOTO_BATCH);
 
   // Interactive modals & cinema theater state
@@ -90,9 +76,6 @@ export function PublicPortfolioShowcase({
   );
   const [selectedFilmId, setSelectedFilmId] = useState<string | null>(null);
   const [playingVideoIds, setPlayingVideoIds] = useState<Record<string, boolean>>({});
-  const [activeShowcaseEvent, setActiveShowcaseEvent] = useState<PortfolioShowcaseEvent | null>(
-    null,
-  );
   const [activeShowcaseItem, setActiveShowcaseItem] = useState<PortfolioItem | null>(null);
 
   useModalHistoryBack(Boolean(selectedGalleryPhoto), () => setSelectedGalleryPhoto(null));
@@ -130,16 +113,10 @@ export function PublicPortfolioShowcase({
     async function loadGalleryOnScroll() {
       setIsLoadingMedia(true);
       try {
-        const [galRes, evRes] = await Promise.all([
-          getPublicGalleryMedia(),
-          showcaseEvents.length === 0 ? getPublicPortfolioEvents() : Promise.resolve(null),
-        ]);
+        const galRes = await getPublicGalleryMedia();
         if (cancelled) return;
         if (galRes.ok && galRes.data) {
           setGalleryMedia(galRes.data.data);
-        }
-        if (evRes && evRes.ok && evRes.data) {
-          setShowcaseEvents(evRes.data.data);
         }
       } finally {
         if (!cancelled) {
@@ -152,80 +129,18 @@ export function PublicPortfolioShowcase({
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasEnteredSection]);
 
-  const q = searchQuery.trim().toLowerCase();
-
   // Separate Videos and Photos cleanly so neither cramps the other's aspect ratio or UX
-  const filteredVideos = useMemo(() => {
-    if (mediaFilter !== 'all' && mediaFilter !== 'video') return [];
-    return galleryMedia.filter((m) => {
-      if (m.resourceType !== 'VIDEO') return false;
-      if (
-        q &&
-        !(m.caption || '').toLowerCase().includes(q) &&
-        !(m.altText || '').toLowerCase().includes(q)
-      ) {
-        return false;
-      }
-      return true;
-    });
-  }, [galleryMedia, mediaFilter, q]);
+  const filteredVideos = useMemo(
+    () => galleryMedia.filter((m) => m.resourceType === 'VIDEO'),
+    [galleryMedia],
+  );
 
-  const filteredPhotos = useMemo(() => {
-    if (mediaFilter !== 'all' && mediaFilter !== 'photo') return [];
-    return galleryMedia.filter((m) => {
-      if (m.resourceType !== 'IMAGE') return false;
-      if (
-        q &&
-        !(m.caption || '').toLowerCase().includes(q) &&
-        !(m.altText || '').toLowerCase().includes(q)
-      ) {
-        return false;
-      }
-      return true;
-    });
-  }, [galleryMedia, mediaFilter, q]);
-
-  const filteredEvents = useMemo(() => {
-    if (mediaFilter !== 'stories' && !q) {
-      // Event Stories have their own dedicated section ("Signature Digital Albums");
-      // show them here in full detail inside the Event Stories tab or when searching.
-      return [];
-    }
-    return showcaseEvents.filter((ev) => {
-      if (isSystemPortfolioEventSlug(ev.slug)) return false;
-      if (mediaFilter === 'video' && (ev.counts?.videos ?? 0) === 0) return false;
-      if (mediaFilter === 'photo' && (ev.counts?.photos ?? 0) === 0) return false;
-      if (
-        q &&
-        !ev.title.toLowerCase().includes(q) &&
-        !(ev.description || '').toLowerCase().includes(q) &&
-        !(ev.location || '').toLowerCase().includes(q)
-      ) {
-        return false;
-      }
-      return true;
-    });
-  }, [showcaseEvents, mediaFilter, q]);
-
-  const filteredLegacyItems = useMemo(() => {
-    if (mediaFilter === 'stories') return [];
-    return portfolio.filter((item) => {
-      const parsed = parseShowcaseMedia(item.mediaUrl);
-      if (mediaFilter === 'photo' && parsed.kind !== 'photo') return false;
-      if (mediaFilter === 'video' && parsed.kind !== 'video') return false;
-      if (
-        q &&
-        !item.title.toLowerCase().includes(q) &&
-        !(item.description || '').toLowerCase().includes(q)
-      ) {
-        return false;
-      }
-      return true;
-    });
-  }, [portfolio, mediaFilter, q]);
+  const filteredPhotos = useMemo(
+    () => galleryMedia.filter((m) => m.resourceType === 'IMAGE'),
+    [galleryMedia],
+  );
 
   const activeFilm =
     filteredVideos.find((v) => v.id === selectedFilmId) ?? filteredVideos[0] ?? null;
@@ -262,21 +177,11 @@ export function PublicPortfolioShowcase({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedGalleryPhoto, selectedPhotoIndex, filteredPhotos.length]);
 
-  const photoTotalCount =
-    galleryMedia.filter((m) => m.resourceType === 'IMAGE').length +
-    portfolio.filter((i) => parseShowcaseMedia(i.mediaUrl).kind === 'photo').length;
-  const videoTotalCount =
-    galleryMedia.filter((m) => m.resourceType === 'VIDEO').length +
-    portfolio.filter((i) => parseShowcaseMedia(i.mediaUrl).kind === 'video').length;
-
   const visiblePhotos = filteredPhotos.slice(0, visiblePhotoCount);
   const hasMorePhotos = visiblePhotoCount < filteredPhotos.length;
 
   const totalMatching =
-    filteredVideos.length +
-    filteredPhotos.length +
-    filteredEvents.length +
-    filteredLegacyItems.length;
+    filteredVideos.length + filteredPhotos.length + portfolio.length;
 
   const accent = branding.themeTokens.accentColor || '#8B6A21';
 
@@ -286,77 +191,19 @@ export function PublicPortfolioShowcase({
       ref={sectionRef}
       className="border-y border-[#E5DFD0] bg-white scroll-mt-16 overflow-x-clip"
     >
-      <div className="mx-auto max-w-6xl min-w-0 px-4 py-14 sm:py-20 sm:px-6 space-y-8 sm:space-y-10">
-        {/* Section Header & Medium Switcher */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 min-w-0">
-          <div className="min-w-0">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#DFCEAA] bg-[#F8F3E6] px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#6F5319] max-w-full">
-              <CameraIcon className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">Step 02B • Visual Exhibition &amp; Cinema</span>
-            </div>
-            <h2 className="font-editorial text-2xl sm:text-4xl lg:text-[2.75rem] font-semibold text-[#181611] mt-2 leading-tight">
-              Captured Moments &amp; Highlight Films
-            </h2>
-            <p className="text-sm text-[#4A4438] mt-1.5 max-w-xl">
-              Stream real wedding highlight reels and browse uncropped photographs to judge our
-              framing, color grading, and storytelling before you book.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2.5 min-w-0 max-w-full">
-            <div className="flex flex-wrap rounded-xl border border-[#DFCEAA] bg-[#F8F3E6] p-1 gap-1 max-w-full">
-              {[
-                { id: 'all' as const, label: 'All Showcase' },
-                {
-                  id: 'photo' as const,
-                  label: photoTotalCount > 0 ? `Photography (${photoTotalCount})` : 'Photography',
-                },
-                {
-                  id: 'video' as const,
-                  label: videoTotalCount > 0 ? `Cinema Films (${videoTotalCount})` : 'Cinema Films',
-                },
-                ...(showcaseEvents.length > 0
-                  ? [
-                      {
-                        id: 'stories' as const,
-                        label: `Event Stories (${showcaseEvents.length})`,
-                      },
-                    ]
-                  : []),
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => {
-                    setMediaFilter(tab.id);
-                    setVisiblePhotoCount(INITIAL_PHOTO_BATCH);
-                  }}
-                  className={cn(
-                    'rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer',
-                    mediaFilter === tab.id
-                      ? 'bg-[#181611] text-white shadow-2xs'
-                      : 'text-[#4A4438] hover:text-[#181611]',
-                  )}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="relative w-full sm:w-52">
-              <SearchIcon className="w-3.5 h-3.5 text-[#8A7F69] absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setVisiblePhotoCount(INITIAL_PHOTO_BATCH);
-                }}
-                placeholder="Search moments or films..."
-                className="w-full rounded-xl border border-[#D8CCB2] bg-[#F9F8F5] pl-8 pr-3 py-1.5 text-xs text-[#181611] placeholder:text-[#8A7F69] outline-none focus:border-[#8B6A21] focus:bg-white"
-              />
-            </div>
-          </div>
+      <div className="mx-auto max-w-6xl min-w-0 px-4 py-12 sm:py-16 sm:px-6 space-y-8">
+        {/* Clean Minimal Section Header */}
+        <div className="flex flex-wrap items-end justify-between gap-4 min-w-0">
+          <h2 className="font-editorial text-2xl sm:text-4xl font-semibold text-[#181611] leading-tight">
+            Highlight Films &amp; Stills
+          </h2>
+          <Link
+            href="/portfolio"
+            className="text-xs sm:text-sm font-semibold hover:underline shrink-0"
+            style={{ color: accent }}
+          >
+            All Client Albums →
+          </Link>
         </div>
 
         {/* Strict Viewport Gate: Nothing loads until the user scrolls to #portfolio! */}
@@ -419,25 +266,18 @@ export function PublicPortfolioShowcase({
           </div>
         ) : totalMatching === 0 ? (
           <div className="atelier-card p-12 text-center text-sm text-[#6B6352] bg-[#F8F3E6]">
-            {galleryMedia.length === 0 && showcaseEvents.length === 0 && portfolio.length === 0
-              ? 'Photos and highlight films uploaded in Admin → Gallery will appear here automatically.'
-              : 'No gallery items match your selected filter or search.'}
+            Photos and highlight films uploaded in Admin → Gallery will appear here automatically.
           </div>
         ) : (
           <div className="space-y-10 sm:space-y-12 min-w-0">
             {/* SUB-STAGE A: DEDICATED CINEMA THEATER (Separated from Photos!) */}
             {activeFilm && (
               <div className="rounded-2xl sm:rounded-3xl border border-[#2E291F] bg-[#14120E] p-3.5 sm:p-7 text-[#F4EFE4] space-y-4 sm:space-y-5 shadow-[0_28px_64px_-24px_rgba(20,18,14,0.55)] min-w-0 w-full overflow-hidden">
-                <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 border-b border-white/10 pb-3.5 sm:pb-4 min-w-0">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="inline-flex h-2.5 w-2.5 shrink-0 rounded-full bg-[#CAA650]" />
-                    <span className="text-[11px] font-bold uppercase tracking-[0.16em] sm:tracking-[0.2em] text-[#E7D1AA] truncate">
-                      Signature Highlight Films ({filteredVideos.length})
-                    </span>
-                  </div>
-                  <p className="text-xs text-[#9C937E] leading-relaxed">
-                    Dedicated widescreen theater — click any reel to stream on demand
-                  </p>
+                <div className="flex items-center gap-2.5 border-b border-white/10 pb-3.5 min-w-0">
+                  <span className="inline-flex h-2.5 w-2.5 shrink-0 rounded-full bg-[#CAA650]" />
+                  <span className="text-[11px] font-bold uppercase tracking-[0.16em] sm:tracking-[0.2em] text-[#E7D1AA] truncate">
+                    Highlight Films ({filteredVideos.length})
+                  </span>
                 </div>
 
                 <div
@@ -591,17 +431,12 @@ export function PublicPortfolioShowcase({
                     <div className="flex items-center gap-2.5 min-w-0">
                       <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-[#CAA650]" />
                       <h3 className="font-editorial text-xl sm:text-2xl font-semibold text-[#181611] truncate">
-                        Photography Wall
+                        Photography
                       </h3>
                       <span className="rounded-full bg-[#F8F3E6] border border-[#DFCEAA] px-2.5 py-0.5 text-[11px] font-mono-code text-[#6B6352] tabular-nums shrink-0">
-                        {filteredPhotos.length} frames
+                        {filteredPhotos.length}
                       </span>
                     </div>
-
-                    {/* Desktop caption helper */}
-                    <p className="hidden sm:block text-xs text-[#6B6352]">
-                      Original portrait &amp; landscape framing — click any frame for full resolution
-                    </p>
 
                     {/* Distinct Mobile Mode Toggle: Story Swipe vs 2-Col Lookbook Grid */}
                     <div className="sm:hidden inline-flex rounded-xl border border-[#DFCEAA] bg-[#F8F3E6] p-1 gap-1 shrink-0">
@@ -881,114 +716,10 @@ export function PublicPortfolioShowcase({
               );
             })()}
 
-            {/* SUB-STAGE C: EVENT STORIES GRID (When Event Stories tab or search matches) */}
-            {filteredEvents.length > 0 && (
-              <div className="space-y-5">
-                <div className="flex items-center justify-between border-b border-[#ECE6D8] pb-3">
-                  <h3 className="font-editorial text-2xl font-semibold text-[#181611]">
-                    Event Stories ({filteredEvents.length})
-                  </h3>
-                  <Link
-                    href="/portfolio"
-                    className="text-xs font-semibold hover:underline"
-                    style={{ color: accent }}
-                  >
-                    Open Full Portfolio Directory →
-                  </Link>
-                </div>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {filteredEvents.map((ev) => {
-                    const rawCoverUrl = ev.coverMedia?.secureUrl || '';
-                    const coverUrl =
-                      ev.coverMedia?.deliveryUrls?.coverUrl ||
-                      buildCloudinaryImageUrl(rawCoverUrl, { width: 800, crop: 'limit' });
-                    const photoCount = ev.counts?.photos ?? 0;
-                    const videoCount = ev.counts?.videos ?? 0;
-
-                    return (
-                      <div
-                        key={ev.id}
-                        className="group atelier-card atelier-card-hover overflow-hidden flex flex-col justify-between bg-white"
-                      >
-                        <button
-                          type="button"
-                          onClick={() => setActiveShowcaseEvent(ev)}
-                          className="text-left flex-1 flex flex-col cursor-pointer focus-visible:outline-none"
-                        >
-                          <div className="aspect-[4/3] w-full bg-[#EFECE3] relative overflow-hidden">
-                            {coverUrl ? (
-                              <LazyViewportImage
-                                src={coverUrl}
-                                srcSet={rawCoverUrl ? buildCloudinarySrcSet(rawCoverUrl) : undefined}
-                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
-                                alt={ev.coverMedia?.altText || ev.title}
-                                containerClassName="h-full w-full"
-                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                              />
-                            ) : (
-                              <div className="h-full w-full flex items-center justify-center bg-[#181611] text-[#C7BFA9] text-xs font-medium">
-                                Showcase Event
-                              </div>
-                            )}
-
-                            <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
-                              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#14120E]/80 backdrop-blur-xs px-3 py-1 text-[11px] font-semibold text-white">
-                                {photoCount > 0 ? `${photoCount} Photos` : 'Story'}
-                                {videoCount > 0 ? ` • ${videoCount} Film` : ''}
-                              </span>
-                              {ev.eventType && (
-                                <span className="rounded-full bg-white/95 backdrop-blur-xs px-2.5 py-0.5 text-[11px] font-bold text-[#181611]">
-                                  {ev.eventType.name}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="p-5 flex-1">
-                            {ev.eventDate && (
-                              <div className="flex items-center gap-1.5 text-xs text-[#6B6352] mb-1 font-mono-code">
-                                <CalendarIcon className="w-3.5 h-3.5 text-[#CAA650]" />
-                                <span>{formatLocalDate(ev.eventDate)}</span>
-                              </div>
-                            )}
-                            <h3 className="font-editorial text-xl font-semibold text-[#181611] group-hover:text-[#8B6A21] transition-colors">
-                              {ev.title}
-                            </h3>
-                            {parseAlbumDescriptionAndTheme(ev.description).cleanDescription && (
-                              <p className="mt-1 text-xs sm:text-sm text-[#4A4438] line-clamp-2">
-                                {parseAlbumDescriptionAndTheme(ev.description).cleanDescription}
-                              </p>
-                            )}
-                          </div>
-                        </button>
-
-                        <div className="px-5 py-3 border-t border-[#ECE6D8] bg-[#F8F3E6]/60 flex items-center justify-between gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setActiveShowcaseEvent(ev)}
-                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#181611] hover:text-[#8B6A21] cursor-pointer"
-                          >
-                            <span>Explore Story</span>
-                            <ArrowRightIcon className="w-3.5 h-3.5" />
-                          </button>
-                          <Link
-                            href={`/album/${ev.slug}`}
-                            className="text-xs font-semibold text-[#6B6352] hover:text-[#181611]"
-                          >
-                            Full Page ↗
-                          </Link>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
             {/* Legacy Portfolio Fallback Items if any exist */}
-            {filteredLegacyItems.length > 0 && (
+            {portfolio.length > 0 && (
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredLegacyItems.map((item) => {
+                {portfolio.map((item) => {
                   const parsed = parseShowcaseMedia(item.mediaUrl);
                   return (
                     <button
@@ -1178,13 +909,6 @@ export function PublicPortfolioShowcase({
             </div>
           )}
         </div>
-      )}
-
-      {activeShowcaseEvent && (
-        <PortfolioEventDetailModal
-          event={activeShowcaseEvent}
-          onClose={() => setActiveShowcaseEvent(null)}
-        />
       )}
 
       {activeShowcaseItem && (
