@@ -13,7 +13,6 @@ interface MobileNavDrawerProps {
 }
 
 const NAV_LINKS = [
-  { href: '/#specialties', label: 'Specialties', hint: 'Wedding • Holud • Pre-Wedding' },
   { href: '/#featured-portfolios', label: 'Signature Work', hint: 'Featured Client Albums' },
   { href: '/portfolio', label: 'Client Albums', hint: 'All Published Portfolios' },
   { href: '/#packages', label: 'Packages', hint: 'Collections & Pricing' },

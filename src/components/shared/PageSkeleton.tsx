@@ -158,23 +158,21 @@ export function PageSkeleton({
           </div>
         </div>
 
-        {/* Step 01 Preview Skeleton */}
-        <div className="bg-[#F3EFE6]/75 flex-1">
-          <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 space-y-6">
+        {/* Featured Client Samples Skeleton */}
+        <div className="bg-[#14120E] flex-1">
+          <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 space-y-8">
             <div className="space-y-2">
-              <div className="h-6 w-44 rounded-full skeleton-bone" />
-              <div className="h-9 w-72 rounded-xl skeleton-bone" />
+              <div className="h-6 w-36 rounded-full skeleton-bone-dark" />
+              <div className="h-10 w-80 max-w-full rounded-xl skeleton-bone-dark" />
             </div>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="atelier-card p-5 bg-white space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="h-5 w-28 rounded-full skeleton-bone" />
-                    <div className="h-4 w-6 rounded-md skeleton-bone" />
+                <div key={i} className="rounded-2xl border border-white/10 bg-[#1C1913] overflow-hidden">
+                  <div className="aspect-[4/3] w-full skeleton-bone-dark" />
+                  <div className="p-5 space-y-2">
+                    <div className="h-4 w-24 rounded-full skeleton-bone-dark" />
+                    <div className="h-7 w-48 rounded-lg skeleton-bone-dark" />
                   </div>
-                  <div className="h-7 w-40 rounded-lg skeleton-bone" />
-                  <div className="h-3.5 w-full rounded-md skeleton-bone" />
-                  <div className="h-3.5 w-4/5 rounded-md skeleton-bone" />
                 </div>
               ))}
             </div>

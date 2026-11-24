@@ -85,8 +85,8 @@ export function Footer({ branding }: { branding?: PublicBranding | null }) {
             </p>
             <ul className="space-y-2 text-[#D5CDB8]">
               <li>
-                <Link href="/#specialties" className="hover:text-white transition-colors">
-                  Specialties
+                <Link href="/#featured-portfolios" className="hover:text-white transition-colors">
+                  Signature Work
                 </Link>
               </li>
               <li>

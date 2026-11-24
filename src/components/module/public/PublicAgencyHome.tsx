@@ -112,22 +112,6 @@ export function PublicAgencyHome({
     document.getElementById('inquire')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleSpecialtyClick = (specialtyTitle: string) => {
-    const token = specialtyTitle.toLowerCase().split('&')[0].trim();
-    const matchedCategory = packageCategories.find(
-      (cat) =>
-        cat.name.toLowerCase().includes(token) || cat.slug.toLowerCase().includes(token),
-    );
-    if (matchedCategory) {
-      setSelectedCategoryId(matchedCategory.id);
-    }
-    if (!packages.length) {
-      setInquiryTitle(`${specialtyTitle} Photography & Cinema`);
-    }
-    const targetId = packages.length > 0 ? 'packages' : 'inquire';
-    document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   const handleSelectComboPreset = (preset: (typeof STUDIO_PROFILE.comboPresets)[number]) => {
     setSelectedPackageId('');
     setInquiryTitle(preset.title);
@@ -203,105 +187,22 @@ export function PublicAgencyHome({
       />
 
       {/* =====================================================================
-          STEP 01: SERVICES & CEREMONIES WE COVER
-      ===================================================================== */}
-      <section
-        id="specialties"
-        className="border-b border-[#E5DFD0] bg-[#F3EFE6]/75 scroll-mt-16"
-      >
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:py-16 sm:px-6 space-y-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div className="space-y-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#DFCEAA] bg-white px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.18em] text-[#7A5E21]">
-                Step 01 • Services &amp; Coverage
-              </span>
-              <h2 className="font-editorial text-3xl sm:text-4xl font-semibold text-[#181611]">
-                Do We Cover Your Celebration?
-              </h2>
-            </div>
-            <p className="text-sm text-[#4A4438] max-w-md">
-              Tap your ceremony below to jump directly to matching packages or plan a custom
-              indoor &amp; outdoor shoot.
-            </p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {STUDIO_PROFILE.specialties.map((spec) => (
-              <button
-                key={spec.code}
-                type="button"
-                onClick={() => handleSpecialtyClick(spec.title)}
-                className="group text-left atelier-card atelier-card-hover p-5 bg-white flex flex-col justify-between gap-3 cursor-pointer"
-              >
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F8F3E6] border border-[#DFCEAA] px-2.5 py-0.5 text-[10.5px] font-semibold uppercase tracking-wider text-[#6F5319]">
-                      {spec.tag}
-                    </span>
-                    <span className="font-mono-code text-xs font-bold text-[#A89A7C] group-hover:text-[#8B6A21] transition-colors">
-                      {spec.code}
-                    </span>
-                  </div>
-                  <h3 className="font-editorial text-2xl font-semibold text-[#181611] group-hover:text-[#8B6A21] transition-colors">
-                    {spec.title}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-[#4A4438] leading-relaxed">
-                    {spec.summary}
-                  </p>
-                </div>
-                <div className="pt-2 border-t border-[#F0EAE0] flex items-center justify-between text-xs font-semibold text-[#6B6352] group-hover:text-[#181611]">
-                  <span>See {spec.title} Packages</span>
-                  <ArrowRightIcon className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                </div>
-              </button>
-            ))}
-          </div>
-
-          {eventTypes.length > 0 && (
-            <div className="pt-2 flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#6B6352] mr-1">
-                Active Studio Categories:
-              </span>
-              {eventTypes.map((et) => (
-                <a
-                  key={et.id}
-                  href="#packages"
-                  onClick={() => {
-                    if (packageCategories.some((c) => c.id === et.id)) {
-                      setSelectedCategoryId(et.id);
-                    }
-                  }}
-                  className="rounded-full border border-[#DFCEAA] bg-white px-3.5 py-1 text-xs font-medium text-[#3C362B] hover:border-[#CAA650] hover:text-[#8B6A21] transition-colors"
-                >
-                  {et.name}
-                </a>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* =====================================================================
-          STEP 02A: PROOF OF WORK — FEATURED CLIENT ALBUMS
+          CLIENT SAMPLES: FEATURED CLIENT ALBUMS
       ===================================================================== */}
       <section
         id="featured-portfolios"
         className="border-b border-[#2E291F] bg-[#14120E] text-[#F4EFE4] scroll-mt-16"
       >
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20 sm:px-6 space-y-10">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:py-18 sm:px-6 space-y-10">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               <div className="inline-flex items-center gap-2 rounded-full border border-[#CAA650]/40 bg-[#CAA650]/15 px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#E7D1AA]">
                 <CameraIcon className="w-3.5 h-3.5" />
-                <span>Step 02 • Inspect Real Client Work</span>
+                <span>Real Client Work</span>
               </div>
               <h2 className="font-editorial text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-white leading-tight">
                 Signature Digital Albums &amp; Cinema
               </h2>
-              <p className="text-sm text-[#C7BFA9] max-w-xl leading-relaxed">
-                Don&apos;t take our word for it—open real Wedding, Holud &amp; Reception albums
-                delivered by {branding.displayName} and evaluate our framing and color yourself.
-              </p>
             </div>
 
             <Link
@@ -461,7 +362,7 @@ export function PublicAgencyHome({
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div className="space-y-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-[#DFCEAA] bg-white px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.18em] text-[#7A5E21]">
-                Step 03 • Compare Transparent Pricing
+                Compare Transparent Pricing
               </span>
               <h2 className="font-editorial text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-[#181611]">
                 Wedding &amp; Event Packages
@@ -663,7 +564,7 @@ export function PublicAgencyHome({
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="space-y-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-[#DFCEAA] bg-[#F8F3E6] px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.18em] text-[#6F5319]">
-                Step 04 • Peace of Mind &amp; Process
+                Peace of Mind &amp; Process
               </span>
               <h2 className="font-editorial text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-[#181611]">
                 How We Guarantee a Stress-Free Experience
@@ -814,7 +715,7 @@ export function PublicAgencyHome({
         <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20 sm:px-6 space-y-10">
           <div className="text-center space-y-2.5 max-w-2xl mx-auto">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-[#DFCEAA] bg-white px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.18em] text-[#7A5E21]">
-              Step 05 • Meet Us or Reserve Your Date
+              Meet Us or Reserve Your Date
             </span>
             <h2 className="font-editorial text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-[#181611]">
               Ready to Book {branding.displayName}?

@@ -57,14 +57,8 @@ export function Navbar({ branding }: NavbarProps) {
           className="hidden lg:flex items-center gap-0.5 xl:gap-1 rounded-full border border-[#E5DFD0] bg-[#F3EFE6]/95 p-1 text-xs font-semibold text-[#4A4438] shrink-0"
         >
           <Link
-            href="/#specialties"
-            className="rounded-full px-2.5 xl:px-3.5 py-1.5 hover:bg-white hover:text-[#181611] hover:shadow-2xs transition-all whitespace-nowrap"
-          >
-            Specialties
-          </Link>
-          <Link
             href="/#featured-portfolios"
-            className="hidden xl:inline-flex rounded-full px-3.5 py-1.5 hover:bg-white hover:text-[#181611] hover:shadow-2xs transition-all whitespace-nowrap"
+            className="rounded-full px-2.5 xl:px-3.5 py-1.5 hover:bg-white hover:text-[#181611] hover:shadow-2xs transition-all whitespace-nowrap"
           >
             Signature Work
           </Link>
