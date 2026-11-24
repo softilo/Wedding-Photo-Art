@@ -14,6 +14,7 @@ import {
   CameraIcon,
   CheckCircleIcon,
   ExternalLinkIcon,
+  GalleryHorizontalIcon,
   LayersIcon,
   LogOutIcon,
   PaletteIcon,
@@ -123,6 +124,7 @@ export function DashboardShell({
     ? []
     : [
         { href: '/admin/gallery', label: 'Gallery', icon: CameraIcon },
+        { href: '/admin/hero', label: 'Hero Slider', icon: GalleryHorizontalIcon },
         { href: '/admin/portfolio', label: 'Client Portfolios', icon: LayersIcon },
         { href: '/admin/catalog', label: 'Packages', icon: PaletteIcon },
         { href: '/admin/crew', label: 'Crew & Gear', icon: UsersIcon },

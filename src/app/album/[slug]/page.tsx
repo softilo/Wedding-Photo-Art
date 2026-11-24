@@ -4,6 +4,7 @@ import { PageSkeleton } from '@/components/shared/PageSkeleton';
 import { getPublicBranding } from '@/service/agency/agency.service';
 import { getPublicPortfolioEventBySlug } from '@/service/catalog/catalog.service';
 import { resolvePublicBranding } from '@/lib/publicStorefront';
+import { isSystemPortfolioEventSlug } from '@/lib/heroSlider';
 import { PortfolioEventPageClient } from '@/components/module/public/PortfolioEventPageClient';
 
 interface AlbumSlugPageProps {
@@ -12,6 +13,9 @@ interface AlbumSlugPageProps {
 
 async function DigitalAlbumContent({ params }: AlbumSlugPageProps) {
   const { slug } = await params;
+  if (isSystemPortfolioEventSlug(slug)) {
+    notFound();
+  }
 
   const [brandRes, eventRes] = await Promise.all([
     getPublicBranding(),

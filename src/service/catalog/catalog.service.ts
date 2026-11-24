@@ -3,6 +3,11 @@
 import { revalidatePath, updateTag } from 'next/cache';
 import { serverFetch } from '@/lib/serverFetch';
 import {
+  DEFAULT_HERO_SLIDER_SETTINGS,
+  HERO_SLIDER_SLUG,
+  serializeHeroSliderDescription,
+} from '@/lib/heroSlider';
+import {
   CloudinaryStatusSummary,
   DeliverableLabelTemplate,
   EventType,
@@ -232,6 +237,7 @@ function revalidatePortfolioPaths(slug?: string) {
     revalidatePath(`/portfolio/${slug}`);
   }
   revalidatePath('/admin/portfolio');
+  revalidatePath('/admin/hero');
   revalidatePath('/admin/gallery');
   revalidatePath('/admin/catalog');
 }
@@ -577,4 +583,100 @@ export async function createPortfolioEventFromBooking(
     revalidatePath('/admin/bookings');
   }
   return result;
+}
+
+export async function getAdminHeroSliderEvent(): Promise<
+  ActionResult<PortfolioShowcaseEvent | null>
+> {
+  const eventsRes = await listAdminPortfolioEvents();
+  if (!eventsRes.ok || !eventsRes.data) {
+    return { ok: false, message: eventsRes.message || 'Failed to load portfolio events' };
+  }
+  const match = eventsRes.data.data.find((ev) => ev.slug === HERO_SLIDER_SLUG);
+  if (!match) {
+    return { ok: true, data: null };
+  }
+  const detailRes = await getAdminPortfolioEvent(match.id);
+  if (detailRes.ok && detailRes.data) {
+    return { ok: true, data: detailRes.data };
+  }
+  return { ok: true, data: match };
+}
+
+export async function ensureHeroSliderEvent(): Promise<ActionResult<PortfolioShowcaseEvent>> {
+  const existing = await getAdminHeroSliderEvent();
+  if (existing.ok && existing.data) {
+    return { ok: true, data: existing.data };
+  }
+
+  const created = await createPortfolioEvent({
+    title: 'Homepage Hero Slideshow',
+    slug: HERO_SLIDER_SLUG,
+    description: serializeHeroSliderDescription(DEFAULT_HERO_SLIDER_SETTINGS),
+  });
+  if (created.ok && created.data) {
+    revalidatePortfolioPaths(HERO_SLIDER_SLUG);
+    return created;
+  }
+
+  // Recover cleanly if a concurrent upload already initialized the slug
+  const retry = await getAdminHeroSliderEvent();
+  if (retry.ok && retry.data) {
+    return { ok: true, data: retry.data };
+  }
+  return {
+    ok: false,
+    message: created.message || 'Could not initialize hero slideshow record',
+  };
+}
+
+export async function activateHeroSliderMedia(
+  eventId: string,
+  leadMediaId: string,
+  publishNow = true,
+): Promise<ActionResult<PortfolioShowcaseEvent>> {
+  const coverRes = await updatePortfolioMedia(eventId, leadMediaId, { isCover: true });
+  if (!coverRes.ok) {
+    return { ok: false, message: coverRes.message || 'Could not set hero lead photo' };
+  }
+
+  if (publishNow) {
+    const pubRes = await publishPortfolioEvent(eventId);
+    if (!pubRes.ok || !pubRes.data) {
+      return { ok: false, message: pubRes.message || 'Could not publish hero slideshow' };
+    }
+    revalidatePortfolioPaths(pubRes.data.slug);
+    return pubRes;
+  }
+
+  revalidatePortfolioPaths(HERO_SLIDER_SLUG);
+  return getAdminPortfolioEvent(eventId);
+}
+
+export async function removeHeroSliderMedia(
+  eventId: string,
+  mediaId: string,
+): Promise<ActionResult<PortfolioShowcaseEvent | null>> {
+  const detailRes = await getAdminPortfolioEvent(eventId);
+  const currentEvent = detailRes.ok ? detailRes.data : null;
+
+  if (currentEvent && currentEvent.status === 'PUBLISHED') {
+    const remainingReady = (currentEvent.media || []).filter(
+      (m) => m.id !== mediaId && m.resourceType === 'IMAGE' && m.status === 'READY',
+    );
+    if (remainingReady.length === 0) {
+      await unpublishPortfolioEvent(eventId);
+    } else if (currentEvent.coverMediaId === mediaId) {
+      await updatePortfolioMedia(eventId, remainingReady[0].id, { isCover: true });
+    }
+  }
+
+  const removeRes = await removePortfolioMedia(eventId, mediaId);
+  if (!removeRes.ok) {
+    return { ok: false, message: removeRes.message || 'Failed to remove hero slide' };
+  }
+
+  revalidatePortfolioPaths(HERO_SLIDER_SLUG);
+  const refreshed = await getAdminPortfolioEvent(eventId);
+  return { ok: true, data: refreshed.ok && refreshed.data ? refreshed.data : null };
 }

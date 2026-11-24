@@ -19,6 +19,7 @@ import {
   parseShowcaseMedia,
 } from '@/lib/showcaseMedia';
 import { parseAlbumDescriptionAndTheme } from '@/lib/albumTheme';
+import { isSystemPortfolioEventSlug } from '@/lib/heroSlider';
 import { useModalHistoryBack } from '@/lib/useModalHistoryBack';
 import { cn, formatLocalDate } from '@/lib/utils';
 import {
@@ -194,6 +195,7 @@ export function PublicPortfolioShowcase({
       return [];
     }
     return showcaseEvents.filter((ev) => {
+      if (isSystemPortfolioEventSlug(ev.slug)) return false;
       if (mediaFilter === 'video' && (ev.counts?.videos ?? 0) === 0) return false;
       if (mediaFilter === 'photo' && (ev.counts?.photos ?? 0) === 0) return false;
       if (

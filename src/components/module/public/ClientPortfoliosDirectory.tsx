@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { EventType, PortfolioShowcaseEvent, PublicBranding } from '@/types/event-management';
 import { parseAlbumDescriptionAndTheme } from '@/lib/albumTheme';
+import { isSystemPortfolioEventSlug } from '@/lib/heroSlider';
 import { isNextOptimizableUrl } from '@/lib/showcaseMedia';
 import { ArrowRightIcon, CameraIcon, SearchIcon } from '@/components/shared/Icons';
 import { cn } from '@/lib/utils';
@@ -25,7 +26,7 @@ export function ClientPortfoliosDirectory({
   const [filmOnly, setFilmOnly] = useState(false);
 
   const clientAlbums = useMemo(
-    () => events.filter((ev) => ev.slug !== 'studio-media-gallery'),
+    () => events.filter((ev) => !isSystemPortfolioEventSlug(ev.slug)),
     [events],
   );
 

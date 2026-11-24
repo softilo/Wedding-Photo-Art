@@ -1,13 +1,17 @@
 import { getPublicBranding } from '@/service/agency/agency.service';
 import {
   getPublicEventTypes,
+  getPublicGalleryMedia,
   getPublicPackages,
   getPublicPortfolio,
+  getPublicPortfolioEventBySlug,
   getPublicPortfolioEvents,
 } from '@/service/catalog/catalog.service';
+import { HERO_SLIDER_SLUG } from '@/lib/heroSlider';
 import {
   EventType,
   PortfolioItem,
+  PortfolioMediaItem,
   PortfolioShowcaseEvent,
   PublicBranding,
   StudioPackage,
@@ -272,14 +276,18 @@ export async function loadPublicStorefront(): Promise<{
   packages: StudioPackage[];
   portfolio: PortfolioItem[];
   portfolioEvents: PortfolioShowcaseEvent[];
+  heroEvent: PortfolioShowcaseEvent | null;
+  galleryImages: PortfolioMediaItem[];
   isBackendConnected: boolean;
 }> {
-  const [brandRes, etRes, pkgRes, portRes, portEventsRes] = await Promise.all([
+  const [brandRes, etRes, pkgRes, portRes, portEventsRes, heroRes, galleryRes] = await Promise.all([
     getPublicBranding(),
     getPublicEventTypes(),
     getPublicPackages(),
     getPublicPortfolio(),
     getPublicPortfolioEvents(),
+    getPublicPortfolioEventBySlug(HERO_SLIDER_SLUG),
+    getPublicGalleryMedia('IMAGE'),
   ]);
 
   if (!brandRes.ok || !brandRes.data) {
@@ -289,6 +297,8 @@ export async function loadPublicStorefront(): Promise<{
       packages: [],
       portfolio: [],
       portfolioEvents: [],
+      heroEvent: null,
+      galleryImages: [],
       isBackendConnected: false,
     };
   }
@@ -299,6 +309,11 @@ export async function loadPublicStorefront(): Promise<{
     packages: pkgRes.ok && pkgRes.data ? pkgRes.data.data : [],
     portfolio: portRes.ok && portRes.data ? portRes.data.data : [],
     portfolioEvents: portEventsRes.ok && portEventsRes.data ? portEventsRes.data.data : [],
+    heroEvent: heroRes.ok && heroRes.data ? heroRes.data : null,
+    galleryImages:
+      galleryRes.ok && galleryRes.data
+        ? galleryRes.data.data.filter((m) => m.resourceType === 'IMAGE' && m.status === 'READY').slice(0, 12)
+        : [],
     isBackendConnected: true,
   };
 }

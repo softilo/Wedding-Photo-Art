@@ -6,17 +6,17 @@ import Image from 'next/image';
 import {
   EventType,
   PortfolioItem,
+  PortfolioMediaItem,
   PortfolioShowcaseEvent,
   PublicBranding,
   StudioPackage,
 } from '@/types/event-management';
 import { parseAlbumDescriptionAndTheme } from '@/lib/albumTheme';
+import { isSystemPortfolioEventSlug } from '@/lib/heroSlider';
 import { STUDIO_PROFILE } from '@/lib/publicStorefront';
 import { isNextOptimizableUrl } from '@/lib/showcaseMedia';
-import { BrandMark } from '@/components/common/BrandMark';
 import { formatPoisha, cn } from '@/lib/utils';
 import {
-  ApertureIcon,
   ArrowRightIcon,
   CameraIcon,
   CheckCircleIcon,
@@ -31,6 +31,7 @@ import {
   ShieldCheckIcon,
   StarIcon,
 } from '@/components/shared/Icons';
+import { HeroPhotoSlider } from './HeroPhotoSlider';
 import { InquiryForm } from './InquiryForm';
 import { PublicPortfolioShowcase } from './PublicPortfolioShowcase';
 
@@ -40,6 +41,8 @@ interface PublicAgencyHomeProps {
   packages: StudioPackage[];
   portfolio: PortfolioItem[];
   portfolioEvents?: PortfolioShowcaseEvent[];
+  heroEvent?: PortfolioShowcaseEvent | null;
+  galleryImages?: PortfolioMediaItem[];
   isBackendConnected: boolean;
   initialPackageId?: string;
 }
@@ -58,6 +61,8 @@ export function PublicAgencyHome({
   packages,
   portfolio,
   portfolioEvents = [],
+  heroEvent = null,
+  galleryImages = [],
   isBackendConnected,
   initialPackageId = '',
 }: PublicAgencyHomeProps) {
@@ -68,7 +73,6 @@ export function PublicAgencyHome({
   const [openFaqIdx, setOpenFaqIdx] = useState<number>(0);
 
   const primary = branding.themeTokens.primaryColor || '#181611';
-  const secondary = branding.themeTokens.secondaryColor || '#CAA650';
   const accent = branding.themeTokens.accentColor || '#8B6A21';
 
   const contactPhone = branding.contactDetails?.phone || STUDIO_PROFILE.phoneIntl;
@@ -78,7 +82,7 @@ export function PublicAgencyHome({
 
   const allClientPortfolios = useMemo(() => {
     return [...portfolioEvents]
-      .filter((ev) => ev.slug !== 'studio-media-gallery')
+      .filter((ev) => !isSystemPortfolioEventSlug(ev.slug))
       .sort((a, b) => {
         const scoreA =
           (a.coverMedia ? 1000 : 0) +
@@ -146,20 +150,33 @@ export function PublicAgencyHome({
       )}
 
       {/* =====================================================================
-          HERO: Immediate Studio Identity & Trust Verification
+          HERO: Clean Full-Background Sliding Photography Showcase (Image Only)
+      ===================================================================== */}
+      <HeroPhotoSlider
+        branding={branding}
+        heroEvent={heroEvent}
+        portfolioEvents={allClientPortfolios}
+        galleryImages={galleryImages}
+        legacyPortfolio={portfolio}
+      />
+
+      {/* =====================================================================
+          STUDIO INTRO: Editorial Headline, Actions & Verification Below Image
       ===================================================================== */}
       <section className="relative overflow-hidden border-b border-[#E5DFD0] bg-[#F9F8F5]">
         <div
-          className="absolute inset-0 opacity-[0.14] pointer-events-none"
+          aria-hidden="true"
+          className="absolute inset-0 opacity-[0.12] pointer-events-none"
           style={{
-            background: `radial-gradient(circle at 10% 16%, ${secondary} 0%, transparent 45%), radial-gradient(circle at 88% 72%, #E7D1AA 0%, transparent 48%)`,
+            background:
+              'radial-gradient(circle at 12% 20%, #CAA650 0%, transparent 45%), radial-gradient(circle at 88% 80%, #E7D1AA 0%, transparent 48%)',
           }}
         />
-        <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16 lg:py-20">
-          <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
-            <div className="lg:col-span-7 min-w-0 space-y-6">
-              <div className="inline-flex flex-wrap items-center gap-2 rounded-full border border-[#DFCEAA] bg-white/95 px-4 py-1.5 text-xs font-semibold text-[#4A4438] shadow-2xs">
-                <ApertureIcon className="w-3.5 h-3.5" style={{ color: accent }} />
+        <div className="relative mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+          <div className="grid gap-6 lg:grid-cols-12 lg:items-center">
+            <div className="lg:col-span-7 min-w-0 space-y-4">
+              <div className="inline-flex flex-wrap items-center gap-2 rounded-full border border-[#DFCEAA] bg-white/95 px-3.5 py-1.5 text-xs font-semibold text-[#4A4438] shadow-2xs">
+                <CameraIcon className="w-3.5 h-3.5 shrink-0" style={{ color: accent }} />
                 <span>{branding.displayName}</span>
                 <span className="text-[#C9B996]">•</span>
                 <span className="text-[#7A5E21]">{STUDIO_PROFILE.city}</span>
@@ -167,22 +184,21 @@ export function PublicAgencyHome({
                 <span className="text-[#6B6352]">{STUDIO_PROFILE.followersCount} Followers</span>
               </div>
 
-              <h1 className="font-editorial text-4xl sm:text-5xl lg:text-[3.75rem] font-semibold text-[#181611] leading-[1.06]">
+              <h1 className="font-editorial text-3xl sm:text-5xl font-semibold text-[#181611] leading-[1.08]">
                 {STUDIO_PROFILE.headlineLead}{' '}
                 <span className="italic" style={{ color: accent }}>
                   {STUDIO_PROFILE.headlineAccent}
                 </span>
               </h1>
 
-              <p className="text-base sm:text-lg text-[#4A4438] max-w-xl leading-relaxed">
+              <p className="text-sm sm:text-base text-[#4A4438] max-w-2xl leading-relaxed">
                 {STUDIO_PROFILE.description}
               </p>
 
-              {/* Guided First Actions: Inspect Work First or Book Directly */}
-              <div className="flex flex-wrap items-center gap-3 pt-1">
+              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-1">
                 <a
                   href="#featured-portfolios"
-                  className="inline-flex items-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
+                  className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
                   style={{ backgroundColor: accent }}
                 >
                   <span>See Real Client Work</span>
@@ -190,140 +206,46 @@ export function PublicAgencyHome({
                 </a>
                 <a
                   href="#packages"
-                  className="inline-flex items-center gap-2 rounded-xl border border-[#D8CCB2] bg-white px-5 py-3.5 text-sm font-semibold text-[#2E291F] hover:bg-[#F3EFE6] hover:border-[#CAA650] transition-colors"
+                  className="inline-flex items-center gap-2 rounded-xl border border-[#D8CCB2] bg-white px-4.5 py-3 text-sm font-semibold text-[#2E291F] hover:bg-[#F3EFE6] hover:border-[#CAA650] transition-colors"
                 >
                   Compare Packages
                 </a>
                 <a
                   href="#inquire"
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-transparent px-3.5 py-3.5 text-sm font-semibold text-[#6F5319] hover:text-[#181611] transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-transparent px-3 py-3 text-sm font-semibold text-[#6F5319] hover:text-[#181611] transition-colors"
                 >
                   Check Availability →
                 </a>
               </div>
-
-              {/* Studio Verification Strip */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-5 border-t border-[#E5DFD0] max-w-2xl">
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-[#7A5E21]">
-                    Physical Studio
-                  </p>
-                  <p className="text-xs text-[#4A4438] mt-0.5 leading-snug">
-                    Grand Haque Tower (5th Fl), Mizan Rd, Feni
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-[#7A5E21]">
-                    Direct Studio Line
-                  </p>
-                  <a
-                    href={`tel:${contactPhone.replace(/\s+/g, '')}`}
-                    className="text-xs font-mono-code font-semibold text-[#181611] hover:underline mt-0.5 inline-block"
-                  >
-                    {STUDIO_PROFILE.phoneDisplay}
-                  </a>
-                </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-[#7A5E21]">
-                    Coverage Scope
-                  </p>
-                  <p className="text-xs text-[#4A4438] mt-0.5">
-                    Outdoor • Indoor • Digital Albums
-                  </p>
-                </div>
-              </div>
             </div>
 
-            {/* Right Column: Studio Emblem & Instant Trust Checklist */}
-            <div className="lg:col-span-5">
-              <div className="atelier-card overflow-hidden bg-white shadow-[0_24px_60px_-24px_rgba(24,22,17,0.14)] border-[#D8CCB2]">
-                <div className="relative bg-[#14120E] px-6 py-6 text-center text-[#F4EFE4] overflow-hidden border-b border-[#CAA650]/35">
-                  <div
-                    className="absolute inset-0 opacity-25 pointer-events-none"
-                    style={{
-                      background: `radial-gradient(circle at 50% 35%, ${secondary} 0%, transparent 65%)`,
-                    }}
-                  />
-                  <div className="relative flex flex-col items-center gap-2.5">
-                    <BrandMark
-                      logoUrl={branding.logoUrl}
-                      alt={branding.displayName}
-                      size={92}
-                      variant="dark"
-                      className="rounded-2xl border-[#CAA650]/50 shadow-xl"
-                    />
-                    <div className="space-y-0.5">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-[#E7D1AA]">
-                        {STUDIO_PROFILE.tagline}
-                      </p>
-                      <p className="text-xs text-[#C7BFA9]">
-                        {STUDIO_PROFILE.productionTagline}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-5 sm:p-6 space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#ECE6D8] pb-3">
-                    <div>
-                      <p
-                        className="text-[10.5px] font-bold uppercase tracking-[0.18em]"
-                        style={{ color: accent }}
-                      >
-                        Quick Studio Facts
-                      </p>
-                      <p className="font-editorial text-2xl font-semibold text-[#181611] mt-0.5">
-                        Why Couples Book With Us
-                      </p>
-                    </div>
-                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F8F3E6] text-[#7A5E21] border border-[#DFCEAA]">
-                      <ShieldCheckIcon className="w-4 h-4" />
-                    </span>
-                  </div>
-
-                  <ul className="space-y-3 text-xs sm:text-sm text-[#3C362B]">
-                    {[
-                      {
-                        title: 'Meet Us Face-to-Face in Feni',
-                        desc: 'Visit Grand Haque Tower (5th Floor), Mizan Rd before booking.',
-                      },
-                      {
-                        title: 'Zero Crew Double-Booking',
-                        desc: 'Your shoot date, lead photographers & gear are date-locked.',
-                      },
-                      {
-                        title: 'Transparent Written Quotes',
-                        desc: 'Itemized BDT pricing with clear deliverables—no hidden fees.',
-                      },
-                      {
-                        title: 'Online Digital Photo & Film Albums',
-                        desc: 'Preview real client albums below before making your decision.',
-                      },
-                    ].map((fact) => (
-                      <li key={fact.title} className="flex items-start gap-2.5">
-                        <CheckCircleIcon
-                          className="w-4 h-4 shrink-0 mt-0.5"
-                          style={{ color: accent }}
-                        />
-                        <div>
-                          <p className="font-semibold text-[#181611] leading-snug">{fact.title}</p>
-                          <p className="text-xs text-[#6B6352] mt-0.5">{fact.desc}</p>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="pt-3 border-t border-[#ECE6D8] flex items-center justify-between text-xs text-[#6B6352]">
-                    <span>Follow the 5 steps below</span>
-                    <a
-                      href="#specialties"
-                      className="font-semibold hover:underline underline-offset-4"
-                      style={{ color: accent }}
-                    >
-                      Start Step 01 →
-                    </a>
-                  </div>
-                </div>
+            <div className="lg:col-span-5 atelier-card bg-white/95 border-[#DFCEAA] p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4">
+              <div>
+                <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#7A5E21]">
+                  Physical Studio
+                </p>
+                <p className="text-xs sm:text-sm text-[#4A4438] mt-0.5 leading-snug">
+                  Grand Haque Tower (5th Fl), Mizan Rd, Feni
+                </p>
+              </div>
+              <div className="sm:border-l lg:border-l-0 lg:border-t border-[#ECE6D8] sm:pl-4 lg:pl-0 lg:pt-3.5">
+                <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#7A5E21]">
+                  Direct Studio Line
+                </p>
+                <a
+                  href={`tel:${contactPhone.replace(/\s+/g, '')}`}
+                  className="text-xs sm:text-sm font-mono-code font-semibold text-[#181611] hover:underline mt-0.5 inline-block"
+                >
+                  {STUDIO_PROFILE.phoneDisplay}
+                </a>
+              </div>
+              <div className="sm:border-l lg:border-l-0 lg:border-t border-[#ECE6D8] sm:pl-4 lg:pl-0 lg:pt-3.5">
+                <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#7A5E21]">
+                  Coverage Scope
+                </p>
+                <p className="text-xs sm:text-sm text-[#4A4438] mt-0.5">
+                  Outdoor • Indoor • Digital Albums
+                </p>
               </div>
             </div>
           </div>

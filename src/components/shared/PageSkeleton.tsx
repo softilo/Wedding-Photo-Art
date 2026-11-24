@@ -119,15 +119,27 @@ export function PageSkeleton({
         <span className="sr-only">{label}</span>
         <PublicNavbarSkeleton />
 
-        {/* Hero Skeleton */}
+        {/* 1 / 2 / 3 Borderless Clean Hero Images Skeleton */}
+        <div className="w-full px-[1px] md:px-[2px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[2px] md:gap-1">
+            <div className="aspect-[3/2] max-h-[270px] sm:max-h-[300px] md:max-h-[290px] lg:max-h-[320px] xl:max-h-[380px] w-full skeleton-bone" />
+            <div className="hidden md:block aspect-[3/2] md:max-h-[290px] lg:max-h-[320px] xl:max-h-[380px] w-full skeleton-bone" />
+            <div className="hidden lg:block aspect-[3/2] lg:max-h-[320px] xl:max-h-[380px] w-full skeleton-bone" />
+          </div>
+          <div className="mt-1.5 flex justify-center">
+            <div className="h-2.5 w-20 rounded-full skeleton-bone" />
+          </div>
+        </div>
+
+        {/* Studio Intro Below Hero Skeleton */}
         <div className="border-b border-[#E5DFD0] bg-[#F9F8F5]">
-          <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16 lg:py-20">
-            <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
-              <div className="lg:col-span-7 space-y-6">
-                <div className="h-8 w-72 max-w-full rounded-full skeleton-bone" />
+          <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+            <div className="grid gap-6 lg:grid-cols-12 lg:items-center">
+              <div className="lg:col-span-7 space-y-4">
+                <div className="h-8 w-64 max-w-full rounded-full skeleton-bone" />
                 <div className="space-y-3">
-                  <div className="h-11 sm:h-14 w-11/12 rounded-xl skeleton-bone" />
-                  <div className="h-11 sm:h-14 w-3/4 rounded-xl skeleton-bone" />
+                  <div className="h-10 sm:h-12 w-11/12 rounded-xl skeleton-bone" />
+                  <div className="h-10 sm:h-12 w-3/4 rounded-xl skeleton-bone" />
                 </div>
                 <div className="space-y-2 max-w-xl">
                   <div className="h-4 w-full rounded-md skeleton-bone" />
@@ -135,45 +147,17 @@ export function PageSkeleton({
                 </div>
                 <div className="flex flex-wrap gap-3 pt-1">
                   <div className="h-12 w-44 rounded-xl skeleton-bone" />
-                  <div className="h-12 w-40 rounded-xl skeleton-bone" />
-                  <div className="h-12 w-32 rounded-xl skeleton-bone" />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-5 border-t border-[#E5DFD0] max-w-2xl">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="space-y-1.5">
-                      <div className="h-3 w-24 rounded-md skeleton-bone" />
-                      <div className="h-3.5 w-36 rounded-md skeleton-bone" />
-                    </div>
-                  ))}
+                  <div className="h-12 w-36 rounded-xl skeleton-bone" />
                 </div>
               </div>
 
-              <div className="lg:col-span-5">
-                <div className="atelier-card overflow-hidden bg-white border-[#D8CCB2]">
-                  <div className="bg-[#14120E] px-6 py-6 flex flex-col items-center gap-3 border-b border-[#CAA650]/35">
-                    <div className="h-[92px] w-[92px] rounded-2xl skeleton-bone-dark border border-[#CAA650]/40" />
-                    <div className="h-3 w-40 rounded-md skeleton-bone-dark" />
-                    <div className="h-3 w-56 rounded-md skeleton-bone-dark" />
+              <div className="lg:col-span-5 rounded-2xl border border-[#DFCEAA] bg-white p-5 sm:p-6 space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="space-y-1.5">
+                    <div className="h-3 w-24 rounded-md skeleton-bone" />
+                    <div className="h-4 w-48 rounded-md skeleton-bone" />
                   </div>
-                  <div className="p-6 space-y-4">
-                    <div className="flex items-center justify-between border-b border-[#ECE6D8] pb-3">
-                      <div className="space-y-1.5">
-                        <div className="h-2.5 w-28 rounded-md skeleton-bone" />
-                        <div className="h-6 w-48 rounded-lg skeleton-bone" />
-                      </div>
-                      <div className="h-9 w-9 rounded-xl skeleton-bone" />
-                    </div>
-                    {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="flex items-start gap-2.5">
-                        <div className="h-4 w-4 rounded-full skeleton-bone shrink-0 mt-0.5" />
-                        <div className="flex-1 space-y-1.5">
-                          <div className="h-3.5 w-3/4 rounded-md skeleton-bone" />
-                          <div className="h-3 w-11/12 rounded-md skeleton-bone" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>

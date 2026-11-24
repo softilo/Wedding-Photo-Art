@@ -9,6 +9,7 @@ import {
 } from '@/service/catalog/catalog.service';
 import { PortfolioEventManager } from '@/components/module/admin/PortfolioEventManager';
 import { PageSkeleton } from '@/components/shared/PageSkeleton';
+import { isSystemPortfolioEventSlug } from '@/lib/heroSlider';
 
 interface AdminPortfolioPageProps {
   searchParams?: Promise<{ eventId?: string }>;
@@ -29,7 +30,7 @@ async function AdminPortfolioContent({ searchParams }: AdminPortfolioPageProps) 
   ]);
 
   const portfolioEvents = (eventsRes.ok && eventsRes.data ? eventsRes.data.data : []).filter(
-    (ev) => ev.slug !== 'studio-media-gallery',
+    (ev) => !isSystemPortfolioEventSlug(ev.slug),
   );
   const completedBookings = bookingsRes.ok && bookingsRes.data ? bookingsRes.data.data : [];
 

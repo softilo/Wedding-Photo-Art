@@ -39,6 +39,7 @@ import {
   serializeAlbumDescriptionWithTheme,
   shortenTitleToSlug,
 } from '@/lib/albumTheme';
+import { isSystemPortfolioEventSlug } from '@/lib/heroSlider';
 import { cn, formatLocalDate } from '@/lib/utils';
 import { PlusIcon } from '@/components/shared/Icons';
 import { PortfolioEventDetailModal } from '../public/PortfolioEventDetailModal';
@@ -127,7 +128,7 @@ export function PortfolioEventManager({
   mode = 'portfolio',
 }: PortfolioEventManagerProps) {
   const isGalleryMode = mode === 'gallery';
-  const filteredInitialEvents = initialEvents.filter((e) => e.slug !== 'studio-media-gallery');
+  const filteredInitialEvents = initialEvents.filter((e) => !isSystemPortfolioEventSlug(e.slug));
   const [events, setEvents] = useState<PortfolioShowcaseEvent[]>(filteredInitialEvents);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(() => {
     if (

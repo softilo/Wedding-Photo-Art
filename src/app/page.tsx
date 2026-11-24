@@ -6,8 +6,16 @@ import { PageSkeleton } from '@/components/shared/PageSkeleton';
 import { loadPublicStorefront } from '@/lib/publicStorefront';
 
 async function RootStorefrontContent() {
-  const { branding, eventTypes, packages, portfolio, portfolioEvents, isBackendConnected } =
-    await loadPublicStorefront();
+  const {
+    branding,
+    eventTypes,
+    packages,
+    portfolio,
+    portfolioEvents,
+    heroEvent,
+    galleryImages,
+    isBackendConnected,
+  } = await loadPublicStorefront();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -18,6 +26,8 @@ async function RootStorefrontContent() {
         packages={packages}
         portfolio={portfolio}
         portfolioEvents={portfolioEvents}
+        heroEvent={heroEvent}
+        galleryImages={galleryImages}
         isBackendConnected={isBackendConnected}
       />
       <Footer branding={branding} />

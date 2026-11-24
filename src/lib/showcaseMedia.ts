@@ -111,31 +111,38 @@ function buildVideoMedia(videoUrl: string, customCover?: string): ParsedShowcase
  */
 export function buildCloudinaryImageUrl(
   url: string,
-  options: { width: number; height?: number; crop?: 'limit' | 'fill' } = { width: 1200 },
+  options: {
+    width: number;
+    height?: number;
+    crop?: 'limit' | 'fill';
+    quality?: 'auto' | 'auto:good' | 'auto:best' | '100';
+  } = { width: 1200 },
 ): string {
   if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) {
     return url;
   }
-  // Avoid double-transforming URLs that already contain f_auto,q_auto
-  const cleanUrl = url.replace(/\/upload\/[^/]*f_auto,q_auto[^/]*\//, '/upload/');
+  // Avoid double-transforming URLs that already contain f_auto,q_auto or q_100
+  const cleanUrl = url.replace(/\/upload\/[^/]*f_auto,q_(?:auto|100)[^/]*\//, '/upload/');
   const cropMode = options.crop ?? 'limit';
+  const qualityMode = options.quality ?? 'auto';
   const heightSegment = options.height ? `,h_${options.height}` : '';
   const gravitySegment = cropMode === 'fill' ? ',g_auto' : '';
   return cleanUrl.replace(
     '/upload/',
-    `/upload/f_auto,q_auto,c_${cropMode}${gravitySegment},w_${options.width}${heightSegment}/`,
+    `/upload/f_auto,q_${qualityMode},c_${cropMode}${gravitySegment},w_${options.width}${heightSegment}/`,
   );
 }
 
 export function buildCloudinarySrcSet(
   url: string,
   widths: number[] = [480, 800, 1200, 1600],
+  quality: 'auto' | 'auto:good' | 'auto:best' | '100' = 'auto',
 ): string | undefined {
   if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) {
     return undefined;
   }
   return widths
-    .map((w) => `${buildCloudinaryImageUrl(url, { width: w, crop: 'limit' })} ${w}w`)
+    .map((w) => `${buildCloudinaryImageUrl(url, { width: w, crop: 'limit', quality })} ${w}w`)
     .join(', ');
 }
 
