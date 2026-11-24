@@ -314,3 +314,17 @@ export function WhatsAppIcon({ className = 'w-6 h-6', style }: IconProps) {
     </svg>
   );
 }
+
+export function FacebookIcon({ className = 'w-4 h-4', style }: IconProps) {
+  return (
+    <svg
+      className={className}
+      style={style}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M13.5 22v-8h2.7l.4-3h-3.1V9.1c0-.87.24-1.46 1.5-1.46H16.7V4.95c-.3-.04-1.32-.13-2.5-.13-2.48 0-4.18 1.51-4.18 4.28V11H7.3v3h2.72v8h3.48Z" />
+    </svg>
+  );
+}

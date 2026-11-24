@@ -31,15 +31,11 @@ function PublicNavbarSkeleton() {
             <div className="h-2.5 w-24 sm:w-32 rounded-md skeleton-bone" />
           </div>
         </div>
-        <div className="hidden lg:flex items-center gap-2 rounded-full border border-[#E5DFD0] bg-[#F3EFE6] px-3 py-1.5">
-          {[68, 78, 64, 58, 72].map((w, i) => (
-            <div key={i} style={{ width: w }} className="h-5 rounded-full skeleton-bone" />
-          ))}
-        </div>
         <div className="flex items-center gap-2">
-          <div className="h-9 w-20 sm:w-24 rounded-xl skeleton-bone" />
-          <div className="hidden md:block h-9 w-24 rounded-xl skeleton-bone" />
-          <div className="lg:hidden h-9 w-9 rounded-xl skeleton-bone" />
+          <div className="hidden md:block h-9 w-9 rounded-full skeleton-bone" />
+          <div className="hidden lg:block h-9 w-32 rounded-full skeleton-bone" />
+          <div className="hidden sm:block h-9 w-24 rounded-full skeleton-bone" />
+          <div className="h-10 w-10 sm:w-24 rounded-full skeleton-bone" />
         </div>
       </div>
     </div>
