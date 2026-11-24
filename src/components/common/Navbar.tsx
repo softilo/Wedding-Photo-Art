@@ -41,7 +41,7 @@ export function Navbar({ branding }: NavbarProps) {
             className="rounded-xl shadow-2xs transition-transform duration-200 group-hover:scale-105"
           />
           <div className="leading-none min-w-0">
-            <span className="font-editorial text-lg sm:text-[1.35rem] font-semibold tracking-tight text-[#181611] block truncate">
+            <span className="font-editorial text-[1.28rem] sm:text-[1.58rem] font-semibold text-[#181611] leading-none block truncate">
               {displayName}
             </span>
             <span className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.12em] sm:tracking-[0.2em] text-[#7A5E21] block mt-0.5 sm:mt-1 truncate">

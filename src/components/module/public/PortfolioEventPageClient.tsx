@@ -246,7 +246,11 @@ export function PortfolioEventPageClient({
   const coverHeight = coverItem?.height && coverItem.height > 0 ? coverItem.height : 1200;
 
   const albumHeadingStyle = {
-    fontFamily: 'var(--font-sans), system-ui, sans-serif',
+    fontFamily:
+      savedTheme.fontStyle === 'serif'
+        ? 'var(--font-album-serif), Georgia, serif'
+        : 'var(--font-sans), system-ui, sans-serif',
+    fontKerning: 'normal' as const,
   };
 
   const scrollToSection = (id: string) => {

@@ -44,7 +44,7 @@ export function Footer({ branding }: { branding?: PublicBranding | null }) {
                 className="rounded-2xl shadow-md"
               />
               <div>
-                <p className="font-editorial text-2xl font-semibold tracking-tight text-white">
+                <p className="font-editorial text-[1.75rem] leading-tight font-semibold text-white">
                   {displayName}
                 </p>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#E7D1AA] mt-0.5">

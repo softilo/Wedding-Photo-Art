@@ -1986,7 +1986,7 @@ export function PortfolioEventManager({
                               style={{
                                 fontFamily:
                                   editTheme.fontStyle === 'serif'
-                                    ? 'Georgia, serif'
+                                    ? 'var(--font-album-serif), Georgia, serif'
                                     : 'var(--font-sans), sans-serif',
                               }}
                               className="text-lg sm:text-xl font-semibold leading-tight line-clamp-2"

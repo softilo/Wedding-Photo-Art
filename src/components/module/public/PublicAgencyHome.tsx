@@ -47,14 +47,6 @@ interface PublicAgencyHomeProps {
   initialPackageId?: string;
 }
 
-const DECISION_STEPS = [
-  { step: '01', label: 'Services & Genres', href: '#specialties' },
-  { step: '02', label: 'Real Albums & Films', href: '#featured-portfolios' },
-  { step: '03', label: 'Packages & Pricing', href: '#packages' },
-  { step: '04', label: 'Guarantees & FAQ', href: '#why-choose-us' },
-  { step: '05', label: 'Book & Visit Feni', href: '#studio-concierge' },
-];
-
 export function PublicAgencyHome({
   branding,
   eventTypes,
@@ -166,7 +158,7 @@ export function PublicAgencyHome({
       <section className="border-b border-[#E5DFD0] bg-[#F9F8F5]">
         <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-7 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="min-w-0 space-y-1">
-            <h1 className="font-editorial text-2xl sm:text-3xl font-semibold text-[#181611] tracking-tight">
+            <h1 className="font-editorial text-[1.75rem] sm:text-[2.35rem] font-semibold text-[#181611] leading-[1.06]">
               Wedding Photography{' '}
               <span className="italic" style={{ color: accent }}>
                 &amp; Cinema.
@@ -195,8 +187,6 @@ export function PublicAgencyHome({
           </div>
         </div>
       </section>
-
-
 
       {/* =====================================================================
           STEP 01: SERVICES & CEREMONIES WE COVER
@@ -735,7 +725,7 @@ export function PublicAgencyHome({
                     key={i}
                     className={cn('space-y-1', i > 0 ? 'pt-2.5 border-t border-white/10' : '')}
                   >
-                    <p className="font-editorial text-lg italic text-white leading-snug">
+                    <p className="font-editorial text-xl italic text-white leading-snug">
                       &ldquo;{rev.quote}&rdquo;
                     </p>
                     <footer className="text-xs text-[#C7BFA9]">
