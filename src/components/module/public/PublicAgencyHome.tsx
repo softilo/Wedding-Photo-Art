@@ -20,7 +20,6 @@ import {
   ArrowRightIcon,
   CameraIcon,
   CheckCircleIcon,
-  ChevronDownIcon,
   ExternalLinkIcon,
   FilmIcon,
   LayersIcon,
@@ -28,8 +27,6 @@ import {
   MapPinIcon,
   MessageCircleIcon,
   PhoneIcon,
-  ShieldCheckIcon,
-  StarIcon,
 } from '@/components/shared/Icons';
 import { EditorialBentoShowcase } from './EditorialBentoShowcase';
 import { HeroPhotoSlider } from './HeroPhotoSlider';
@@ -65,7 +62,6 @@ export function PublicAgencyHome({
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('ALL');
   const [inquiryTitle, setInquiryTitle] = useState<string>('');
   const [inquiryNotes, setInquiryNotes] = useState<string>('');
-  const [openFaqIdx, setOpenFaqIdx] = useState<number>(0);
 
   const primary = branding.themeTokens.primaryColor || '#181611';
   const accent = branding.themeTokens.accentColor || '#8B6A21';
@@ -554,159 +550,7 @@ export function PublicAgencyHome({
       </section>
 
       {/* =====================================================================
-          STEP 04: WHY CHOOSE US — GUARANTEES, WORKFLOW, REVIEWS & FAQ
-      ===================================================================== */}
-      <section
-        id="why-choose-us"
-        className="border-b border-[#E5DFD0] bg-white scroll-mt-16"
-      >
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20 sm:px-6 space-y-12">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div className="space-y-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#DFCEAA] bg-[#F8F3E6] px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.18em] text-[#6F5319]">
-                Peace of Mind &amp; Process
-              </span>
-              <h2 className="font-editorial text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-[#181611]">
-                How We Guarantee a Stress-Free Experience
-              </h2>
-            </div>
-            <p className="text-sm text-[#4A4438] max-w-md">
-              Everything families check before finalizing a wedding photography team—clear
-              process, locked dates, and verified client feedback.
-            </p>
-          </div>
-
-          {/* 4 Studio Guarantees */}
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {STUDIO_PROFILE.guarantees.map((g, idx) => (
-              <div
-                key={g.title}
-                className="atelier-card p-5 bg-[#F9F8F5] border-[#DFCEAA] space-y-2.5"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#181611] text-[#E7D1AA] font-mono-code text-xs font-bold">
-                    0{idx + 1}
-                  </span>
-                  <ShieldCheckIcon className="w-4 h-4 text-[#8B6A21]" />
-                </div>
-                <h3 className="font-editorial text-xl font-semibold text-[#181611] leading-snug">
-                  {g.title}
-                </h3>
-                <p className="text-xs text-[#4A4438] leading-relaxed">{g.summary}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Booking Timeline + FAQ Accordion */}
-          <div className="grid gap-8 lg:grid-cols-12 items-start">
-            {/* Left: 3-Step Booking & Delivery Process */}
-            <div className="lg:col-span-5 min-w-0 atelier-card p-6 bg-[#14120E] text-[#F4EFE4] border-[#2E291F] space-y-5">
-              <div className="border-b border-white/10 pb-3.5">
-                <p className="text-[10.5px] font-bold uppercase tracking-[0.2em] text-[#E7D1AA]">
-                  From Inquiry to Album
-                </p>
-                <h3 className="font-editorial text-2xl font-semibold text-white mt-0.5">
-                  3 Clear Steps to Book
-                </h3>
-              </div>
-
-              <ul className="space-y-4">
-                {STUDIO_PROFILE.bookingSteps.map((item) => (
-                  <li key={item.step} className="flex items-start gap-3">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#CAA650] text-[#181611] text-xs font-mono-code font-bold mt-0.5">
-                      {item.step}
-                    </span>
-                    <div>
-                      <p className="text-sm font-semibold text-white">{item.title}</p>
-                      <p className="text-xs text-[#C7BFA9] mt-0.5 leading-relaxed">{item.desc}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="pt-3 border-t border-white/10 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1 text-[#E7D1AA]">
-                    {[0, 1, 2, 3, 4].map((idx) => (
-                      <StarIcon key={idx} className="w-3.5 h-3.5" />
-                    ))}
-                  </div>
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-[#E7D1AA]">
-                    {STUDIO_PROFILE.followersCount} Facebook Community
-                  </span>
-                </div>
-                {STUDIO_PROFILE.reviews.map((rev, i) => (
-                  <blockquote
-                    key={i}
-                    className={cn('space-y-1', i > 0 ? 'pt-2.5 border-t border-white/10' : '')}
-                  >
-                    <p className="font-editorial text-xl italic text-white leading-snug">
-                      &ldquo;{rev.quote}&rdquo;
-                    </p>
-                    <footer className="text-xs text-[#C7BFA9]">
-                      — <span className="font-semibold text-[#E7D1AA]">{rev.author}</span> •{' '}
-                      {rev.source}
-                    </footer>
-                  </blockquote>
-                ))}
-              </div>
-            </div>
-
-            {/* Right: Client Questions Answered (Interactive FAQ Accordion) */}
-            <div className="lg:col-span-7 space-y-3">
-              <div className="pb-1">
-                <p
-                  className="text-[10.5px] font-bold uppercase tracking-[0.2em]"
-                  style={{ color: accent }}
-                >
-                  Common Questions
-                </p>
-                <h3 className="font-editorial text-2xl sm:text-3xl font-semibold text-[#181611] mt-0.5">
-                  Answers Before You Decide
-                </h3>
-              </div>
-
-              {STUDIO_PROFILE.faqs.map((faq, idx) => {
-                const isOpen = openFaqIdx === idx;
-                return (
-                  <div
-                    key={faq.question}
-                    className={cn(
-                      'atelier-card overflow-hidden transition-colors',
-                      isOpen ? 'border-[#CAA650] bg-[#F9F8F5]' : 'bg-white',
-                    )}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setOpenFaqIdx(isOpen ? -1 : idx)}
-                      aria-expanded={isOpen}
-                      className="w-full px-5 py-4 flex items-center justify-between gap-4 text-left cursor-pointer"
-                    >
-                      <span className="text-sm sm:text-base font-semibold text-[#181611]">
-                        {faq.question}
-                      </span>
-                      <ChevronDownIcon
-                        className={cn(
-                          'w-4 h-4 shrink-0 text-[#8B6A21] transition-transform duration-200',
-                          isOpen ? 'rotate-180' : '',
-                        )}
-                      />
-                    </button>
-                    {isOpen && (
-                      <div className="px-5 pb-4 pt-0 text-xs sm:text-sm text-[#4A4438] leading-relaxed border-t border-[#ECE6D8]/70">
-                        <p className="pt-3">{faq.answer}</p>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* =====================================================================
-          STEP 05: VISIT FENI STUDIO OR SEND FREE BOOKING INQUIRY
+          VISIT FENI STUDIO OR SEND FREE BOOKING INQUIRY
       ===================================================================== */}
       <section
         id="studio-concierge"

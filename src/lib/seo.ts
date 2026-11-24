@@ -203,25 +203,13 @@ export function buildStudioJsonLdGraph(params: {
         sameAs: sameAsUrl ? [sameAsUrl] : undefined,
         ...(offers.length > 0
           ? {
-            hasOfferCatalog: {
-              '@type': 'OfferCatalog',
-              name: 'Wedding Photography & Cinematography Packages',
-              itemListElement: offers,
-            },
-          }
+              hasOfferCatalog: {
+                '@type': 'OfferCatalog',
+                name: 'Wedding Photography & Cinematography Packages',
+                itemListElement: offers,
+              },
+            }
           : {}),
-      },
-      {
-        '@type': 'FAQPage',
-        '@id': `${siteUrl}/#faq`,
-        mainEntity: STUDIO_PROFILE.faqs.map((faq) => ({
-          '@type': 'Question',
-          name: faq.question,
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: faq.answer,
-          },
-        })),
       },
       {
         '@type': 'BreadcrumbList',

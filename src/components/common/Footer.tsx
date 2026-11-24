@@ -4,6 +4,7 @@ import { PublicBranding } from '@/types/event-management';
 import { resolvePublicBranding, STUDIO_PROFILE } from '@/lib/publicStorefront';
 import { BrandMark } from './BrandMark';
 import { CopyrightYear } from './CopyrightYear';
+import { FloatingWhatsAppButton } from './FloatingWhatsAppButton';
 import {
   ExternalLinkIcon,
   MailIcon,
@@ -25,7 +26,8 @@ export function Footer({ branding }: { branding?: PublicBranding | null }) {
   const facebookUrl = contact?.website || STUDIO_PROFILE.facebookUrl;
 
   return (
-    <footer className="mt-auto bg-[#14120E] text-[#F4EFE4] border-t border-[#2E291F]">
+    <>
+      <footer className="mt-auto bg-[#14120E] text-[#F4EFE4] border-t border-[#2E291F]">
       <div
         className="h-[2px] w-full opacity-90"
         style={{
@@ -179,6 +181,8 @@ export function Footer({ branding }: { branding?: PublicBranding | null }) {
           </span>
         </div>
       </div>
-    </footer>
+      </footer>
+      <FloatingWhatsAppButton branding={branding} />
+    </>
   );
 }
