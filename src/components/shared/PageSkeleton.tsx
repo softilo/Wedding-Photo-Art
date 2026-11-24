@@ -133,32 +133,15 @@ export function PageSkeleton({
 
         {/* Studio Intro Below Hero Skeleton */}
         <div className="border-b border-[#E5DFD0] bg-[#F9F8F5]">
-          <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
-            <div className="grid gap-6 lg:grid-cols-12 lg:items-center">
-              <div className="lg:col-span-7 space-y-4">
-                <div className="h-8 w-64 max-w-full rounded-full skeleton-bone" />
-                <div className="space-y-3">
-                  <div className="h-10 sm:h-12 w-11/12 rounded-xl skeleton-bone" />
-                  <div className="h-10 sm:h-12 w-3/4 rounded-xl skeleton-bone" />
-                </div>
-                <div className="space-y-2 max-w-xl">
-                  <div className="h-4 w-full rounded-md skeleton-bone" />
-                  <div className="h-4 w-5/6 rounded-md skeleton-bone" />
-                </div>
-                <div className="flex flex-wrap gap-3 pt-1">
-                  <div className="h-12 w-44 rounded-xl skeleton-bone" />
-                  <div className="h-12 w-36 rounded-xl skeleton-bone" />
-                </div>
-              </div>
+          <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-7 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-2 max-w-xl w-full">
+              <div className="h-7 sm:h-8 w-80 max-w-full rounded-lg skeleton-bone" />
+              <div className="h-4 w-full max-w-md rounded-md skeleton-bone" />
+            </div>
 
-              <div className="lg:col-span-5 rounded-2xl border border-[#DFCEAA] bg-white p-5 sm:p-6 space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="space-y-1.5">
-                    <div className="h-3 w-24 rounded-md skeleton-bone" />
-                    <div className="h-4 w-48 rounded-md skeleton-bone" />
-                  </div>
-                ))}
-              </div>
+            <div className="flex flex-wrap gap-2.5 shrink-0">
+              <div className="h-10 w-36 rounded-xl skeleton-bone" />
+              <div className="h-10 w-28 rounded-xl skeleton-bone" />
             </div>
           </div>
         </div>

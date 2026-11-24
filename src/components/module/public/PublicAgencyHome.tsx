@@ -161,93 +161,37 @@ export function PublicAgencyHome({
       />
 
       {/* =====================================================================
-          STUDIO INTRO: Editorial Headline, Actions & Verification Below Image
+          STUDIO INTRO: Clean, Compact Quality Statement Below Hero
       ===================================================================== */}
-      <section className="relative overflow-hidden border-b border-[#E5DFD0] bg-[#F9F8F5]">
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 opacity-[0.12] pointer-events-none"
-          style={{
-            background:
-              'radial-gradient(circle at 12% 20%, #CAA650 0%, transparent 45%), radial-gradient(circle at 88% 80%, #E7D1AA 0%, transparent 48%)',
-          }}
-        />
-        <div className="relative mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
-          <div className="grid gap-6 lg:grid-cols-12 lg:items-center">
-            <div className="lg:col-span-7 min-w-0 space-y-4">
-              <div className="inline-flex flex-wrap items-center gap-2 rounded-full border border-[#DFCEAA] bg-white/95 px-3.5 py-1.5 text-xs font-semibold text-[#4A4438] shadow-2xs">
-                <CameraIcon className="w-3.5 h-3.5 shrink-0" style={{ color: accent }} />
-                <span>{branding.displayName}</span>
-                <span className="text-[#C9B996]">•</span>
-                <span className="text-[#7A5E21]">{STUDIO_PROFILE.city}</span>
-                <span className="text-[#C9B996]">•</span>
-                <span className="text-[#6B6352]">{STUDIO_PROFILE.followersCount} Followers</span>
-              </div>
+      <section className="border-b border-[#E5DFD0] bg-[#F9F8F5]">
+        <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-7 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="min-w-0 space-y-1">
+            <h1 className="font-editorial text-2xl sm:text-3xl font-semibold text-[#181611] tracking-tight">
+              Timeless Wedding Photography{' '}
+              <span className="italic" style={{ color: accent }}>
+                &amp; Cinema.
+              </span>
+            </h1>
+            <p className="text-xs sm:text-sm text-[#4A4438] max-w-xl">
+              True-to-life color, fine natural light, and heartfelt storytelling for Weddings, Holud &amp; Receptions.
+            </p>
+          </div>
 
-              <h1 className="font-editorial text-3xl sm:text-5xl font-semibold text-[#181611] leading-[1.08]">
-                {STUDIO_PROFILE.headlineLead}{' '}
-                <span className="italic" style={{ color: accent }}>
-                  {STUDIO_PROFILE.headlineAccent}
-                </span>
-              </h1>
-
-              <p className="text-sm sm:text-base text-[#4A4438] max-w-2xl leading-relaxed">
-                {STUDIO_PROFILE.description}
-              </p>
-
-              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-1">
-                <a
-                  href="#featured-portfolios"
-                  className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
-                  style={{ backgroundColor: accent }}
-                >
-                  <span>See Real Client Work</span>
-                  <ArrowRightIcon className="w-4 h-4" />
-                </a>
-                <a
-                  href="#packages"
-                  className="inline-flex items-center gap-2 rounded-xl border border-[#D8CCB2] bg-white px-4.5 py-3 text-sm font-semibold text-[#2E291F] hover:bg-[#F3EFE6] hover:border-[#CAA650] transition-colors"
-                >
-                  Compare Packages
-                </a>
-                <a
-                  href="#inquire"
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-transparent px-3 py-3 text-sm font-semibold text-[#6F5319] hover:text-[#181611] transition-colors"
-                >
-                  Check Availability →
-                </a>
-              </div>
-            </div>
-
-            <div className="lg:col-span-5 atelier-card bg-white/95 border-[#DFCEAA] p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4">
-              <div>
-                <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#7A5E21]">
-                  Physical Studio
-                </p>
-                <p className="text-xs sm:text-sm text-[#4A4438] mt-0.5 leading-snug">
-                  Grand Haque Tower (5th Fl), Mizan Rd, Feni
-                </p>
-              </div>
-              <div className="sm:border-l lg:border-l-0 lg:border-t border-[#ECE6D8] sm:pl-4 lg:pl-0 lg:pt-3.5">
-                <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#7A5E21]">
-                  Direct Studio Line
-                </p>
-                <a
-                  href={`tel:${contactPhone.replace(/\s+/g, '')}`}
-                  className="text-xs sm:text-sm font-mono-code font-semibold text-[#181611] hover:underline mt-0.5 inline-block"
-                >
-                  {STUDIO_PROFILE.phoneDisplay}
-                </a>
-              </div>
-              <div className="sm:border-l lg:border-l-0 lg:border-t border-[#ECE6D8] sm:pl-4 lg:pl-0 lg:pt-3.5">
-                <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#7A5E21]">
-                  Coverage Scope
-                </p>
-                <p className="text-xs sm:text-sm text-[#4A4438] mt-0.5">
-                  Outdoor • Indoor • Digital Albums
-                </p>
-              </div>
-            </div>
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <a
+              href="#featured-portfolios"
+              className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
+              style={{ backgroundColor: accent }}
+            >
+              <span>See Real Work</span>
+              <ArrowRightIcon className="w-3.5 h-3.5" />
+            </a>
+            <a
+              href="#packages"
+              className="inline-flex items-center rounded-xl border border-[#D8CCB2] bg-white px-4 py-2.5 text-xs sm:text-sm font-semibold text-[#2E291F] hover:bg-[#F3EFE6] hover:border-[#CAA650] transition-colors"
+            >
+              Packages
+            </a>
           </div>
         </div>
       </section>
