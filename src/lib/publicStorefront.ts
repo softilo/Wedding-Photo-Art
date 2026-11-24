@@ -305,14 +305,17 @@ export async function loadPublicStorefront(): Promise<{
 
   return {
     branding: resolvePublicBranding(brandRes.data),
-    eventTypes: etRes.ok && etRes.data ? etRes.data : [],
-    packages: pkgRes.ok && pkgRes.data ? pkgRes.data.data : [],
-    portfolio: portRes.ok && portRes.data ? portRes.data.data : [],
-    portfolioEvents: portEventsRes.ok && portEventsRes.data ? portEventsRes.data.data : [],
+    eventTypes: etRes.ok && Array.isArray(etRes.data) ? etRes.data : [],
+    packages: pkgRes.ok && Array.isArray(pkgRes.data?.data) ? pkgRes.data.data : [],
+    portfolio: portRes.ok && Array.isArray(portRes.data?.data) ? portRes.data.data : [],
+    portfolioEvents:
+      portEventsRes.ok && Array.isArray(portEventsRes.data?.data) ? portEventsRes.data.data : [],
     heroEvent: heroRes.ok && heroRes.data ? heroRes.data : null,
     galleryImages:
-      galleryRes.ok && galleryRes.data
-        ? galleryRes.data.data.filter((m) => m.resourceType === 'IMAGE' && m.status === 'READY').slice(0, 12)
+      galleryRes.ok && Array.isArray(galleryRes.data?.data)
+        ? galleryRes.data.data
+            .filter((m) => m.resourceType === 'IMAGE' && m.status === 'READY')
+            .slice(0, 12)
         : [],
     isBackendConnected: true,
   };

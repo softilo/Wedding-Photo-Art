@@ -18,8 +18,11 @@ async function AllPortfoliosContent() {
   ]);
 
   const branding = resolvePublicBranding(brandRes.ok ? brandRes.data : null);
-  const events = eventsRes.ok && eventsRes.data ? eventsRes.data.data : [];
-  const eventTypes = etRes.ok && etRes.data ? etRes.data : [];
+  const events =
+    eventsRes.ok && eventsRes.data && Array.isArray(eventsRes.data.data)
+      ? eventsRes.data.data
+      : [];
+  const eventTypes = etRes.ok && Array.isArray(etRes.data) ? etRes.data : [];
 
   return (
     <div className="min-h-screen flex flex-col">

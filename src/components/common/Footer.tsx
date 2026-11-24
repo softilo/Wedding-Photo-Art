@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { PublicBranding } from '@/types/event-management';
 import { resolvePublicBranding, STUDIO_PROFILE } from '@/lib/publicStorefront';
 import { BrandMark } from './BrandMark';
+import { CopyrightYear } from './CopyrightYear';
 import {
   ExternalLinkIcon,
   MailIcon,
@@ -171,7 +172,7 @@ export function Footer({ branding }: { branding?: PublicBranding | null }) {
 
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-[#9C937E]">
           <span>
-            © {new Date().getFullYear()} {displayName}. All rights reserved.
+            © <CopyrightYear /> {displayName}. All rights reserved.
           </span>
           <span className="tracking-wide">
             {STUDIO_PROFILE.subtitle} • {STUDIO_PROFILE.city}
