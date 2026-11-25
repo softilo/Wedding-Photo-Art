@@ -191,7 +191,7 @@ export function PublicPortfolioShowcase({
       ref={sectionRef}
       className="border-y border-[#E5DFD0] bg-white scroll-mt-16 overflow-x-clip"
     >
-      <div className="mx-auto max-w-6xl min-w-0 px-4 py-12 sm:py-16 sm:px-6 space-y-8">
+      <div className="mx-auto max-w-[1380px] min-w-0 px-4 py-12 sm:px-6 sm:py-16 lg:px-10 space-y-8">
         {/* Clean Minimal Section Header */}
         <div className="flex flex-wrap items-end justify-between gap-4 min-w-0">
           <h2 className="font-editorial text-2xl sm:text-4xl font-semibold text-[#181611] leading-tight">

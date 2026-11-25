@@ -168,13 +168,13 @@ export function PublicAgencyHome({
       {/* =====================================================================
           EDITORIAL MOSAIC: 4-Frame Asymmetric Quality Photo Showcase
       ===================================================================== */}
-      <EditorialBentoShowcase
+      {/* <EditorialBentoShowcase
         branding={branding}
         editorialEvent={editorialGridEvent}
         portfolioEvents={allClientPortfolios}
         galleryImages={galleryImages}
         legacyPortfolio={portfolio}
-      />
+      /> */}
 
       {/* =====================================================================
           STEP 02B: GALLERY WALL & CINEMA THEATER (Strict Viewport-Lazy)
