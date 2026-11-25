@@ -10,6 +10,7 @@ interface FloatingWhatsAppButtonProps {
 export function buildWhatsAppUrl(
   phone?: string | null,
   studioName: string = STUDIO_PROFILE.name,
+  customMessage?: string,
 ): string {
   const rawDigits = (phone || STUDIO_PROFILE.phoneIntl).replace(/\D+/g, '');
   const e164Digits =
@@ -17,7 +18,8 @@ export function buildWhatsAppUrl(
       ? `88${rawDigits}`
       : rawDigits || '8801855585601';
   const greeting = encodeURIComponent(
-    `Hello ${studioName}! I would like to inquire about wedding photography & cinematography.`,
+    customMessage?.trim() ||
+      `Hello ${studioName}! I would like to inquire about wedding photography & cinematography.`,
   );
   return `https://wa.me/${e164Digits}?text=${greeting}`;
 }

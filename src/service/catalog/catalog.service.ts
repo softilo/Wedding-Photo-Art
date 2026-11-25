@@ -16,6 +16,11 @@ import {
   serializeStudioServicesDescription,
 } from '@/lib/studioServices';
 import {
+  ABOUT_TEAM_SLUG,
+  DEFAULT_ABOUT_TEAM_SETTINGS,
+  serializeAboutTeamDescription,
+} from '@/lib/studioAboutTeam';
+import {
   CloudinaryStatusSummary,
   DeliverableLabelTemplate,
   EventType,
@@ -237,6 +242,7 @@ export async function updateTaskTemplate(
 function revalidatePortfolioPaths(slug?: string) {
   updateTag('public-storefront');
   revalidatePath('/', 'layout');
+  revalidatePath('/about');
   revalidatePath('/portfolio');
   revalidatePath('/all-services');
   revalidatePath('/all-server');
@@ -788,4 +794,34 @@ export async function removeServicesShowcaseMedia(
   mediaId: string,
 ): Promise<ActionResult<PortfolioShowcaseEvent | null>> {
   return removeSystemPortfolioMedia(SERVICES_SHOWCASE_SLUG, eventId, mediaId);
+}
+
+export async function getAdminAboutTeamEvent(): Promise<
+  ActionResult<PortfolioShowcaseEvent | null>
+> {
+  return getAdminSystemPortfolioEvent(ABOUT_TEAM_SLUG);
+}
+
+export async function ensureAboutTeamEvent(): Promise<ActionResult<PortfolioShowcaseEvent>> {
+  return ensureSystemPortfolioEvent({
+    slug: ABOUT_TEAM_SLUG,
+    title: 'Studio About & Creative Team',
+    description: serializeAboutTeamDescription(DEFAULT_ABOUT_TEAM_SETTINGS),
+    fallbackMessage: 'Could not initialize About & Team showcase record',
+  });
+}
+
+export async function activateAboutTeamMedia(
+  eventId: string,
+  leadMediaId: string,
+  publishNow = true,
+): Promise<ActionResult<PortfolioShowcaseEvent>> {
+  return activateSystemPortfolioMedia(ABOUT_TEAM_SLUG, eventId, leadMediaId, publishNow);
+}
+
+export async function removeAboutTeamMedia(
+  eventId: string,
+  mediaId: string,
+): Promise<ActionResult<PortfolioShowcaseEvent | null>> {
+  return removeSystemPortfolioMedia(ABOUT_TEAM_SLUG, eventId, mediaId);
 }

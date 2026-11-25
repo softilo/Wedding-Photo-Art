@@ -12,6 +12,7 @@ import {
   MapPinIcon,
   PhoneIcon,
   WhatsAppIcon,
+  YouTubeIcon,
 } from '@/components/shared/Icons';
 
 interface EditorialNavbarClientProps {
@@ -25,17 +26,19 @@ interface EditorialNavbarClientProps {
   address: string;
   mapsUrl: string;
   facebookUrl: string;
+  youtubeUrl: string;
   whatsappHref: string;
 }
 
 const EDITORIAL_MENU_ITEMS = [
   { href: '/', label: 'Home' },
-  { href: '/#about', label: 'About' },
+  { href: '/about', label: 'About' },
   { href: '/#packages', label: 'Packages' },
   { href: '/#portfolio', label: 'Sample Works' },
   { href: '/#inquire', label: 'Book Us' },
   { href: '/#studio-concierge', label: 'Why Us' },
   { href: '/career', label: 'Career' },
+  { href: '/contact', label: 'Contact' },
 ];
 
 export function EditorialNavbarClient({
@@ -49,6 +52,7 @@ export function EditorialNavbarClient({
   address,
   mapsUrl,
   facebookUrl,
+  youtubeUrl,
   whatsappHref,
 }: EditorialNavbarClientProps) {
   const [open, setOpen] = useState(false);
@@ -84,8 +88,14 @@ export function EditorialNavbarClient({
     if (href === '/') {
       return pathname === '/' && !activeHash;
     }
+    if (href === '/about') {
+      return pathname.startsWith('/about');
+    }
     if (href === '/career') {
       return pathname.startsWith('/career');
+    }
+    if (href === '/contact') {
+      return pathname.startsWith('/contact');
     }
     if (href === '/#portfolio') {
       return (
@@ -158,6 +168,17 @@ export function EditorialNavbarClient({
             </a>
 
             <a
+              href={youtubeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${displayName} YouTube`}
+              title="YouTube Channel"
+              className="hidden md:inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#E5DFD0] bg-white text-[#4A4438] hover:border-[#FF0000]/60 hover:text-[#DC2626] transition-colors"
+            >
+              <YouTubeIcon className="w-4 h-4" />
+            </a>
+
+            <a
               href={phoneHref}
               className="hidden lg:inline-flex items-center gap-1.5 rounded-full border border-[#DFCEAA] bg-[#F8F3E6] px-3.5 py-2 text-xs font-semibold text-[#4A4438] hover:border-[#CAA650] hover:text-[#181611] transition-colors whitespace-nowrap"
               title={`Call ${displayName}`}
@@ -212,6 +233,15 @@ export function EditorialNavbarClient({
                   <FacebookIcon className="w-4 h-4" />
                 </a>
                 <a
+                  href={youtubeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${displayName} YouTube`}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#F4EFE4] hover:border-[#EF4444] hover:text-[#F87171] transition-colors"
+                >
+                  <YouTubeIcon className="w-4 h-4" />
+                </a>
+                <a
                   href={whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -242,7 +272,7 @@ export function EditorialNavbarClient({
             {/* Large Editorial Menu Links */}
             <nav
               aria-label="Drawer navigation"
-              className="relative my-auto py-4 flex flex-col space-y-1 sm:space-y-1.5"
+              className="relative my-auto py-3 flex flex-col space-y-0.5 sm:space-y-1"
             >
               <div
                 aria-hidden="true"
@@ -279,7 +309,7 @@ export function EditorialNavbarClient({
                     />
                     <span
                       className={cn(
-                        'font-editorial text-[1.95rem] sm:text-[2.35rem] font-medium leading-[1.12] whitespace-nowrap transition-colors duration-200',
+                        'font-editorial text-[1.8rem] sm:text-[2.15rem] font-medium leading-[1.12] whitespace-nowrap transition-colors duration-200',
                         isActive
                           ? 'text-[#E7D1AA]'
                           : 'text-[#F4EFE4] group-hover:text-[#E7D1AA]',

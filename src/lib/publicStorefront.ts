@@ -8,6 +8,7 @@ import {
   getPublicPortfolioEvents,
 } from '@/service/catalog/catalog.service';
 import { EDITORIAL_GRID_SLUG, HERO_SLIDER_SLUG } from '@/lib/heroSlider';
+import { ABOUT_TEAM_SLUG } from '@/lib/studioAboutTeam';
 import { SERVICES_SHOWCASE_SLUG } from '@/lib/studioServices';
 import {
   EventType,
@@ -39,8 +40,18 @@ export const STUDIO_PROFILE = {
   emailHref: 'mailto:weddingphotoart868@gmail.com',
   facebookUrl: 'https://www.facebook.com/weddingphotoArt.01',
   messengerUrl: 'https://m.me/weddingphotoArt.01',
+  youtubeUrl: 'https://youtube.com/@weddingphotoart1263?si=ki2LE-toftTUTO3i',
   mapsUrl:
-    'https://www.bing.com/maps/default.aspx?v=2&pc=FACEBK&mid=8100&where1=Grand%20Haque%20Tower%20(5th%20Floor)%20Shop%20no%20%3A4068%2C%20Mizan%20Rd%2C%20Feni%2C%20Feni%2C%20Bangladesh%2C%203900',
+    'https://www.google.com/maps/dir/?api=1&destination=23.013694763183594,91.39972686767578',
+  bingMapsUrl:
+    'https://www.bing.com/maps/directions?rtp=~pos.23.013694763183594_91.39972686767578_Feni%2c+Chattogram_Grand+Huq+Tower_',
+  googleMapsEmbedUrl:
+    'https://maps.google.com/maps?q=23.013694763183594,91.39972686767578+(Wedding+PhotoArt+%E2%80%A2+Grand+Haque+Tower)&hl=en&z=17&output=embed',
+  studioGeo: {
+    lat: 23.013694763183594,
+    lng: 91.39972686767578,
+  },
+  studioHours: 'Opens 9:00 AM • Sat–Thu (Events All Week)',
   logoMarkUrl: '/brand/wedding-photoart-mark.png',
   logoCardUrl: '/brand/wedding-photoart-logo.png',
   followersCount: '2.7K+',
@@ -280,6 +291,7 @@ export async function loadPublicStorefront(): Promise<{
   heroEvent: PortfolioShowcaseEvent | null;
   editorialGridEvent: PortfolioShowcaseEvent | null;
   servicesEvent: PortfolioShowcaseEvent | null;
+  aboutTeamEvent: PortfolioShowcaseEvent | null;
   galleryImages: PortfolioMediaItem[];
   isBackendConnected: boolean;
 }> {
@@ -292,6 +304,7 @@ export async function loadPublicStorefront(): Promise<{
     heroRes,
     editorialGridRes,
     servicesRes,
+    aboutTeamRes,
     galleryRes,
   ] = await Promise.all([
     getPublicBranding(),
@@ -302,6 +315,7 @@ export async function loadPublicStorefront(): Promise<{
     getPublicPortfolioEventBySlug(HERO_SLIDER_SLUG),
     getPublicPortfolioEventBySlug(EDITORIAL_GRID_SLUG),
     getPublicPortfolioEventBySlug(SERVICES_SHOWCASE_SLUG),
+    getPublicPortfolioEventBySlug(ABOUT_TEAM_SLUG),
     getPublicGalleryMedia('IMAGE'),
   ]);
 
@@ -315,6 +329,7 @@ export async function loadPublicStorefront(): Promise<{
       heroEvent: null,
       editorialGridEvent: null,
       servicesEvent: null,
+      aboutTeamEvent: null,
       galleryImages: [],
       isBackendConnected: false,
     };
@@ -331,6 +346,7 @@ export async function loadPublicStorefront(): Promise<{
     editorialGridEvent:
       editorialGridRes.ok && editorialGridRes.data ? editorialGridRes.data : null,
     servicesEvent: servicesRes.ok && servicesRes.data ? servicesRes.data : null,
+    aboutTeamEvent: aboutTeamRes.ok && aboutTeamRes.data ? aboutTeamRes.data : null,
     galleryImages:
       galleryRes.ok && Array.isArray(galleryRes.data?.data)
         ? galleryRes.data.data

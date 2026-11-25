@@ -192,18 +192,25 @@ export function PublicPortfolioShowcase({
       className="border-y border-[#E5DFD0] bg-white scroll-mt-16 overflow-x-clip"
     >
       <div className="mx-auto max-w-[1380px] min-w-0 px-4 py-12 sm:px-6 sm:py-16 lg:px-10 space-y-8">
-        {/* Clean Minimal Section Header */}
-        <div className="flex flex-wrap items-end justify-between gap-4 min-w-0">
-          <h2 className="font-editorial text-2xl sm:text-4xl font-semibold text-[#181611] leading-tight">
-            Highlight Films &amp; Stills
-          </h2>
-          <Link
-            href="/portfolio"
-            className="text-xs sm:text-sm font-semibold hover:underline shrink-0"
+        {/* Centered Editorial Title Matching Our Services */}
+        <div className="text-center space-y-2.5 min-w-0">
+          <h2
+            className="font-editorial text-[2.35rem] sm:text-[3.05rem] lg:text-[3.45rem] font-normal tracking-tight leading-tight"
             style={{ color: accent }}
           >
-            All Client Albums →
-          </Link>
+            Our Recent Works
+          </h2>
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs sm:text-sm text-[#5A5448]">
+            <span>Highlight Films &amp; Client Stills</span>
+            <span aria-hidden="true">•</span>
+            <Link
+              href="/portfolio"
+              className="font-semibold hover:underline underline-offset-4"
+              style={{ color: accent }}
+            >
+              All Client Albums →
+            </Link>
+          </div>
         </div>
 
         {/* Strict Viewport Gate: Nothing loads until the user scrolls to #portfolio! */}

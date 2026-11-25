@@ -47,17 +47,20 @@ import {
   LayersIcon,
   PlusIcon,
 } from '@/components/shared/Icons';
+import { AboutTeamSetup } from './AboutTeamSetup';
 import { EditorialMosaicSetup } from './EditorialMosaicSetup';
 import { ServicesShowcaseSetup } from './ServicesShowcaseSetup';
 import { StudioGalleryPickerModal } from './StudioGalleryPickerModal';
+import { parseAboutTeamSettings } from '@/lib/studioAboutTeam';
 import { parseStudioServicesSettings } from '@/lib/studioServices';
 
-type SetupSectionTab = 'hero' | 'editorial' | 'services';
+type SetupSectionTab = 'hero' | 'editorial' | 'services' | 'about';
 
 interface HeroSliderManagerProps {
   initialHeroEvent: PortfolioShowcaseEvent | null;
   initialEditorialEvent?: PortfolioShowcaseEvent | null;
   initialServicesEvent?: PortfolioShowcaseEvent | null;
+  initialAboutTeamEvent?: PortfolioShowcaseEvent | null;
   galleryImages: PortfolioMediaItem[];
   cloudinaryStatus: CloudinaryStatusSummary | null;
   studioName: string;
@@ -96,6 +99,7 @@ export function HeroSliderManager({
   initialHeroEvent,
   initialEditorialEvent = null,
   initialServicesEvent = null,
+  initialAboutTeamEvent = null,
   galleryImages,
   cloudinaryStatus,
   studioName,
@@ -107,6 +111,9 @@ export function HeroSliderManager({
   );
   const [servicesEventState, setServicesEventState] = useState<PortfolioShowcaseEvent | null>(
     initialServicesEvent,
+  );
+  const [aboutTeamEventState, setAboutTeamEventState] = useState<PortfolioShowcaseEvent | null>(
+    initialAboutTeamEvent,
   );
   const [galleryPool, setGalleryPool] = useState<PortfolioMediaItem[]>(galleryImages);
   const [settingsDraft, setSettingsDraft] = useState<HeroSliderSettings>(() =>
@@ -170,6 +177,11 @@ export function HeroSliderManager({
   const servicesSettings = useMemo(
     () => parseStudioServicesSettings(servicesEventState?.description, studioName),
     [servicesEventState?.description, studioName],
+  );
+
+  const aboutTeamSettings = useMemo(
+    () => parseAboutTeamSettings(aboutTeamEventState?.description, studioName),
+    [aboutTeamEventState?.description, studioName],
   );
 
   const editorialCustomCount = useMemo(() => {
@@ -667,7 +679,7 @@ export function HeroSliderManager({
                   ? `${editorialCustomCount}/4 Custom Frames`
                   : 'Section Hidden'}
               </span>
-            ) : (
+            ) : activeTab === 'services' ? (
               <span
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold',
@@ -685,6 +697,11 @@ export function HeroSliderManager({
                 {servicesSettings.enabled
                   ? `${servicesSettings.items.filter((i) => i.isActive).length} Active Services`
                   : 'Services Hidden'}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/35 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                {aboutTeamSettings.members.filter((m) => m.isActive).length} Team Profiles
               </span>
             )}
           </div>
@@ -727,8 +744,8 @@ export function HeroSliderManager({
         </div>
       </div>
 
-      {/* Section Categories Bar (Hero Slider, Showcase Bento Grid, Services Showcase) */}
-      <div className="grid gap-3 sm:grid-cols-3">
+      {/* Section Categories Bar (Hero, Editorial Mosaic, Services, About & Team) */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <button
           type="button"
           onClick={() => setActiveTab('hero')}
@@ -843,6 +860,44 @@ export function HeroSliderManager({
             {servicesSettings.items.filter((i) => i.isActive).length} items
           </span>
         </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('about')}
+          className={cn(
+            'text-left rounded-2xl border p-4 transition-all flex items-center justify-between gap-3 cursor-pointer',
+            activeTab === 'about'
+              ? 'border-[var(--admin-accent)] bg-[var(--admin-accent-soft)] shadow-2xs'
+              : 'border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-surface-subtle)]',
+          )}
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <span
+              className={cn(
+                'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border',
+                activeTab === 'about'
+                  ? 'border-[var(--admin-accent)]/40 bg-[var(--admin-accent)] text-[var(--admin-accent-fg)]'
+                  : 'border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] text-[var(--admin-accent)]',
+              )}
+            >
+              <LayersIcon className="w-5 h-5" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[10.5px] font-bold uppercase tracking-wider text-[var(--admin-accent)]">
+                Section 04
+              </p>
+              <p className="text-sm font-semibold text-[var(--admin-text)] truncate">
+                About &amp; Team Details
+              </p>
+              <p className="text-[11px] text-[var(--admin-muted)] truncate">
+                Studio story &amp; team roster for /about
+              </p>
+            </div>
+          </div>
+          <span className="font-mono-code text-xs font-bold text-[var(--admin-muted)] shrink-0">
+            {aboutTeamSettings.members.filter((m) => m.isActive).length} team
+          </span>
+        </button>
       </div>
 
       {!isCloudinaryReady && cloudinaryStatus && (
@@ -894,6 +949,15 @@ export function HeroSliderManager({
           studioName={studioName}
           onNotify={notify}
           onServicesEventChange={setServicesEventState}
+        />
+      ) : activeTab === 'about' ? (
+        <AboutTeamSetup
+          initialAboutTeamEvent={aboutTeamEventState}
+          galleryPool={galleryPool}
+          onGalleryPoolUpdate={setGalleryPool}
+          studioName={studioName}
+          onNotify={notify}
+          onAboutTeamEventChange={setAboutTeamEventState}
         />
       ) : (
         <>

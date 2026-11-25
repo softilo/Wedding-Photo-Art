@@ -6,8 +6,8 @@ import {
 import {
   getHeroSlideImageUrl,
   getHeroSlideSrcSet,
-  HERO_SLIDER_SLUG,
-  EDITORIAL_GRID_SLUG,
+  isSystemPortfolioEventSlug,
+  SERVICES_SHOWCASE_SLUG,
 } from '@/lib/heroSlider';
 import {
   buildCloudinaryImageUrl,
@@ -15,14 +15,7 @@ import {
   parseShowcaseMedia,
 } from '@/lib/showcaseMedia';
 
-export const SERVICES_SHOWCASE_SLUG = 'studio-services-showcase';
-
-const SERVICES_SYSTEM_SLUGS = new Set([
-  'studio-media-gallery',
-  HERO_SLIDER_SLUG,
-  EDITORIAL_GRID_SLUG,
-  SERVICES_SHOWCASE_SLUG,
-]);
+export { SERVICES_SHOWCASE_SLUG };
 
 export interface StudioServiceItem {
   id: string;
@@ -247,7 +240,7 @@ export function resolveStudioServices(params: {
   };
 
   for (const ev of portfolioEvents) {
-    if (SERVICES_SYSTEM_SLUGS.has((ev.slug || '').trim().toLowerCase())) continue;
+    if (isSystemPortfolioEventSlug(ev.slug)) continue;
     if (ev.coverMedia) pushFallback(ev.coverMedia);
     for (const m of ev.media || []) {
       pushFallback(m);

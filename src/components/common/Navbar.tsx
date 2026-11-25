@@ -37,6 +37,7 @@ export function Navbar({ branding }: NavbarProps) {
       address={address}
       mapsUrl={STUDIO_PROFILE.mapsUrl}
       facebookUrl={facebookUrl}
+      youtubeUrl={STUDIO_PROFILE.youtubeUrl}
       whatsappHref={whatsappHref}
     />
   );

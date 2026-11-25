@@ -11,6 +11,7 @@ import {
   MapPinIcon,
   MessageCircleIcon,
   PhoneIcon,
+  YouTubeIcon,
 } from '@/components/shared/Icons';
 
 export function Footer({ branding }: { branding?: PublicBranding | null }) {
@@ -70,6 +71,15 @@ export function Footer({ branding }: { branding?: PublicBranding | null }) {
                 <ExternalLinkIcon className="w-3.5 h-3.5 text-[#E7D1AA]" />
               </a>
               <a
+                href={STUDIO_PROFILE.youtubeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 px-3.5 py-2 text-xs font-semibold text-[#F4EFE4] hover:border-[#EF4444]/65 hover:bg-white/10 transition-colors"
+              >
+                <YouTubeIcon className="w-3.5 h-3.5 text-[#F87171]" />
+                <span>YouTube</span>
+              </a>
+              <a
                 href={STUDIO_PROFILE.messengerUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -86,6 +96,16 @@ export function Footer({ branding }: { branding?: PublicBranding | null }) {
               Explore
             </p>
             <ul className="space-y-2 text-[#D5CDB8]">
+              <li>
+                <Link href="/about" className="hover:text-white transition-colors">
+                  About Us &amp; Team
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:text-white transition-colors">
+                  Contact &amp; Google Map
+                </Link>
+              </li>
               <li>
                 <Link href="/all-services" className="hover:text-white transition-colors">
                   Our Services

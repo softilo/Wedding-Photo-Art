@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { getMe } from '@/service/auth';
 import {
+  getAdminAboutTeamEvent,
   getAdminEditorialGridEvent,
   getAdminHeroSliderEvent,
   getAdminServicesShowcaseEvent,
@@ -16,20 +17,28 @@ async function AdminHeroContent() {
   if (!session) redirect('/login');
   if (session.role === 'STAFF' || session.role === 'ACCOUNTANT') redirect('/admin');
 
-  const [heroEventRes, editorialEventRes, servicesEventRes, galleryRes, statusRes] =
-    await Promise.all([
-      getAdminHeroSliderEvent(),
-      getAdminEditorialGridEvent(),
-      getAdminServicesShowcaseEvent(),
-      listGalleryMedia('IMAGE'),
-      getGalleryStatus(),
-    ]);
+  const [
+    heroEventRes,
+    editorialEventRes,
+    servicesEventRes,
+    aboutTeamEventRes,
+    galleryRes,
+    statusRes,
+  ] = await Promise.all([
+    getAdminHeroSliderEvent(),
+    getAdminEditorialGridEvent(),
+    getAdminServicesShowcaseEvent(),
+    getAdminAboutTeamEvent(),
+    listGalleryMedia('IMAGE'),
+    getGalleryStatus(),
+  ]);
 
   return (
     <HeroSliderManager
       initialHeroEvent={heroEventRes.ok ? (heroEventRes.data ?? null) : null}
       initialEditorialEvent={editorialEventRes.ok ? (editorialEventRes.data ?? null) : null}
       initialServicesEvent={servicesEventRes.ok ? (servicesEventRes.data ?? null) : null}
+      initialAboutTeamEvent={aboutTeamEventRes.ok ? (aboutTeamEventRes.data ?? null) : null}
       galleryImages={galleryRes.ok && galleryRes.data ? galleryRes.data.data : []}
       cloudinaryStatus={statusRes.ok && statusRes.data ? statusRes.data : null}
       studioName={session.studioName || 'Wedding PhotoArt'}

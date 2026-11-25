@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import React, { useMemo, useState } from 'react';
 import {
   EventType,
@@ -12,18 +13,20 @@ import {
 import { isSystemPortfolioEventSlug } from '@/lib/heroSlider';
 import { STUDIO_PROFILE } from '@/lib/publicStorefront';
 import { formatPoisha, cn } from '@/lib/utils';
+import { buildWhatsAppUrl } from '@/components/common/FloatingWhatsAppButton';
 import {
   ArrowRightIcon,
   CheckCircleIcon,
   ExternalLinkIcon,
+  FacebookIcon,
   MailIcon,
   MapPinIcon,
   MessageCircleIcon,
   PhoneIcon,
+  WhatsAppIcon,
+  YouTubeIcon,
 } from '@/components/shared/Icons';
-import { EditorialBentoShowcase } from './EditorialBentoShowcase';
 import { HeroPhotoSlider } from './HeroPhotoSlider';
-import { InquiryForm } from './InquiryForm';
 import { PublicPortfolioShowcase } from './PublicPortfolioShowcase';
 import { PublicServicesSection } from './PublicServicesSection';
 import { StudioCountStats } from './StudioCountStats';
@@ -49,7 +52,6 @@ export function PublicAgencyHome({
   portfolio,
   portfolioEvents = [],
   heroEvent = null,
-  editorialGridEvent = null,
   servicesEvent = null,
   galleryImages = [],
   isBackendConnected,
@@ -57,8 +59,7 @@ export function PublicAgencyHome({
 }: PublicAgencyHomeProps) {
   const [selectedPackageId, setSelectedPackageId] = useState<string>(initialPackageId);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('ALL');
-  const [inquiryTitle, setInquiryTitle] = useState<string>('');
-  const [inquiryNotes, setInquiryNotes] = useState<string>('');
+  const [selectedInquiryLabel, setSelectedInquiryLabel] = useState<string>('');
 
   const primary = branding.themeTokens.primaryColor || '#181611';
   const accent = branding.themeTokens.accentColor || '#8B6A21';
@@ -67,6 +68,10 @@ export function PublicAgencyHome({
   const contactEmail = branding.contactDetails?.email || STUDIO_PROFILE.email;
   const contactAddress = branding.contactDetails?.address || STUDIO_PROFILE.address;
   const facebookUrl = branding.contactDetails?.website || STUDIO_PROFILE.facebookUrl;
+  const whatsappMessage = selectedInquiryLabel
+    ? `Hello ${branding.displayName}! I would like to book / inquire about: ${selectedInquiryLabel}.`
+    : undefined;
+  const whatsappBookUrl = buildWhatsAppUrl(contactPhone, branding.displayName, whatsappMessage);
 
   const allClientPortfolios = useMemo(() => {
     return [...portfolioEvents]
@@ -97,13 +102,16 @@ export function PublicAgencyHome({
 
   const handleSelectPackage = (id: string) => {
     setSelectedPackageId(id);
+    const matched = packages.find((p) => p.id === id);
+    if (matched) {
+      setSelectedInquiryLabel(matched.name);
+    }
     document.getElementById('inquire')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleSelectComboPreset = (preset: (typeof STUDIO_PROFILE.comboPresets)[number]) => {
     setSelectedPackageId('');
-    setInquiryTitle(preset.title);
-    setInquiryNotes(preset.notes);
+    setSelectedInquiryLabel(preset.title);
     document.getElementById('inquire')?.scrollIntoView({ behavior: 'smooth' });
   };
 
@@ -408,153 +416,210 @@ export function PublicAgencyHome({
             </p>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-12 items-start">
-            {/* Left Studio Info + Community Reviews */}
-            <div className="lg:col-span-5 space-y-5">
-              {/* Visit Our Feni Studio Card */}
-              <div className="atelier-card p-6 space-y-5 bg-white">
-                <div className="flex items-start justify-between gap-3 border-b border-[#ECE6D8] pb-4">
-                  <div>
-                    <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-[#7A5E21]">
-                      Studio Lounge • {STUDIO_PROFILE.city}
-                    </p>
-                    <h3 className="font-editorial text-2xl font-semibold text-[#181611] mt-0.5">
-                      Visit {branding.displayName}
-                    </h3>
+          <div className="grid gap-6 lg:grid-cols-12 items-stretch">
+            {/* Left Studio Info + Highlighted WhatsApp Book Now & Social Channels */}
+            <div id="inquire" className="lg:col-span-7 scroll-mt-20">
+              <div className="atelier-card p-6 sm:p-8 space-y-5 bg-white h-full flex flex-col justify-between">
+                <div className="space-y-5">
+                  <div className="flex items-start justify-between gap-3 border-b border-[#ECE6D8] pb-4">
+                    <div>
+                      <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-[#7A5E21]">
+                        Studio Lounge • {STUDIO_PROFILE.city}
+                      </p>
+                      <h3 className="font-editorial text-2xl sm:text-3xl font-semibold text-[#181611] mt-0.5">
+                        Visit {branding.displayName}
+                      </h3>
+                    </div>
+                    <span className="rounded-full bg-[#F8F3E6] border border-[#DFCEAA] px-2.5 py-0.5 text-[11px] font-semibold text-[#6F5319]">
+                      {STUDIO_PROFILE.priceTier} Studio
+                    </span>
                   </div>
-                  <span className="rounded-full bg-[#F8F3E6] border border-[#DFCEAA] px-2.5 py-0.5 text-[11px] font-semibold text-[#6F5319]">
-                    {STUDIO_PROFILE.priceTier} Studio
-                  </span>
+
+                  {selectedInquiryLabel && (
+                    <div className="rounded-xl border border-[#CAA650]/50 bg-[#F8F3E6] px-4 py-2.5 flex items-center justify-between gap-2 text-xs">
+                      <span className="font-medium text-[#181611] truncate">
+                        Selected: <strong>{selectedInquiryLabel}</strong>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedPackageId('');
+                          setSelectedInquiryLabel('');
+                        }}
+                        className="text-[11px] font-semibold text-[#7A5E21] underline shrink-0 cursor-pointer"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="grid gap-4 sm:grid-cols-2 text-sm text-[#3C362B]">
+                    <div className="sm:col-span-2 flex items-start gap-3">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F8F3E6] border border-[#DFCEAA] text-[#7A5E21]">
+                        <MapPinIcon className="w-4 h-4" />
+                      </span>
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-[#6B6352]">
+                          Studio Address
+                        </p>
+                        <p className="text-sm text-[#181611] mt-0.5 leading-relaxed">
+                          {contactAddress}
+                        </p>
+                        <a
+                          href={STUDIO_PROFILE.mapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs font-semibold mt-1.5 hover:underline underline-offset-4"
+                          style={{ color: accent }}
+                        >
+                          <span>Open Studio Map</span>
+                          <ExternalLinkIcon className="w-3 h-3" />
+                        </a>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F8F3E6] border border-[#DFCEAA] text-[#7A5E21]">
+                        <PhoneIcon className="w-4 h-4" />
+                      </span>
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-[#6B6352]">
+                          Phone &amp; WhatsApp
+                        </p>
+                        <a
+                          href={`tel:${contactPhone.replace(/[^\d+]/g, '')}`}
+                          className="text-sm font-mono-code font-semibold text-[#181611] hover:underline mt-0.5 inline-block"
+                        >
+                          {contactPhone}
+                        </a>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F8F3E6] border border-[#DFCEAA] text-[#7A5E21]">
+                        <MailIcon className="w-4 h-4" />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold uppercase tracking-wider text-[#6B6352]">
+                          Studio Email
+                        </p>
+                        <a
+                          href={`mailto:${contactEmail}`}
+                          className="text-sm text-[#181611] hover:underline mt-0.5 inline-block break-all"
+                        >
+                          {contactEmail}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="space-y-4 text-sm text-[#3C362B]">
-                  <div className="flex items-start gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F8F3E6] border border-[#DFCEAA] text-[#7A5E21]">
-                      <MapPinIcon className="w-4 h-4" />
-                    </span>
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-wider text-[#6B6352]">
-                        Studio Address
-                      </p>
-                      <p className="text-sm text-[#181611] mt-0.5 leading-relaxed">
-                        {contactAddress}
-                      </p>
-                      <a
-                        href={STUDIO_PROFILE.mapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs font-semibold mt-1.5 hover:underline underline-offset-4"
-                        style={{ color: accent }}
-                      >
-                        <span>Open Studio Map</span>
-                        <ExternalLinkIcon className="w-3 h-3" />
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F8F3E6] border border-[#DFCEAA] text-[#7A5E21]">
-                      <PhoneIcon className="w-4 h-4" />
-                    </span>
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-wider text-[#6B6352]">
-                        Phone &amp; WhatsApp
-                      </p>
-                      <a
-                        href={`tel:${contactPhone.replace(/\s+/g, '')}`}
-                        className="text-sm font-mono-code font-semibold text-[#181611] hover:underline mt-0.5 inline-block"
-                      >
-                        {contactPhone} ({STUDIO_PROFILE.phoneDisplay})
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F8F3E6] border border-[#DFCEAA] text-[#7A5E21]">
-                      <MailIcon className="w-4 h-4" />
-                    </span>
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-wider text-[#6B6352]">
-                        Studio Email
-                      </p>
-                      <a
-                        href={`mailto:${contactEmail}`}
-                        className="text-sm text-[#181611] hover:underline mt-0.5 inline-block break-all"
-                      >
-                        {contactEmail}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2.5 pt-2 border-t border-[#ECE6D8]">
+                <div className="space-y-3 pt-4 border-t border-[#ECE6D8]">
                   <a
-                    href={STUDIO_PROFILE.messengerUrl}
+                    href={whatsappBookUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#181611] px-3.5 py-2.5 text-xs font-semibold text-white hover:opacity-90 transition-opacity"
+                    className="w-full inline-flex items-center justify-center gap-2.5 rounded-xl bg-[#16A34A] hover:bg-[#15803D] px-5 py-3.5 text-sm sm:text-base font-bold text-white shadow-md shadow-[#16A34A]/25 ring-2 ring-[#25D366]/35 transition-all active:scale-[0.99]"
                   >
-                    <MessageCircleIcon className="w-3.5 h-3.5 text-[#E7D1AA]" />
-                    <span>Inbox Messenger</span>
+                    <WhatsAppIcon className="w-5 h-5" />
+                    <span>Book Now</span>
+                    <ArrowRightIcon className="w-4 h-4" />
                   </a>
-                  <a
-                    href={facebookUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#D8CCB2] bg-[#F8F3E6] px-3.5 py-2.5 text-xs font-semibold text-[#181611] hover:bg-white transition-colors"
-                  >
-                    <span>Facebook Page</span>
-                    <ExternalLinkIcon className="w-3.5 h-3.5 text-[#7A5E21]" />
-                  </a>
-                </div>
-              </div>
 
-              {/* What Happens Next Card */}
-              <div className="rounded-2xl border border-[#2E291F] bg-[#14120E] p-6 text-[#F4EFE4] space-y-4">
-                <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
-                  <div>
-                    <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-[#E7D1AA]">
-                      After You Submit
-                    </p>
-                    <h3 className="font-editorial text-xl font-semibold text-white mt-0.5">
-                      What Happens Next?
-                    </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <a
+                      href={STUDIO_PROFILE.messengerUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#181611] px-3 py-2.5 text-xs font-semibold text-white hover:opacity-90 transition-opacity"
+                    >
+                      <MessageCircleIcon className="w-3.5 h-3.5 text-[#E7D1AA]" />
+                      <span>Messenger</span>
+                    </a>
+                    <a
+                      href={facebookUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#D8CCB2] bg-[#F8F3E6] px-3 py-2.5 text-xs font-semibold text-[#181611] hover:bg-white transition-colors"
+                    >
+                      <FacebookIcon className="w-3.5 h-3.5 text-[#7A5E21]" />
+                      <span>Facebook</span>
+                    </a>
+                    <a
+                      href={STUDIO_PROFILE.youtubeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#D8CCB2] bg-white px-3 py-2.5 text-xs font-semibold text-[#181611] hover:border-[#DC2626] hover:text-[#DC2626] transition-colors"
+                    >
+                      <YouTubeIcon className="w-3.5 h-3.5 text-[#DC2626]" />
+                      <span>YouTube</span>
+                    </a>
+                    <a
+                      href={`mailto:${contactEmail}`}
+                      className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#D8CCB2] bg-white px-3 py-2.5 text-xs font-semibold text-[#181611] hover:border-[#8B6A21] hover:text-[#8B6A21] transition-colors"
+                    >
+                      <MailIcon className="w-3.5 h-3.5 text-[#7A5E21]" />
+                      <span>Email Us</span>
+                    </a>
                   </div>
-                  <span className="rounded-full border border-[#CAA650]/40 bg-[#CAA650]/15 px-2.5 py-0.5 text-[10.5px] font-semibold text-[#E7D1AA]">
-                    Free Quote
-                  </span>
                 </div>
-
-                <ul className="space-y-2.5 text-xs text-[#C7BFA9]">
-                  <li className="flex items-start gap-2.5">
-                    <span className="font-mono-code font-bold text-[#E7D1AA]">01.</span>
-                    <span>Our coordinator checks photographer &amp; cinema crew availability for your dates.</span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <span className="font-mono-code font-bold text-[#E7D1AA]">02.</span>
-                    <span>You receive a clear, itemized BDT quote via phone, WhatsApp, or email.</span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <span className="font-mono-code font-bold text-[#E7D1AA]">03.</span>
-                    <span>Visit our Mizan Rd studio or confirm your deposit to lock your date.</span>
-                  </li>
-                </ul>
               </div>
             </div>
 
-            {/* Right Interactive Booking & Quote Form */}
-            <div id="inquire" className="lg:col-span-7 scroll-mt-20">
-              <InquiryForm
-                branding={branding}
-                eventTypes={eventTypes}
-                packages={packages}
-                selectedPackageId={selectedPackageId}
-                onPackageChange={setSelectedPackageId}
-                eventTitle={inquiryTitle}
-                onEventTitleChange={setInquiryTitle}
-                notes={inquiryNotes}
-                onNotesChange={setInquiryNotes}
-              />
+            {/* Right: Simple Concierge Process & Direct Studio Map Link */}
+            <div className="lg:col-span-5">
+              <div className="rounded-2xl border border-[#2E291F] bg-[#14120E] p-6 sm:p-8 text-[#F4EFE4] space-y-5 h-full flex flex-col justify-between">
+                <div className="space-y-5">
+                  <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-4">
+                    <div>
+                      <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-[#E7D1AA]">
+                        Simple Booking Flow
+                      </p>
+                      <h3 className="font-editorial text-2xl font-semibold text-white mt-0.5">
+                        What Happens Next?
+                      </h3>
+                    </div>
+                    <span className="rounded-full border border-[#CAA650]/40 bg-[#CAA650]/15 px-3 py-0.5 text-[10.5px] font-semibold text-[#E7D1AA]">
+                      Instant Reply
+                    </span>
+                  </div>
+
+                  <ul className="space-y-4 text-xs sm:text-sm text-[#C7BFA9]">
+                    <li className="flex items-start gap-3">
+                      <span className="font-mono-code font-bold text-[#E7D1AA]">01.</span>
+                      <span>
+                        Message us directly on WhatsApp or Messenger with your Wedding, Holud, or
+                        Reception dates.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="font-mono-code font-bold text-[#E7D1AA]">02.</span>
+                      <span>
+                        Our coordinator confirms crew availability and shares a clear, itemized BDT
+                        quote.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="font-mono-code font-bold text-[#E7D1AA]">03.</span>
+                      <span>
+                        Visit our Grand Haque Tower studio on Mizan Rd, Feni or confirm advance to
+                        lock your date.
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="pt-4 border-t border-white/10">
+                  <Link
+                    href="/contact"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#CAA650]/45 bg-white/5 px-4 py-3 text-xs sm:text-sm font-semibold text-[#E7D1AA] hover:bg-[#CAA650]/15 transition-colors"
+                  >
+                    <MapPinIcon className="w-4 h-4" />
+                    <span>View Interactive Google Map &amp; Hours</span>
+                    <ArrowRightIcon className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>

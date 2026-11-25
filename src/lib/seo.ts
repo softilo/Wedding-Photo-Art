@@ -193,6 +193,11 @@ export function buildStudioJsonLdGraph(params: {
           postalCode: '3900',
           addressCountry: 'BD',
         },
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: STUDIO_PROFILE.studioGeo.lat,
+          longitude: STUDIO_PROFILE.studioGeo.lng,
+        },
         hasMap: STUDIO_PROFILE.mapsUrl,
         areaServed: [
           { '@type': 'City', name: 'Feni' },
@@ -200,7 +205,7 @@ export function buildStudioJsonLdGraph(params: {
           { '@type': 'City', name: 'Dhaka' },
           { '@type': 'Country', name: 'Bangladesh' },
         ],
-        sameAs: sameAsUrl ? [sameAsUrl] : undefined,
+        sameAs: [sameAsUrl, STUDIO_PROFILE.youtubeUrl].filter(Boolean),
         ...(offers.length > 0
           ? {
               hasOfferCatalog: {
