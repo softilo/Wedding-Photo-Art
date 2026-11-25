@@ -41,10 +41,17 @@ function FeaturedFounderSpotlight({
   branding: PublicBranding;
   accent: string;
 }) {
+  const specialtyTags = member.specialty
+    ? member.specialty
+        .split(/[•|,]/)
+        .map((item) => item.trim())
+        .filter(Boolean)
+    : [];
+
   return (
-    <article className="rounded-3xl border border-[#CAA650]/45 bg-[#14120E] text-[#F4EFE4] overflow-hidden shadow-xl grid lg:grid-cols-12 items-stretch">
+    <article className="rounded-3xl border-2 border-[#DFCEAA] bg-white text-[#181611] overflow-hidden shadow-[0_20px_50px_-20px_rgba(24,22,17,0.16)] grid lg:grid-cols-12 items-stretch">
       {/* Left: Portrait Photo */}
-      <div className="lg:col-span-5 relative min-h-[340px] sm:min-h-[420px] lg:min-h-[480px] bg-[#1C1913] border-b lg:border-b-0 lg:border-r border-[#CAA650]/20 overflow-hidden">
+      <div className="lg:col-span-5 relative min-h-[360px] sm:min-h-[440px] lg:min-h-[520px] bg-[#14120E] border-b-2 lg:border-b-0 lg:border-r-2 border-[#DFCEAA] overflow-hidden">
         {member.imageUrl ? (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
@@ -71,72 +78,82 @@ function FeaturedFounderSpotlight({
           </div>
         )}
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#14120E]/80 to-transparent lg:hidden" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#14120E]/75 to-transparent lg:hidden" />
 
         <div className="absolute top-4 left-4">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#CAA650]/55 bg-[#14120E]/85 backdrop-blur-sm px-3.5 py-1 text-[10.5px] font-bold uppercase tracking-[0.18em] text-[#E7D1AA]">
-            <CameraIcon className="w-3 h-3" />
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#CAA650]/70 bg-[#14120E]/90 backdrop-blur-sm px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#F3DFB8] shadow-md">
+            <CameraIcon className="w-3.5 h-3.5" />
             <span>Founder &amp; Lead</span>
           </span>
         </div>
       </div>
 
       {/* Right: Detailed Bio & Creative Vision */}
-      <div className="lg:col-span-7 p-7 sm:p-10 lg:p-14 flex flex-col justify-center space-y-5">
-        <div className="space-y-2.5">
+      <div className="lg:col-span-7 bg-gradient-to-br from-white via-[#FCF9F2] to-[#F7F1E2] p-7 sm:p-10 lg:p-12 flex flex-col justify-center space-y-6">
+        <div className="space-y-3">
           {member.role && (
-            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] text-[#E7D1AA]">
-              {member.role}
-            </p>
+            <span className="inline-flex w-fit items-center gap-2 rounded-full bg-[#181611] px-4 py-1.5 text-[11px] sm:text-xs font-bold uppercase tracking-[0.18em] text-[#E7D1AA] shadow-xs">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#CAA650]" />
+              <span>{member.role}</span>
+            </span>
           )}
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <h3 className="font-editorial text-3xl sm:text-4xl lg:text-[2.9rem] font-semibold text-white leading-[1.08]">
+          <div className="flex flex-wrap items-center gap-x-3.5 gap-y-2 pt-1">
+            <h3 className="font-editorial text-3xl sm:text-4xl lg:text-[3.1rem] font-semibold text-[#181611] leading-[1.06] tracking-[-0.015em]">
               {member.name}
             </h3>
             {member.subtitle && (
-              <span className="text-sm sm:text-base font-medium text-[#E7D1AA]/90">
-                ({member.subtitle})
+              <span className="inline-flex items-center rounded-full border border-[#DFCEAA] bg-[#F8F3E6] px-3.5 py-1 text-xs sm:text-sm font-semibold text-[#7A5E21]">
+                {member.subtitle}
               </span>
             )}
           </div>
-          {member.specialty && (
-            <p className="text-xs sm:text-sm italic text-[#D5CDB8]">{member.specialty}</p>
+          {specialtyTags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              {specialtyTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center rounded-lg border border-[#E5D7B8] bg-white/95 px-3 py-1 text-xs sm:text-[13px] font-semibold text-[#4A4131]"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           )}
         </div>
 
-        <div className="h-[1.5px] w-16 bg-[#CAA650] rounded-full" />
+        <div className="h-[2px] w-20 bg-gradient-to-r from-[#8B6A21] to-[#DFCEAA] rounded-full" />
 
         {member.bio && (
-          <p className="text-sm sm:text-base text-[#D5CDB8] leading-[1.85] max-w-2xl">
+          <p className="text-[15.5px] sm:text-[17px] text-[#2E291F] leading-[1.78] font-normal max-w-2xl">
             {member.bio}
           </p>
         )}
 
         {member.quote && (
-          <blockquote className="border-l-2 border-[#CAA650]/70 pl-4 font-editorial italic text-lg sm:text-xl text-[#E7D1AA]/95 leading-snug">
+          <blockquote className="rounded-2xl border border-[#DFCEAA] border-l-4 border-l-[#8B6A21] bg-[#F8F3E6]/85 px-5 py-3.5 font-editorial italic text-lg sm:text-[1.32rem] font-medium text-[#181611] leading-snug">
             &ldquo;{member.quote}&rdquo;
           </blockquote>
         )}
 
         {/* Personal Contact & Social Links */}
         {(member.phone || member.instagram || member.location) && (
-          <div className="flex flex-wrap items-center gap-2.5 pt-1 text-xs">
+          <div className="flex flex-wrap items-center gap-2.5 pt-1 text-xs sm:text-[13px]">
             {member.phone && (
               <>
                 <a
                   href={`tel:${member.phone.replace(/[^\d+]/g, '')}`}
-                  className="inline-flex items-center gap-2 rounded-full border border-[#CAA650]/40 bg-white/5 px-3.5 py-2 font-mono-code font-semibold text-[#F4EFE4] hover:border-[#CAA650] hover:bg-[#CAA650]/15 transition-colors"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#D4C094] bg-white px-4 py-2 font-mono-code font-bold text-[#181611] shadow-xs hover:border-[#8B6A21] hover:bg-[#F8F3E6] transition-colors"
                 >
-                  <PhoneIcon className="w-3.5 h-3.5 text-[#E7D1AA]" />
+                  <PhoneIcon className="w-3.5 h-3.5 text-[#8B6A21]" />
                   <span>{member.phone}</span>
                 </a>
                 <a
                   href={buildWhatsAppUrl(member.phone, member.name)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-full border border-[#25D366]/45 bg-[#25D366]/10 px-3.5 py-2 font-semibold text-[#6EE7B7] hover:bg-[#25D366]/20 transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[#16A34A] px-4 py-2 font-bold text-white shadow-sm hover:bg-[#15803D] transition-colors"
                 >
-                  <WhatsAppIcon className="w-3.5 h-3.5" />
+                  <WhatsAppIcon className="w-4 h-4" />
                   <span>WhatsApp</span>
                 </a>
               </>
@@ -147,9 +164,9 @@ function FeaturedFounderSpotlight({
                 href={`https://www.instagram.com/${member.instagram.replace(/^@+/, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3.5 py-2 font-medium text-[#D5CDB8] hover:border-[#CAA650] hover:text-white transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#D4C094] bg-white px-4 py-2 font-semibold text-[#181611] shadow-xs hover:border-[#8B6A21] hover:bg-[#F8F3E6] transition-colors"
               >
-                <svg className="w-3.5 h-3.5 text-[#E7D1AA]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="w-3.5 h-3.5 text-[#8B6A21]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
                   <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
                   <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
@@ -159,8 +176,8 @@ function FeaturedFounderSpotlight({
             )}
 
             {member.location && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-2 text-[#C7BFA9]">
-                <MapPinIcon className="w-3.5 h-3.5 text-[#E7D1AA]" />
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E5D7B8] bg-[#FAF6EC] px-4 py-2 font-semibold text-[#3D3528]">
+                <MapPinIcon className="w-3.5 h-3.5 text-[#8B6A21]" />
                 <span>{member.location}</span>
               </span>
             )}
@@ -170,7 +187,7 @@ function FeaturedFounderSpotlight({
         <div className="pt-2 flex flex-wrap items-center gap-3">
           <Link
             href="/#inquire"
-            className="inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm hover:opacity-95 transition-opacity"
+            className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs sm:text-sm font-bold text-white shadow-md hover:opacity-95 transition-opacity"
             style={{ backgroundColor: accent }}
           >
             <span>Book With Our Lead Crew</span>
@@ -178,7 +195,7 @@ function FeaturedFounderSpotlight({
           </Link>
           <Link
             href="/portfolio"
-            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-2.5 text-xs sm:text-sm font-semibold text-[#F4EFE4] hover:border-[#CAA650] transition-colors"
+            className="inline-flex items-center gap-2 rounded-full border-2 border-[#181611]/20 bg-white px-6 py-3 text-xs sm:text-sm font-bold text-[#181611] hover:border-[#8B6A21] hover:bg-[#F8F3E6] transition-colors"
           >
             <span>View Signature Albums</span>
           </Link>

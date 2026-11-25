@@ -1042,6 +1042,22 @@ export function PortfolioEventPageClient({
             {branding.displayName}
           </span>
         </p>
+        <p className="text-[11px] tracking-wide pt-1">
+          Developed by{' '}
+          <a
+            href="https://softilo.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              'font-semibold underline underline-offset-4 transition-colors',
+              darkGallery
+                ? 'text-[#E7D1AA] hover:text-white decoration-[#CAA650]/50'
+                : 'text-[#8B6A21] hover:text-[#181611] decoration-[#8B6A21]/40',
+            )}
+          >
+            softilo.io
+          </a>
+        </p>
       </footer>
     </div>
   );

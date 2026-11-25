@@ -192,12 +192,23 @@ export function Footer({ branding }: { branding?: PublicBranding | null }) {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-[#9C937E]">
+        <div className="mt-12 flex flex-col md:flex-row items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-[#9C937E]">
           <span>
             © <CopyrightYear /> {displayName}. All rights reserved.
           </span>
           <span className="tracking-wide">
             {STUDIO_PROFILE.subtitle} • {STUDIO_PROFILE.city}
+          </span>
+          <span className="text-[#C7BFA9]">
+            Developed by{' '}
+            <a
+              href="https://softilo.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-[#E7D1AA] hover:text-white underline underline-offset-4 decoration-[#CAA650]/50 transition-colors"
+            >
+              softilo.io
+            </a>
           </span>
         </div>
       </div>
