@@ -322,7 +322,7 @@ async function ContactPageContent() {
 
 export default function ContactPage() {
   return (
-    <Suspense fallback={<PageSkeleton variant="storefront" label="Loading studio contact map..." />}>
+    <Suspense fallback={<PageSkeleton variant="contact" label="Loading studio contact map..." />}>
       <ContactPageContent />
     </Suspense>
   );

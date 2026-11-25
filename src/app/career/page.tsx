@@ -166,7 +166,7 @@ async function CareerContent() {
 
 export default function CareerPage() {
   return (
-    <Suspense fallback={<PageSkeleton variant="storefront" label="Loading studio careers..." />}>
+    <Suspense fallback={<PageSkeleton variant="career" label="Loading studio careers..." />}>
       <CareerContent />
     </Suspense>
   );

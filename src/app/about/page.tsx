@@ -59,7 +59,7 @@ async function AboutPageContent() {
 
 export default function AboutPage() {
   return (
-    <Suspense fallback={<PageSkeleton variant="storefront" label="Loading about studio..." />}>
+    <Suspense fallback={<PageSkeleton variant="about" label="Loading about studio..." />}>
       <AboutPageContent />
     </Suspense>
   );

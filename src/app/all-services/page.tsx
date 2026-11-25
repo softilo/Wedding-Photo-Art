@@ -103,7 +103,7 @@ async function AllServicesContent() {
 
 export default function AllServicesPage() {
   return (
-    <Suspense fallback={<PageSkeleton variant="storefront" label="Loading studio services..." />}>
+    <Suspense fallback={<PageSkeleton variant="services" label="Loading studio services..." />}>
       <AllServicesContent />
     </Suspense>
   );
