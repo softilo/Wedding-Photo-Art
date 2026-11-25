@@ -12,11 +12,13 @@ import {
 export const STUDIO_GALLERY_SLUG = 'studio-media-gallery';
 export const HERO_SLIDER_SLUG = 'studio-hero-slider';
 export const EDITORIAL_GRID_SLUG = 'studio-editorial-grid';
+export const SERVICES_SHOWCASE_SLUG = 'studio-services-showcase';
 
 const SYSTEM_PORTFOLIO_EVENT_SLUGS = new Set([
   STUDIO_GALLERY_SLUG,
   HERO_SLIDER_SLUG,
   EDITORIAL_GRID_SLUG,
+  SERVICES_SHOWCASE_SLUG,
 ]);
 
 export function isSystemPortfolioEventSlug(slug?: string | null): boolean {

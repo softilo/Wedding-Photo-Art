@@ -35,6 +35,7 @@ async function RootStorefrontContent() {
     portfolioEvents,
     heroEvent,
     editorialGridEvent,
+    servicesEvent,
     galleryImages,
     isBackendConnected,
   } = await loadPublicStorefront();
@@ -58,6 +59,7 @@ async function RootStorefrontContent() {
         portfolioEvents={portfolioEvents}
         heroEvent={heroEvent}
         editorialGridEvent={editorialGridEvent}
+        servicesEvent={servicesEvent}
         galleryImages={galleryImages}
         isBackendConnected={isBackendConnected}
       />

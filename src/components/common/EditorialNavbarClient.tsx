@@ -29,12 +29,13 @@ interface EditorialNavbarClientProps {
 }
 
 const EDITORIAL_MENU_ITEMS = [
-  { code: '01', href: '/', label: 'Home' },
-  { code: '02', href: '/#featured-portfolios', label: 'Signature Work' },
-  { code: '03', href: '/portfolio', label: 'Client Albums' },
-  { code: '04', href: '/#portfolio', label: 'Highlight Films & Stills' },
-  { code: '05', href: '/#packages', label: 'Packages' },
-  { code: '06', href: '/#studio-concierge', label: 'Book Your Date' },
+  { href: '/', label: 'Home' },
+  { href: '/#about', label: 'About' },
+  { href: '/#packages', label: 'Packages' },
+  { href: '/#portfolio', label: 'Sample Works' },
+  { href: '/#inquire', label: 'Book Us' },
+  { href: '/#studio-concierge', label: 'Why Us' },
+  { href: '/career', label: 'Career' },
 ];
 
 export function EditorialNavbarClient({
@@ -51,7 +52,20 @@ export function EditorialNavbarClient({
   whatsappHref,
 }: EditorialNavbarClientProps) {
   const [open, setOpen] = useState(false);
+  const [activeHash, setActiveHash] = useState('');
   const pathname = usePathname();
+
+  useEffect(() => {
+    const syncHash = () => {
+      setActiveHash(window.location.hash || '');
+    };
+    const rafId = window.requestAnimationFrame(syncHash);
+    window.addEventListener('hashchange', syncHash);
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener('hashchange', syncHash);
+    };
+  }, [pathname]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -66,6 +80,26 @@ export function EditorialNavbarClient({
 
   const closeDrawer = () => setOpen(false);
 
+  const isNavItemActive = (href: string) => {
+    if (href === '/') {
+      return pathname === '/' && !activeHash;
+    }
+    if (href === '/career') {
+      return pathname.startsWith('/career');
+    }
+    if (href === '/#portfolio') {
+      return (
+        pathname.startsWith('/portfolio') ||
+        pathname.startsWith('/album') ||
+        (pathname === '/' && activeHash === '#portfolio')
+      );
+    }
+    if (href.startsWith('/#')) {
+      return pathname === '/' && activeHash === href.slice(1);
+    }
+    return pathname === href;
+  };
+
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-[#E5DFD0]/90 bg-[#F9F8F5]/95 backdrop-blur-xl">
@@ -77,23 +111,39 @@ export function EditorialNavbarClient({
         />
 
         <div className="mx-auto flex h-16 sm:h-[68px] max-w-6xl items-center justify-between gap-3 px-3 sm:px-6">
-          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group min-w-0">
-            <BrandMark
-              logoUrl={logoUrl}
-              alt={displayName}
-              size={40}
-              variant="light"
-              className="rounded-xl shadow-2xs transition-transform duration-200 group-hover:scale-105"
-            />
-            <div className="leading-none min-w-0">
-              <span className="font-editorial text-[1.28rem] sm:text-[1.58rem] font-semibold text-[#181611] leading-none block truncate">
-                {displayName}
+          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+            <button
+              type="button"
+              onClick={() => setOpen((prev) => !prev)}
+              aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={open}
+              className="inline-flex h-10 shrink-0 items-center gap-2.5 rounded-full border border-[#D8CCB2] bg-white px-3.5 sm:px-4 text-xs sm:text-sm font-semibold text-[#181611] shadow-2xs hover:border-[#8B6A21] hover:bg-[#F8F3E6] transition-all cursor-pointer"
+            >
+              <span aria-hidden="true" className="flex flex-col justify-center gap-[5px] w-4">
+                <span className="block h-[1.5px] w-full bg-[#181611] rounded-full" />
+                <span className="block h-[1.5px] w-3 bg-[#8B6A21] rounded-full self-start" />
               </span>
-              <span className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.12em] sm:tracking-[0.2em] text-[#7A5E21] block mt-0.5 sm:mt-1 truncate">
-                {subtitleText}
-              </span>
-            </div>
-          </Link>
+              <span className="hidden sm:inline tracking-wide">Menu</span>
+            </button>
+
+            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group min-w-0">
+              <BrandMark
+                logoUrl={logoUrl}
+                alt={displayName}
+                size={40}
+                variant="light"
+                className="rounded-xl shadow-2xs transition-transform duration-200 group-hover:scale-105"
+              />
+              <div className="leading-none min-w-0">
+                <span className="font-editorial text-[1.28rem] sm:text-[1.58rem] font-semibold text-[#181611] leading-none block truncate">
+                  {displayName}
+                </span>
+                <span className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.12em] sm:tracking-[0.2em] text-[#7A5E21] block mt-0.5 sm:mt-1 truncate">
+                  {subtitleText}
+                </span>
+              </div>
+            </Link>
+          </div>
 
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             <a
@@ -118,46 +168,39 @@ export function EditorialNavbarClient({
 
             <Link
               href="/#inquire"
-              className="hidden sm:inline-flex items-center rounded-full px-4 py-2 text-xs sm:text-sm font-semibold text-white shadow-sm transition-all hover:opacity-95 active:scale-[0.98] whitespace-nowrap"
+              className="inline-flex items-center rounded-full px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-white shadow-sm transition-all hover:opacity-95 active:scale-[0.98] whitespace-nowrap"
               style={{ backgroundColor: accent }}
             >
               Book Date
             </Link>
-
-            <button
-              type="button"
-              onClick={() => setOpen((prev) => !prev)}
-              aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
-              aria-expanded={open}
-              className="inline-flex h-10 items-center gap-2.5 rounded-full border border-[#D8CCB2] bg-white px-3.5 sm:px-4 text-xs sm:text-sm font-semibold text-[#181611] shadow-2xs hover:border-[#8B6A21] hover:bg-[#F8F3E6] transition-all cursor-pointer"
-            >
-              <span className="hidden sm:inline tracking-wide">Menu</span>
-              <span aria-hidden="true" className="flex flex-col justify-center gap-[5px] w-4">
-                <span className="block h-[1.5px] w-full bg-[#181611] rounded-full" />
-                <span className="block h-[1.5px] w-3 bg-[#8B6A21] rounded-full self-end" />
-              </span>
-            </button>
           </div>
         </div>
       </header>
 
-      {/* Lightweight Slide-Over Drawer (Zero scroll-lock trap, leaves page layout untouched) */}
-      {open && (
-        <>
-          <div
-            aria-hidden="true"
-            onClick={closeDrawer}
-            className="fixed inset-0 z-50 bg-black/45 backdrop-blur-[2px]"
-          />
+      {/* Lightweight Left Slide-Over Drawer (Zero scroll-lock trap, leaves page layout untouched) */}
+      <div
+        aria-hidden="true"
+        onClick={closeDrawer}
+        className={cn(
+          'fixed inset-0 z-50 bg-black/45 backdrop-blur-[2px] transition-all duration-300 ease-out',
+          open ? 'opacity-100 pointer-events-auto visible' : 'opacity-0 pointer-events-none invisible',
+        )}
+      />
 
-          <aside
-            role="dialog"
-            aria-modal="true"
-            aria-label="Site Navigation"
-            className="fixed inset-y-0 right-0 z-50 w-full max-w-[430px] sm:max-w-[470px] bg-[#14120E]/[0.97] text-[#F4EFE4] border-l border-[#CAA650]/30 shadow-[0_24px_80px_rgba(0,0,0,0.65)] flex flex-col justify-between p-6 sm:p-8 overflow-y-auto"
-          >
+      <aside
+        role="dialog"
+        aria-modal={open || undefined}
+        aria-hidden={!open}
+        aria-label="Site Navigation"
+        className={cn(
+          'fixed inset-y-0 left-0 z-50 w-full max-w-[430px] sm:max-w-[470px] bg-[#14120E]/[0.97] text-[#F4EFE4] border-r border-[#CAA650]/30 shadow-[0_24px_80px_rgba(0,0,0,0.65)] flex flex-col justify-between p-5 sm:p-7 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden transition-all duration-300 ease-out will-change-transform',
+          open
+            ? 'translate-x-0 opacity-100 pointer-events-auto visible'
+            : '-translate-x-full opacity-0 pointer-events-none invisible',
+        )}
+      >
             {/* Drawer Top Controls */}
-            <div className="flex items-center justify-between gap-3 pb-4 border-b border-white/10 shrink-0">
+            <div className="flex items-center justify-between gap-3 pb-3.5 border-b border-white/10 shrink-0">
               <div className="flex items-center gap-2">
                 <a
                   href={facebookUrl}
@@ -199,49 +242,67 @@ export function EditorialNavbarClient({
             {/* Large Editorial Menu Links */}
             <nav
               aria-label="Drawer navigation"
-              className="my-auto py-8 flex flex-col space-y-2.5 sm:space-y-3"
+              className="relative my-auto py-4 flex flex-col space-y-1 sm:space-y-1.5"
             >
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute right-2 top-3 opacity-[0.06] select-none"
+              >
+                <BrandMark logoUrl={logoUrl} alt="" size={84} variant="dark" className="rounded-2xl" />
+              </div>
+
               {EDITORIAL_MENU_ITEMS.map((item) => {
-                const isActive =
-                  item.href === '/'
-                    ? pathname === '/'
-                    : item.href === '/portfolio' && pathname.startsWith('/portfolio');
+                const isActive = isNavItemActive(item.href);
 
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    onClick={closeDrawer}
-                    className="group flex items-baseline gap-4 py-1.5 focus:outline-none"
+                    onClick={() => {
+                      if (item.href === '/') {
+                        setActiveHash('');
+                      } else if (item.href.startsWith('/#')) {
+                        setActiveHash(item.href.slice(1));
+                      }
+                      closeDrawer();
+                    }}
+                    className="group relative flex items-center gap-4 py-1 focus:outline-none"
                   >
                     <span
+                      aria-hidden="true"
                       className={cn(
-                        'font-mono-code text-xs font-semibold tracking-wider w-6 shrink-0 transition-colors',
+                        'h-[1.5px] shrink-0 rounded-full transition-all duration-300 ease-out',
                         isActive
-                          ? 'text-[#E7D1AA]'
-                          : 'text-[#CAA650]/65 group-hover:text-[#E7D1AA]',
+                          ? 'w-7 opacity-100 bg-[#E7D1AA]'
+                          : 'w-0 opacity-0 bg-[#CAA650] group-hover:w-7 group-hover:opacity-100',
                       )}
-                    >
-                      {item.code}
-                    </span>
+                    />
                     <span
                       className={cn(
-                        'font-editorial text-[2.05rem] sm:text-[2.65rem] font-medium leading-[1.16] transition-all duration-200 group-hover:translate-x-2',
+                        'font-editorial text-[1.95rem] sm:text-[2.35rem] font-medium leading-[1.12] whitespace-nowrap transition-colors duration-200',
                         isActive
-                          ? 'text-[#E7D1AA] italic'
-                          : 'text-white/95 group-hover:text-[#E7D1AA]',
+                          ? 'text-[#E7D1AA]'
+                          : 'text-[#F4EFE4] group-hover:text-[#E7D1AA]',
                       )}
                     >
                       {item.label}
                     </span>
-                    <ArrowRightIcon className="w-5 h-5 text-[#CAA650] opacity-0 -translate-x-2 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0 shrink-0 self-center" />
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        'h-[1px] transition-all duration-300 ease-out bg-gradient-to-r from-[#E7D1AA]/85 via-[#CAA650]/40 to-transparent',
+                        isActive
+                          ? 'flex-1 opacity-100'
+                          : 'w-0 opacity-0 group-hover:flex-1 group-hover:opacity-75',
+                      )}
+                    />
                   </Link>
                 );
               })}
             </nav>
 
             {/* Drawer Bottom Info */}
-            <div className="pt-5 border-t border-white/10 space-y-3 shrink-0">
+            <div className="pt-4 border-t border-white/10 space-y-2.5 shrink-0">
               <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                 <a
                   href={phoneHref}
@@ -273,8 +334,6 @@ export function EditorialNavbarClient({
               </a>
             </div>
           </aside>
-        </>
-      )}
     </>
   );
 }

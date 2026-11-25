@@ -48,13 +48,16 @@ import {
   PlusIcon,
 } from '@/components/shared/Icons';
 import { EditorialMosaicSetup } from './EditorialMosaicSetup';
+import { ServicesShowcaseSetup } from './ServicesShowcaseSetup';
 import { StudioGalleryPickerModal } from './StudioGalleryPickerModal';
+import { parseStudioServicesSettings } from '@/lib/studioServices';
 
-type SetupSectionTab = 'hero' | 'editorial';
+type SetupSectionTab = 'hero' | 'editorial' | 'services';
 
 interface HeroSliderManagerProps {
   initialHeroEvent: PortfolioShowcaseEvent | null;
   initialEditorialEvent?: PortfolioShowcaseEvent | null;
+  initialServicesEvent?: PortfolioShowcaseEvent | null;
   galleryImages: PortfolioMediaItem[];
   cloudinaryStatus: CloudinaryStatusSummary | null;
   studioName: string;
@@ -92,6 +95,7 @@ const SPEED_OPTIONS: Array<{ value: HeroSlideSpeed; label: string; hint: string 
 export function HeroSliderManager({
   initialHeroEvent,
   initialEditorialEvent = null,
+  initialServicesEvent = null,
   galleryImages,
   cloudinaryStatus,
   studioName,
@@ -100,6 +104,9 @@ export function HeroSliderManager({
   const [heroEvent, setHeroEvent] = useState<PortfolioShowcaseEvent | null>(initialHeroEvent);
   const [editorialEventState, setEditorialEventState] = useState<PortfolioShowcaseEvent | null>(
     initialEditorialEvent,
+  );
+  const [servicesEventState, setServicesEventState] = useState<PortfolioShowcaseEvent | null>(
+    initialServicesEvent,
   );
   const [galleryPool, setGalleryPool] = useState<PortfolioMediaItem[]>(galleryImages);
   const [settingsDraft, setSettingsDraft] = useState<HeroSliderSettings>(() =>
@@ -158,6 +165,11 @@ export function HeroSliderManager({
   const editorialSettings = useMemo(
     () => parseEditorialGridSettings(editorialEventState?.description),
     [editorialEventState?.description],
+  );
+
+  const servicesSettings = useMemo(
+    () => parseStudioServicesSettings(servicesEventState?.description, studioName),
+    [servicesEventState?.description, studioName],
   );
 
   const editorialCustomCount = useMemo(() => {
@@ -636,7 +648,7 @@ export function HeroSliderManager({
                     ? 'Hero Paused (Draft)'
                     : 'Hero Auto-Fallback'}
               </span>
-            ) : (
+            ) : activeTab === 'editorial' ? (
               <span
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold',
@@ -654,6 +666,25 @@ export function HeroSliderManager({
                 {editorialSettings.enabled
                   ? `${editorialCustomCount}/4 Custom Frames`
                   : 'Section Hidden'}
+              </span>
+            ) : (
+              <span
+                className={cn(
+                  'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold',
+                  servicesSettings.enabled
+                    ? 'border-emerald-500/35 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300'
+                    : 'border-amber-500/35 bg-amber-500/10 text-amber-700 dark:text-amber-300',
+                )}
+              >
+                <span
+                  className={cn(
+                    'h-1.5 w-1.5 rounded-full',
+                    servicesSettings.enabled ? 'bg-emerald-500' : 'bg-amber-500',
+                  )}
+                />
+                {servicesSettings.enabled
+                  ? `${servicesSettings.items.filter((i) => i.isActive).length} Active Services`
+                  : 'Services Hidden'}
               </span>
             )}
           </div>
@@ -696,8 +727,8 @@ export function HeroSliderManager({
         </div>
       </div>
 
-      {/* Section Categories Bar (Just Hero Slider & Showcase Bento Grid) */}
-      <div className="grid gap-3 sm:grid-cols-2">
+      {/* Section Categories Bar (Hero Slider, Showcase Bento Grid, Services Showcase) */}
+      <div className="grid gap-3 sm:grid-cols-3">
         <button
           type="button"
           onClick={() => setActiveTab('hero')}
@@ -774,6 +805,44 @@ export function HeroSliderManager({
             {editorialCustomCount}/4 set
           </span>
         </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('services')}
+          className={cn(
+            'text-left rounded-2xl border p-4 transition-all flex items-center justify-between gap-3 cursor-pointer',
+            activeTab === 'services'
+              ? 'border-[var(--admin-accent)] bg-[var(--admin-accent-soft)] shadow-2xs'
+              : 'border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-surface-subtle)]',
+          )}
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <span
+              className={cn(
+                'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border',
+                activeTab === 'services'
+                  ? 'border-[var(--admin-accent)]/40 bg-[var(--admin-accent)] text-[var(--admin-accent-fg)]'
+                  : 'border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] text-[var(--admin-accent)]',
+              )}
+            >
+              <CameraIcon className="w-5 h-5" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[10.5px] font-bold uppercase tracking-wider text-[var(--admin-accent)]">
+                Section 03
+              </p>
+              <p className="text-sm font-semibold text-[var(--admin-text)] truncate">
+                Studio Services Cards
+              </p>
+              <p className="text-[11px] text-[var(--admin-muted)] truncate">
+                Top 3 on Homepage + Full Grid at /all-services
+              </p>
+            </div>
+          </div>
+          <span className="font-mono-code text-xs font-bold text-[var(--admin-muted)] shrink-0">
+            {servicesSettings.items.filter((i) => i.isActive).length} items
+          </span>
+        </button>
       </div>
 
       {!isCloudinaryReady && cloudinaryStatus && (
@@ -816,6 +885,15 @@ export function HeroSliderManager({
           studioName={studioName}
           onNotify={notify}
           onEditorialEventChange={setEditorialEventState}
+        />
+      ) : activeTab === 'services' ? (
+        <ServicesShowcaseSetup
+          initialServicesEvent={servicesEventState}
+          galleryPool={galleryPool}
+          onGalleryPoolUpdate={setGalleryPool}
+          studioName={studioName}
+          onNotify={notify}
+          onServicesEventChange={setServicesEventState}
         />
       ) : (
         <>

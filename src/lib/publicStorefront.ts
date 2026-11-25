@@ -8,6 +8,7 @@ import {
   getPublicPortfolioEvents,
 } from '@/service/catalog/catalog.service';
 import { EDITORIAL_GRID_SLUG, HERO_SLIDER_SLUG } from '@/lib/heroSlider';
+import { SERVICES_SHOWCASE_SLUG } from '@/lib/studioServices';
 import {
   EventType,
   PortfolioItem,
@@ -278,6 +279,7 @@ export async function loadPublicStorefront(): Promise<{
   portfolioEvents: PortfolioShowcaseEvent[];
   heroEvent: PortfolioShowcaseEvent | null;
   editorialGridEvent: PortfolioShowcaseEvent | null;
+  servicesEvent: PortfolioShowcaseEvent | null;
   galleryImages: PortfolioMediaItem[];
   isBackendConnected: boolean;
 }> {
@@ -289,6 +291,7 @@ export async function loadPublicStorefront(): Promise<{
     portEventsRes,
     heroRes,
     editorialGridRes,
+    servicesRes,
     galleryRes,
   ] = await Promise.all([
     getPublicBranding(),
@@ -298,6 +301,7 @@ export async function loadPublicStorefront(): Promise<{
     getPublicPortfolioEvents(),
     getPublicPortfolioEventBySlug(HERO_SLIDER_SLUG),
     getPublicPortfolioEventBySlug(EDITORIAL_GRID_SLUG),
+    getPublicPortfolioEventBySlug(SERVICES_SHOWCASE_SLUG),
     getPublicGalleryMedia('IMAGE'),
   ]);
 
@@ -310,6 +314,7 @@ export async function loadPublicStorefront(): Promise<{
       portfolioEvents: [],
       heroEvent: null,
       editorialGridEvent: null,
+      servicesEvent: null,
       galleryImages: [],
       isBackendConnected: false,
     };
@@ -325,6 +330,7 @@ export async function loadPublicStorefront(): Promise<{
     heroEvent: heroRes.ok && heroRes.data ? heroRes.data : null,
     editorialGridEvent:
       editorialGridRes.ok && editorialGridRes.data ? editorialGridRes.data : null,
+    servicesEvent: servicesRes.ok && servicesRes.data ? servicesRes.data : null,
     galleryImages:
       galleryRes.ok && Array.isArray(galleryRes.data?.data)
         ? galleryRes.data.data

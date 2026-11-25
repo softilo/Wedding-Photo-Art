@@ -11,6 +11,11 @@ import {
   serializeHeroSliderDescription,
 } from '@/lib/heroSlider';
 import {
+  DEFAULT_STUDIO_SERVICES_SETTINGS,
+  SERVICES_SHOWCASE_SLUG,
+  serializeStudioServicesDescription,
+} from '@/lib/studioServices';
+import {
   CloudinaryStatusSummary,
   DeliverableLabelTemplate,
   EventType,
@@ -233,6 +238,8 @@ function revalidatePortfolioPaths(slug?: string) {
   updateTag('public-storefront');
   revalidatePath('/', 'layout');
   revalidatePath('/portfolio');
+  revalidatePath('/all-services');
+  revalidatePath('/all-server');
   revalidatePath('/showcase');
   if (slug) {
     revalidatePath(`/album/${slug}`);
@@ -749,4 +756,36 @@ export async function removeEditorialGridMedia(
   mediaId: string,
 ): Promise<ActionResult<PortfolioShowcaseEvent | null>> {
   return removeSystemPortfolioMedia(EDITORIAL_GRID_SLUG, eventId, mediaId);
+}
+
+export async function getAdminServicesShowcaseEvent(): Promise<
+  ActionResult<PortfolioShowcaseEvent | null>
+> {
+  return getAdminSystemPortfolioEvent(SERVICES_SHOWCASE_SLUG);
+}
+
+export async function ensureServicesShowcaseEvent(): Promise<
+  ActionResult<PortfolioShowcaseEvent>
+> {
+  return ensureSystemPortfolioEvent({
+    slug: SERVICES_SHOWCASE_SLUG,
+    title: 'Studio Services Showcase',
+    description: serializeStudioServicesDescription(DEFAULT_STUDIO_SERVICES_SETTINGS),
+    fallbackMessage: 'Could not initialize services showcase record',
+  });
+}
+
+export async function activateServicesShowcaseMedia(
+  eventId: string,
+  leadMediaId: string,
+  publishNow = true,
+): Promise<ActionResult<PortfolioShowcaseEvent>> {
+  return activateSystemPortfolioMedia(SERVICES_SHOWCASE_SLUG, eventId, leadMediaId, publishNow);
+}
+
+export async function removeServicesShowcaseMedia(
+  eventId: string,
+  mediaId: string,
+): Promise<ActionResult<PortfolioShowcaseEvent | null>> {
+  return removeSystemPortfolioMedia(SERVICES_SHOWCASE_SLUG, eventId, mediaId);
 }

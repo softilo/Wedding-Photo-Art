@@ -81,23 +81,7 @@ const DESKTOP_PAD_CLASS: Record<HeroColumnCount, string> = {
   3: 'lg:px-[2px]',
 };
 
-const MOBILE_IMAGE_SIZE_CLASS: Record<HeroColumnCount, string> = {
-  1: 'w-full h-auto max-h-[68svh] object-cover object-center',
-  2: 'w-full h-auto max-h-[190px] object-contain',
-  3: 'w-full h-auto max-h-[140px] object-contain',
-};
-
-const TABLET_IMAGE_SIZE_CLASS: Record<HeroColumnCount, string> = {
-  1: 'md:w-full md:h-[min(520px,calc(100svh-96px))] md:max-h-none md:object-cover md:object-center',
-  2: 'md:w-full md:h-auto md:max-h-[290px] md:object-contain',
-  3: 'md:w-full md:h-auto md:max-h-[220px] md:object-contain',
-};
-
-const DESKTOP_IMAGE_SIZE_CLASS: Record<HeroColumnCount, string> = {
-  1: 'lg:w-full lg:h-[calc(100svh-92px)] lg:max-h-none lg:object-cover lg:object-center',
-  2: 'lg:w-full lg:h-auto lg:max-h-[min(460px,calc(100svh-120px))] lg:object-contain',
-  3: 'lg:w-full lg:h-auto lg:max-h-[min(360px,calc(100svh-120px))] xl:max-h-[min(390px,calc(100svh-120px))] lg:object-contain',
-};
+const IMAGE_FRAME_CLASS = 'block w-full h-auto';
 
 function buildImageSizesAttr(
   mobile: HeroColumnCount,
@@ -139,27 +123,33 @@ function buildGroupedPages(slides: HeroSlide[], cols: HeroColumnCount): HeroSlid
 function HeroSlideImage({
   slide,
   sizes,
-  imageSizeClass,
   eager = false,
   priority = false,
 }: {
   slide: HeroSlide;
   sizes: string;
-  imageSizeClass: string;
   eager?: boolean;
   priority?: boolean;
 }) {
+  const hasDimensions =
+    typeof slide.width === 'number' &&
+    slide.width > 0 &&
+    typeof slide.height === 'number' &&
+    slide.height > 0;
+
   return (
     /* eslint-disable-next-line @next/next/no-img-element */
     <img
       src={slide.imageUrl}
       srcSet={slide.srcSet}
       sizes={sizes}
+      width={hasDimensions ? (slide.width ?? undefined) : undefined}
+      height={hasDimensions ? (slide.height ?? undefined) : undefined}
       alt={slide.alt}
       loading={eager ? 'eager' : 'lazy'}
       decoding={priority ? 'sync' : 'async'}
       fetchPriority={priority ? 'high' : 'auto'}
-      className={cn('block mx-auto', imageSizeClass)}
+      className={IMAGE_FRAME_CLASS}
     />
   );
 }
@@ -212,11 +202,41 @@ export function HeroPhotoSlider({
   const [pageIndex, setPageIndex] = useState(0);
   const [skipTransition, setSkipTransition] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [activePageHeight, setActivePageHeight] = useState<number | null>(null);
+  const pageRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const touchStartX = useRef<number | null>(null);
 
   const safeTrackIndex =
     totalPages > 1 ? Math.min(pageIndex, totalPages) : 0;
   const activeLogicalPage = totalPages > 0 ? safeTrackIndex % totalPages : 0;
+
+  useEffect(() => {
+    const activeEl = pageRefs.current[safeTrackIndex];
+    if (!activeEl) return undefined;
+
+    const measure = () => {
+      const nextHeight = Math.round(activeEl.getBoundingClientRect().height);
+      if (nextHeight > 0) {
+        setActivePageHeight((prev) => (prev === nextHeight ? prev : nextHeight));
+      }
+    };
+
+    const rafId = window.requestAnimationFrame(measure);
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', measure);
+      return () => {
+        window.cancelAnimationFrame(rafId);
+        window.removeEventListener('resize', measure);
+      };
+    }
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(activeEl);
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      observer.disconnect();
+    };
+  }, [safeTrackIndex, activeCols, totalPages]);
 
   useEffect(() => {
     if (totalPages <= 1 || isPaused) return undefined;
@@ -292,18 +312,6 @@ export function HeroPhotoSlider({
     DESKTOP_PAD_CLASS[desktopCols],
   );
 
-  const imageSizeClass = cn(
-    MOBILE_IMAGE_SIZE_CLASS[mobileCols],
-    TABLET_IMAGE_SIZE_CLASS[tabletCols],
-    DESKTOP_IMAGE_SIZE_CLASS[desktopCols],
-  );
-
-  const singlePhotoScreenClass = cn(
-    MOBILE_IMAGE_SIZE_CLASS[1],
-    TABLET_IMAGE_SIZE_CLASS[1],
-    DESKTOP_IMAGE_SIZE_CLASS[1],
-  );
-
   const sizesAttr = buildImageSizesAttr(mobileCols, tabletCols, desktopCols);
 
   return (
@@ -338,29 +346,32 @@ export function HeroPhotoSlider({
         </div>
       ) : slides.length === 1 ? (
         <div className="w-full">
-          <HeroSlideImage
-            slide={slides[0]}
-            sizes="100vw"
-            imageSizeClass={singlePhotoScreenClass}
-            eager
-            priority
-          />
+          <HeroSlideImage slide={slides[0]} sizes="100vw" eager priority />
         </div>
       ) : (
         <div className={outerPadClass}>
-          <div className="overflow-hidden">
+          <div
+            style={activePageHeight ? { height: `${activePageHeight}px` } : undefined}
+            className="overflow-hidden transition-[height] duration-500 ease-out"
+          >
             <div
               onTransitionEnd={handleTrackTransitionEnd}
               style={{ transform: `translate3d(-${safeTrackIndex * 100}%, 0, 0)` }}
               className={cn(
-                'flex w-full items-center will-change-transform',
+                'flex w-full items-start will-change-transform',
                 skipTransition
                   ? 'transition-none'
                   : 'transition-transform duration-700 ease-out',
               )}
             >
               {trackPages.map((group, pIdx) => (
-                <div key={`page-${pIdx}`} className="w-full flex-none flex items-center">
+                <div
+                  key={`page-${pIdx}`}
+                  ref={(el) => {
+                    pageRefs.current[pIdx] = el;
+                  }}
+                  className="w-full flex-none flex items-center"
+                >
                   {group.map((slide, sIdx) => (
                     <div
                       key={`${slide.id}-${pIdx}-${sIdx}`}
@@ -373,7 +384,6 @@ export function HeroPhotoSlider({
                       <HeroSlideImage
                         slide={slide}
                         sizes={sizesAttr}
-                        imageSizeClass={imageSizeClass}
                         eager={pIdx <= 1}
                         priority={pIdx === 0}
                       />

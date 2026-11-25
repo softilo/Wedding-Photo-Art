@@ -24,18 +24,20 @@ function PublicNavbarSkeleton() {
     <div className="border-b border-[#E5DFD0]/90 bg-[#F9F8F5]">
       <div className="h-[2px] w-full bg-[#CAA650]/45" />
       <div className="mx-auto flex h-16 sm:h-[68px] max-w-6xl items-center justify-between gap-3 px-3 sm:px-6">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl skeleton-bone border border-[#DFCEAA]" />
-          <div className="space-y-1.5">
-            <div className="h-4 w-32 sm:w-40 rounded-md skeleton-bone" />
-            <div className="h-2.5 w-24 sm:w-32 rounded-md skeleton-bone" />
+        <div className="flex items-center gap-2.5 sm:gap-3.5">
+          <div className="h-10 w-10 sm:w-24 rounded-full skeleton-bone shrink-0" />
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl skeleton-bone border border-[#DFCEAA]" />
+            <div className="space-y-1.5">
+              <div className="h-4 w-32 sm:w-40 rounded-md skeleton-bone" />
+              <div className="h-2.5 w-24 sm:w-32 rounded-md skeleton-bone" />
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <div className="hidden md:block h-9 w-9 rounded-full skeleton-bone" />
           <div className="hidden lg:block h-9 w-32 rounded-full skeleton-bone" />
-          <div className="hidden sm:block h-9 w-24 rounded-full skeleton-bone" />
-          <div className="h-10 w-10 sm:w-24 rounded-full skeleton-bone" />
+          <div className="h-9 w-24 rounded-full skeleton-bone" />
         </div>
       </div>
     </div>

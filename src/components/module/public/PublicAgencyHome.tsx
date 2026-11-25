@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
 import {
   EventType,
   PortfolioItem,
@@ -11,18 +9,13 @@ import {
   PublicBranding,
   StudioPackage,
 } from '@/types/event-management';
-import { parseAlbumDescriptionAndTheme } from '@/lib/albumTheme';
 import { isSystemPortfolioEventSlug } from '@/lib/heroSlider';
 import { STUDIO_PROFILE } from '@/lib/publicStorefront';
-import { isNextOptimizableUrl } from '@/lib/showcaseMedia';
 import { formatPoisha, cn } from '@/lib/utils';
 import {
   ArrowRightIcon,
-  CameraIcon,
   CheckCircleIcon,
   ExternalLinkIcon,
-  FilmIcon,
-  LayersIcon,
   MailIcon,
   MapPinIcon,
   MessageCircleIcon,
@@ -32,6 +25,8 @@ import { EditorialBentoShowcase } from './EditorialBentoShowcase';
 import { HeroPhotoSlider } from './HeroPhotoSlider';
 import { InquiryForm } from './InquiryForm';
 import { PublicPortfolioShowcase } from './PublicPortfolioShowcase';
+import { PublicServicesSection } from './PublicServicesSection';
+import { StudioCountStats } from './StudioCountStats';
 
 interface PublicAgencyHomeProps {
   branding: PublicBranding;
@@ -41,6 +36,7 @@ interface PublicAgencyHomeProps {
   portfolioEvents?: PortfolioShowcaseEvent[];
   heroEvent?: PortfolioShowcaseEvent | null;
   editorialGridEvent?: PortfolioShowcaseEvent | null;
+  servicesEvent?: PortfolioShowcaseEvent | null;
   galleryImages?: PortfolioMediaItem[];
   isBackendConnected: boolean;
   initialPackageId?: string;
@@ -54,6 +50,7 @@ export function PublicAgencyHome({
   portfolioEvents = [],
   heroEvent = null,
   editorialGridEvent = null,
+  servicesEvent = null,
   galleryImages = [],
   isBackendConnected,
   initialPackageId = '',
@@ -87,11 +84,6 @@ export function PublicAgencyHome({
         return (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
       });
   }, [portfolioEvents]);
-
-  const bestThreePortfolios = useMemo(
-    () => allClientPortfolios.slice(0, 3),
-    [allClientPortfolios],
-  );
 
   const packageCategories = useMemo(() => {
     const ids = new Set(packages.map((p) => p.eventTypeId).filter(Boolean));
@@ -136,40 +128,42 @@ export function PublicAgencyHome({
       />
 
       {/* =====================================================================
-          STUDIO INTRO: Clean, Compact Quality Statement Below Hero
+          STUDIO INTRO: Clean Centered Editorial Brand Statement Below Hero
       ===================================================================== */}
-      <section className="border-b border-[#E5DFD0] bg-[#F9F8F5]">
-        <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-7 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="min-w-0 space-y-1">
-            <h1 className="font-editorial text-[1.75rem] sm:text-[2.35rem] font-semibold text-[#181611] leading-[1.06]">
-              Wedding Photography{' '}
-              <span className="italic" style={{ color: accent }}>
-                &amp; Cinema.
-              </span>
-            </h1>
-            <p className="text-xs sm:text-sm text-[#4A4438] max-w-xl">
-              True-to-life color, fine natural light, and heartfelt storytelling for Weddings, Holud &amp; Receptions.
-            </p>
-          </div>
+      <section id="about" className="border-b border-[#E5DFD0] bg-white scroll-mt-16">
+        <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 sm:py-20 lg:py-24 text-center space-y-6 sm:space-y-8">
+          <p className="text-xs sm:text-xl font-extrabold tracking-[0.06em] text-[#181611]">
+            {branding.displayName}
+          </p>
 
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-            <a
-              href="#featured-portfolios"
-              className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm transition-all hover:opacity-95 active:scale-[0.98]"
-              style={{ backgroundColor: accent }}
-            >
-              <span>See Real Work</span>
-              <ArrowRightIcon className="w-3.5 h-3.5" />
-            </a>
-            <a
-              href="#packages"
-              className="inline-flex items-center rounded-xl border border-[#D8CCB2] bg-white px-4 py-2.5 text-xs sm:text-sm font-semibold text-[#2E291F] hover:bg-[#F3EFE6] hover:border-[#CAA650] transition-colors"
-            >
-              Packages
-            </a>
-          </div>
+          <h1
+            className="font-editorial text-[1.9rem] sm:text-[2.6rem] lg:text-[3rem] font-medium leading-[1.15] tracking-tight"
+            style={{ color: accent }}
+          >
+            Premium Class Photography &amp; Cinematography Services
+          </h1>
+
+          <p className="mx-auto max-w-xl text-xs sm:text-[13.5px] text-[#4A4438] leading-[1.85]">
+            {branding.displayName} is a team of experienced professional photographers,
+            cinematographers and photo-book experts who are dedicated to creating stunning,
+            authentic stories of people&apos;s lives.
+          </p>
+
+          <StudioCountStats accentColor={accent} />
         </div>
       </section>
+
+      {/* =====================================================================
+          STUDIO SERVICES SHOWCASE: Dashboard-Controlled 3-Card Row + See All CTA
+      ===================================================================== */}
+      <PublicServicesSection
+        branding={branding}
+        servicesEvent={servicesEvent}
+        portfolioEvents={allClientPortfolios}
+        galleryImages={galleryImages}
+        legacyPortfolio={portfolio}
+        variant="home"
+      />
 
       {/* =====================================================================
           EDITORIAL MOSAIC: 4-Frame Asymmetric Quality Photo Showcase
@@ -181,162 +175,6 @@ export function PublicAgencyHome({
         galleryImages={galleryImages}
         legacyPortfolio={portfolio}
       />
-
-      {/* =====================================================================
-          CLIENT SAMPLES: FEATURED CLIENT ALBUMS
-      ===================================================================== */}
-      <section
-        id="featured-portfolios"
-        className="border-b border-[#2E291F] bg-[#14120E] text-[#F4EFE4] scroll-mt-16"
-      >
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:py-18 sm:px-6 space-y-10">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#CAA650]/40 bg-[#CAA650]/15 px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#E7D1AA]">
-                <CameraIcon className="w-3.5 h-3.5" />
-                <span>Real Client Work</span>
-              </div>
-              <h2 className="font-editorial text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold text-white leading-tight">
-                Signature Digital Albums &amp; Cinema
-              </h2>
-            </div>
-
-            <Link
-              href="/portfolio"
-              className="inline-flex items-center gap-2 rounded-xl bg-[#F4EFE4] px-5 py-2.5 text-xs sm:text-sm font-semibold text-[#181611] hover:bg-white transition-colors shrink-0 shadow-sm"
-            >
-              <span>
-                {allClientPortfolios.length > 0
-                  ? `See All Portfolios (${allClientPortfolios.length})`
-                  : 'Browse Portfolio Directory'}
-              </span>
-              <ArrowRightIcon className="w-4 h-4" />
-            </Link>
-          </div>
-
-          {bestThreePortfolios.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {bestThreePortfolios.map((ev, index) => {
-                const coverItem =
-                  ev.coverMedia ||
-                  (ev.media || []).find((m) => m.resourceType === 'IMAGE' && m.status === 'READY') ||
-                  null;
-                const coverSrc = coverItem?.secureUrl || '';
-                const photoCount = ev.counts?.photos ?? 0;
-                const videoCount = ev.counts?.videos ?? 0;
-                const { theme } = parseAlbumDescriptionAndTheme(ev.description);
-
-                return (
-                  <Link
-                    key={ev.id}
-                    href={`/album/${ev.slug}`}
-                    className="group rounded-2xl border border-white/12 bg-[#1C1913] overflow-hidden flex flex-col justify-between transition-all duration-300 hover:border-[#CAA650]/65 hover:-translate-y-1 hover:shadow-2xl"
-                  >
-                    <div>
-                      <div className="relative aspect-[4/3] w-full bg-[#252118] overflow-hidden">
-                        {coverSrc ? (
-                          <Image
-                            src={coverSrc}
-                            alt={coverItem?.altText || ev.title}
-                            fill
-                            quality={92}
-                            unoptimized={!isNextOptimizableUrl(coverSrc)}
-                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 384px"
-                            className="object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-                        ) : (
-                          <div className="h-full w-full flex items-center justify-center text-xs text-[#9C937E]">
-                            Digital Album
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#14120E]/85 via-transparent to-transparent" />
-
-                        <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-black/65 backdrop-blur-xs px-3 py-1 text-[11px] font-semibold text-white">
-                            {photoCount} Photos{videoCount > 0 ? ` • ${videoCount} Film` : ''}
-                          </span>
-                          <span className="rounded-full bg-[#E7D1AA] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#181611]">
-                            #{index + 1} Featured
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="p-5 space-y-2">
-                        <div className="flex items-center justify-between gap-2">
-                          {ev.eventType ? (
-                            <span className="inline-block rounded-full bg-white/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#E7D1AA]">
-                              {ev.eventType.name}
-                            </span>
-                          ) : (
-                            <span />
-                          )}
-                          <span
-                            style={{ backgroundColor: theme.accent }}
-                            title="Custom album accent color"
-                            className="h-3 w-3 rounded-full border border-white/60 shrink-0"
-                          />
-                        </div>
-                        <h3 className="font-editorial text-2xl font-semibold text-white group-hover:text-[#E7D1AA] transition-colors line-clamp-2 leading-snug">
-                          {ev.title}
-                        </h3>
-                      </div>
-                    </div>
-
-                    <div className="px-5 py-3.5 border-t border-white/10 bg-white/[0.02] flex items-center justify-between text-xs font-semibold text-[#D5CDB8] group-hover:text-[#E7D1AA]">
-                      <span>Open Digital Album</span>
-                      <ArrowRightIcon className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="grid gap-5 md:grid-cols-3">
-              {[
-                {
-                  icon: FilmIcon,
-                  label: 'Outdoor & Venue Cinema',
-                  title: '4K Narrative Highlight Films',
-                  body: 'Stabilized cinema rigs, natural audio capture, and color-graded wedding storytelling from Feni to destination venues.',
-                },
-                {
-                  icon: CameraIcon,
-                  label: 'Indoor & Studio Craft',
-                  title: 'Editorial Couple Portraiture',
-                  body: 'Sculpted lighting for Engagement, Bridal, and Couple portraits inside our Grand Haque Tower studio or your banquet hall.',
-                },
-                {
-                  icon: LayersIcon,
-                  label: 'Online Delivery',
-                  title: 'Custom-Themed Digital Albums',
-                  body: 'Every couple receives a shareable, custom-themed digital gallery with lossless viewing and film streaming.',
-                },
-              ].map((pillar) => {
-                const Icon = pillar.icon;
-                return (
-                  <div
-                    key={pillar.title}
-                    className="rounded-2xl border border-white/12 bg-[#1C1913] p-6 space-y-3"
-                  >
-                    <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#CAA650]/40 bg-[#CAA650]/15 text-[#E7D1AA]">
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-[#E7D1AA]">
-                      {pillar.label}
-                    </p>
-                    <h3 className="font-editorial text-2xl font-semibold text-white">
-                      {pillar.title}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-[#C7BFA9] leading-relaxed">
-                      {pillar.body}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* =====================================================================
           STEP 02B: GALLERY WALL & CINEMA THEATER (Strict Viewport-Lazy)
