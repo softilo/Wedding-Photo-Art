@@ -119,9 +119,7 @@ export function AdaptiveVideoPlayer({
       ? isPortrait
         ? 'w-full h-[65vh] min-h-[360px] max-h-[680px]'
         : 'w-full aspect-video max-h-[75vh]'
-      : isPortrait
-        ? 'w-full aspect-[4/3] sm:aspect-video min-h-[260px]'
-        : 'w-full aspect-video';
+      : 'w-full aspect-video';
 
   return (
     <div
@@ -147,14 +145,14 @@ export function AdaptiveVideoPlayer({
               setDetectedDims({ w: vid.videoWidth, h: vid.videoHeight });
             }
           }}
-          className="w-full h-full object-contain bg-black"
+          className="absolute inset-0 w-full h-full object-contain bg-black"
         />
       ) : (
         <button
           type="button"
           onClick={handleStartPlay}
           aria-label={`Play video: ${title}`}
-          className="group relative block w-full h-full cursor-pointer overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CAA650]"
+          className="group absolute inset-0 block w-full h-full cursor-pointer overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CAA650]"
         >
           {/* Poster fills container cleanly with absolute positioning so play button never pushes sideways */}
           {posterUrl ? (
@@ -182,17 +180,25 @@ export function AdaptiveVideoPlayer({
             className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/25 transition-opacity group-hover:opacity-90"
           />
 
-          {/* Centered Play Button Overlay */}
+          {/* Centered Minimal Frosted Play Button Overlay */}
           <span className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2.5 p-4">
             <span
               className={cn(
-                'flex items-center justify-center rounded-full border border-white/50 bg-black/55 backdrop-blur-md text-white shadow-2xl transition-all duration-200 group-hover:scale-110 group-hover:bg-white group-hover:text-stone-950',
-                variant === 'featured' ? 'h-16 w-16 sm:h-20 sm:w-20' : 'h-12 w-12 sm:h-14 sm:w-14',
+                'flex items-center justify-center rounded-full border border-white/65 bg-black/40 backdrop-blur-md text-white shadow-xl transition-all duration-300 group-hover:scale-110 group-hover:bg-[#8B6A21] group-hover:border-[#DFCEAA]',
+                variant === 'featured' ? 'h-16 w-16 sm:h-20 sm:w-20' : 'h-14 w-14 sm:h-16 sm:w-16',
               )}
             >
-              <span className={cn('ml-0.5', variant === 'featured' ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg')}>
-                ▶
-              </span>
+              <svg
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+                className={cn(
+                  'translate-x-0.5',
+                  variant === 'featured' ? 'w-7 h-7 sm:w-8 sm:h-8' : 'w-6 h-6',
+                )}
+              >
+                <path d="M8 5.14v14l11-7-11-7z" />
+              </svg>
             </span>
 
             {playLabel && (

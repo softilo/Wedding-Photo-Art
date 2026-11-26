@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import Link from 'next/link';
 import {
   PortfolioItem,
   PortfolioMediaItem,
@@ -58,6 +57,7 @@ export function PublicPortfolioShowcase({
 }: PublicPortfolioShowcaseProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const mobileRailRef = useRef<HTMLDivElement | null>(null);
+  const videoTouchStartX = useRef<number | null>(null);
   const lightboxTouchStartX = useRef<number | null>(null);
 
   // Strict section-level gate: DO NOT fetch or mount any gallery media until user scrolls to #portfolio
@@ -70,12 +70,12 @@ export function PublicPortfolioShowcase({
   const [mobileSlideIndex, setMobileSlideIndex] = useState(0);
   const [visiblePhotoCount, setVisiblePhotoCount] = useState(INITIAL_PHOTO_BATCH);
 
-  // Interactive modals & cinema theater state
+  // Interactive modals & sliding highlight film carousel state
   const [selectedGalleryPhoto, setSelectedGalleryPhoto] = useState<PortfolioMediaItem | null>(
     null,
   );
-  const [selectedFilmId, setSelectedFilmId] = useState<string | null>(null);
-  const [playingVideoIds, setPlayingVideoIds] = useState<Record<string, boolean>>({});
+  const [activeFilmIndex, setActiveFilmIndex] = useState(0);
+  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
   const [activeShowcaseItem, setActiveShowcaseItem] = useState<PortfolioItem | null>(null);
 
   useModalHistoryBack(Boolean(selectedGalleryPhoto), () => setSelectedGalleryPhoto(null));
@@ -142,8 +142,16 @@ export function PublicPortfolioShowcase({
     [galleryMedia],
   );
 
-  const activeFilm =
-    filteredVideos.find((v) => v.id === selectedFilmId) ?? filteredVideos[0] ?? null;
+  const filmCount = filteredVideos.length;
+  const safeFilmIndex = filmCount > 0 ? activeFilmIndex % filmCount : 0;
+  const currentFilm = filteredVideos[safeFilmIndex] ?? null;
+
+  const selectFilmSlide = (nextIndex: number) => {
+    if (filmCount <= 1) return;
+    const normalized = (nextIndex + filmCount) % filmCount;
+    setActiveFilmIndex(normalized);
+    setPlayingVideoId(null);
+  };
 
   const selectedPhotoIndex = selectedGalleryPhoto
     ? filteredPhotos.findIndex((p) => p.id === selectedGalleryPhoto.id)
@@ -203,13 +211,7 @@ export function PublicPortfolioShowcase({
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs sm:text-sm text-[#5A5448]">
             <span>Highlight Films &amp; Client Stills</span>
             <span aria-hidden="true">•</span>
-            <Link
-              href="/portfolio"
-              className="font-semibold hover:underline underline-offset-4"
-              style={{ color: accent }}
-            >
-              All Client Albums →
-            </Link>
+         
           </div>
         </div>
 
@@ -222,35 +224,13 @@ export function PublicPortfolioShowcase({
             className="space-y-10"
           >
             <span className="sr-only">Loading photography and highlight films...</span>
-            {/* Cinema Theater Skeleton */}
-            <div className="rounded-2xl sm:rounded-3xl border border-[#2E291F] bg-[#14120E] p-3.5 sm:p-7 space-y-5 min-w-0 overflow-hidden">
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                <div className="h-3.5 w-48 max-w-full rounded-full skeleton-bone-dark" />
-                <div className="hidden sm:block h-3 w-56 rounded-full skeleton-bone-dark" />
+            {/* Centered Stage Film Carousel Skeleton */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-[#ECE6D8] pb-3">
+                <div className="h-7 w-44 rounded-lg skeleton-bone" />
               </div>
-              <div className="grid lg:grid-cols-12 gap-5 sm:gap-6 items-start min-w-0">
-                <div className="lg:col-span-8 min-w-0 w-full space-y-3">
-                  <div className="aspect-video w-full rounded-xl sm:rounded-2xl skeleton-bone-dark border border-white/10" />
-                  <div className="flex items-center justify-between px-1">
-                    <div className="h-3.5 w-24 rounded-md skeleton-bone-dark" />
-                    <div className="h-6 w-20 rounded-full skeleton-bone-dark" />
-                  </div>
-                </div>
-                <div className="lg:col-span-4 min-w-0 w-full space-y-2.5">
-                  <div className="h-3 w-24 rounded-md skeleton-bone-dark mb-1" />
-                  {[1, 2, 3].map((idx) => (
-                    <div
-                      key={idx}
-                      className="rounded-2xl border border-white/10 bg-white/[0.02] p-2.5 flex items-center gap-3"
-                    >
-                      <div className="h-16 w-24 shrink-0 rounded-xl skeleton-bone-dark" />
-                      <div className="flex-1 space-y-2">
-                        <div className="h-3 w-16 rounded-md skeleton-bone-dark" />
-                        <div className="h-3.5 w-28 rounded-md skeleton-bone-dark" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="relative overflow-hidden py-2">
+                <div className="w-[84%] sm:w-[68%] lg:w-[58%] max-w-[820px] mx-auto aspect-video rounded-2xl border border-[#E5DFD0] skeleton-bone" />
               </div>
             </div>
 
@@ -277,139 +257,246 @@ export function PublicPortfolioShowcase({
           </div>
         ) : (
           <div className="space-y-10 sm:space-y-12 min-w-0">
-            {/* SUB-STAGE A: DEDICATED CINEMA THEATER (Separated from Photos!) */}
-            {activeFilm && (
-              <div className="rounded-2xl sm:rounded-3xl border border-[#2E291F] bg-[#14120E] p-3.5 sm:p-7 text-[#F4EFE4] space-y-4 sm:space-y-5 shadow-[0_28px_64px_-24px_rgba(20,18,14,0.55)] min-w-0 w-full overflow-hidden">
-                <div className="flex items-center gap-2.5 border-b border-white/10 pb-3.5 min-w-0">
-                  <span className="inline-flex h-2.5 w-2.5 shrink-0 rounded-full bg-[#CAA650]" />
-                  <span className="text-[11px] font-bold uppercase tracking-[0.16em] sm:tracking-[0.2em] text-[#E7D1AA] truncate">
-                    Highlight Films ({filteredVideos.length})
-                  </span>
-                </div>
-
-                <div
-                  className={cn(
-                    'grid gap-5 sm:gap-6 items-start min-w-0',
-                    filteredVideos.length > 1 ? 'lg:grid-cols-12' : 'grid-cols-1',
-                  )}
-                >
-                  {/* Lead Theater Stage */}
-                  <div
-                    className={
-                      filteredVideos.length > 1
-                        ? 'lg:col-span-8 min-w-0 w-full space-y-3'
-                        : 'min-w-0 w-full space-y-3'
-                    }
-                  >
-                    <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 bg-black w-full">
-                      <AdaptiveVideoPlayer
-                        key={activeFilm.id}
-                        src={activeFilm.deliveryUrls?.fullUrl || activeFilm.secureUrl}
-                        posterUrl={
-                          activeFilm.deliveryUrls?.posterUrl ||
-                          buildCloudinaryVideoPosterUrl(activeFilm.secureUrl, 1280)
-                        }
-                        title={activeFilm.caption || activeFilm.altText || branding.displayName}
-                        durationSeconds={activeFilm.durationSeconds}
-                        width={activeFilm.width}
-                        height={activeFilm.height}
-                        variant="featured"
-                        isPlaying={Boolean(playingVideoIds[activeFilm.id])}
-                        onPlay={() =>
-                          setPlayingVideoIds((prev) => ({ ...prev, [activeFilm.id]: true }))
-                        }
-                        playLabel="Play Highlight Film"
-                      />
-                    </div>
-                    <div className="flex flex-wrap items-center justify-between gap-2 px-1">
-                      <span className="text-xs font-medium text-[#C7BFA9]">
-                        Highlight Film
-                      </span>
-                      <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-mono-code text-[#E7D1AA] uppercase">
-                        {activeFilm.format}
-                        {formatFilmDuration(activeFilm.durationSeconds)
-                          ? ` • ${formatFilmDuration(activeFilm.durationSeconds)}`
-                          : ''}
-                      </span>
-                    </div>
+            {/* SUB-STAGE A: CENTER-STAGE PEEKING FILM CAROUSEL */}
+            {filmCount > 0 && currentFilm && (
+              <div className="space-y-5 min-w-0">
+                <div className="flex items-center justify-between gap-3 border-b border-[#ECE6D8] pb-3 min-w-0">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-[#CAA650]" />
+                    <h3 className="font-editorial text-xl md:text-3xl font-semibold text-[#181611] truncate">
+                      Highlight Films
+                    </h3>
+                    <span className="rounded-full bg-[#F8F3E6] border border-[#DFCEAA] px-2.5 py-0.5 text-[11px] font-mono-code text-[#6B6352] tabular-nums shrink-0">
+                      {filmCount}
+                    </span>
                   </div>
 
-                  {/* Interactive Reel Switcher Playlist — Horizontal Snap Rail on Mobile, Playlist Column on Desktop */}
-                  {filteredVideos.length > 1 && (
-                    <div className="lg:col-span-4 min-w-0 w-full space-y-2.5">
-                      <div className="flex items-center justify-between px-1">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#9C937E]">
-                          Film Reels ({filteredVideos.length})
-                        </p>
-                        <span className="lg:hidden text-[11px] text-[#E7D1AA]/80">
-                          Swipe reels →
-                        </span>
-                      </div>
-                      <div className="flex lg:flex-col gap-2.5 w-full min-w-0 overflow-x-auto lg:overflow-x-visible lg:overflow-y-auto snap-x snap-mandatory lg:max-h-[420px] pb-1 lg:pb-0 lg:pr-1 no-scrollbar">
-                        {filteredVideos.map((reel, idx) => {
-                          const isCurrent = reel.id === activeFilm.id;
-                          const poster =
-                            reel.deliveryUrls?.posterUrl ||
-                            buildCloudinaryVideoPosterUrl(reel.secureUrl, 480);
-                          const duration = formatFilmDuration(reel.durationSeconds);
+                  {filmCount > 1 && (
+                    <span className="text-[11px] font-mono-code text-[#6B6352] tabular-nums shrink-0">
+                      {String(safeFilmIndex + 1).padStart(2, '0')} /{' '}
+                      {String(filmCount).padStart(2, '0')}
+                    </span>
+                  )}
+                </div>
 
-                          return (
-                            <button
-                              key={reel.id}
-                              type="button"
-                              onClick={() => {
-                                setSelectedFilmId(reel.id);
-                                setPlayingVideoIds((prev) => ({ ...prev, [reel.id]: true }));
-                              }}
+                {filmCount === 1 ? (
+                  <div className="mx-auto max-w-4xl space-y-3">
+                    <div className="rounded-2xl overflow-hidden border border-[#DFCEAA] bg-black shadow-[0_24px_60px_-24px_rgba(24,22,17,0.28)]">
+                      <AdaptiveVideoPlayer
+                        src={currentFilm.deliveryUrls?.fullUrl || currentFilm.secureUrl}
+                        posterUrl={
+                          currentFilm.deliveryUrls?.posterUrl ||
+                          buildCloudinaryVideoPosterUrl(currentFilm.secureUrl, 1280)
+                        }
+                        title={currentFilm.caption || currentFilm.altText || 'Highlight Film 01'}
+                        durationSeconds={currentFilm.durationSeconds}
+                        width={currentFilm.width}
+                        height={currentFilm.height}
+                        variant="card"
+                        isPlaying={playingVideoId === currentFilm.id}
+                        onPlay={() => setPlayingVideoId(currentFilm.id)}
+                      />
+                    </div>
+                    <div className="text-center space-y-0.5">
+                      <p className="font-editorial text-xl sm:text-2xl font-semibold text-[#181611]">
+                        {currentFilm.caption || currentFilm.altText || 'Highlight Film 01'}
+                      </p>
+                      {formatFilmDuration(currentFilm.durationSeconds) && (
+                        <p className="text-xs font-mono-code text-[#6B6352]">
+                          {formatFilmDuration(currentFilm.durationSeconds)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Horizontal Stage with Center Focal Film + Peeking Side Neighbor Reels */}
+                    <div
+                      onTouchStart={(e) => {
+                        videoTouchStartX.current = e.touches[0]?.clientX ?? null;
+                      }}
+                      onTouchEnd={(e) => {
+                        if (videoTouchStartX.current === null) return;
+                        const endX = e.changedTouches[0]?.clientX ?? videoTouchStartX.current;
+                        const diff = videoTouchStartX.current - endX;
+                        videoTouchStartX.current = null;
+                        if (Math.abs(diff) > 40) {
+                          if (diff > 0) selectFilmSlide(safeFilmIndex + 1);
+                          else selectFilmSlide(safeFilmIndex - 1);
+                        }
+                      }}
+                      className="relative w-full overflow-hidden py-2 select-none"
+                    >
+                      {/* Floating Champagne Prev / Next Arrows flanking centered video */}
+                      <button
+                        type="button"
+                        onClick={() => selectFilmSlide(safeFilmIndex - 1)}
+                        aria-label="Previous highlight film"
+                        className="absolute left-1.5 sm:left-[9%] lg:left-[15.5%] top-1/2 -translate-y-1/2 z-40 inline-flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full border border-[#DFCEAA] bg-white text-[#181611] shadow-sm hover:border-[#8B6A21] hover:bg-[#8B6A21] hover:text-white transition-all cursor-pointer"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="15 18 9 12 15 6" />
+                        </svg>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => selectFilmSlide(safeFilmIndex + 1)}
+                        aria-label="Next highlight film"
+                        className="absolute right-1.5 sm:right-[9%] lg:right-[15.5%] top-1/2 -translate-y-1/2 z-40 inline-flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full border border-[#DFCEAA] bg-white text-[#181611] shadow-sm hover:border-[#8B6A21] hover:bg-[#8B6A21] hover:text-white transition-all cursor-pointer"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                      </button>
+
+                      {/* Intrinsic Aspect-Ratio Height Spacer (prevents layout jump across breakpoints) */}
+                      <div
+                        aria-hidden="true"
+                        className="w-[84%] sm:w-[68%] lg:w-[58%] max-w-[820px] mx-auto aspect-video invisible pointer-events-none"
+                      />
+
+                      {/* Circular Sliding Track */}
+                      {filteredVideos.map((film, idx) => {
+                        let offset = idx - safeFilmIndex;
+                        if (filmCount >= 3) {
+                          if (offset > filmCount / 2) offset -= filmCount;
+                          if (offset < -filmCount / 2) offset += filmCount;
+                        } else if (filmCount === 2) {
+                          // With 2 films: non-active card glides from right (+1) to left (-1) smoothly
+                          offset = idx === safeFilmIndex ? 0 : idx > safeFilmIndex ? 1 : -1;
+                        }
+
+                        const isCenter = offset === 0;
+                        const isVisibleNeighbor = Math.abs(offset) === 1;
+                        const translatePct = -50 + offset * 106;
+                        const filmTitle =
+                          film.caption ||
+                          film.altText ||
+                          `Highlight Film ${String(idx + 1).padStart(2, '0')}`;
+                        const poster =
+                          film.deliveryUrls?.posterUrl ||
+                          buildCloudinaryVideoPosterUrl(film.secureUrl, 1120);
+
+                        return (
+                          <div
+                            key={film.id}
+                            style={{
+                              transform: `translate3d(${translatePct}%, 0, 0) scale(${isCenter ? 1 : 0.89})`,
+                            }}
+                            className={cn(
+                              'absolute top-2 left-1/2 w-[84%] sm:w-[68%] lg:w-[58%] max-w-[820px] aspect-video transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform',
+                              isCenter
+                                ? 'z-20 opacity-100'
+                                : isVisibleNeighbor
+                                  ? 'z-10 opacity-100'
+                                  : 'z-0 opacity-0 pointer-events-none',
+                            )}
+                          >
+                            <div
                               className={cn(
-                                'w-[74%] min-w-[205px] max-w-[260px] lg:min-w-0 lg:w-full lg:max-w-none shrink-0 snap-start text-left rounded-2xl border p-2.5 flex items-center gap-3 transition-all cursor-pointer',
-                                isCurrent
-                                  ? 'border-[#E7D1AA]/75 bg-white/10 shadow-sm'
-                                  : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.07] hover:border-white/25',
+                                'relative h-full w-full rounded-2xl overflow-hidden bg-black border transition-shadow duration-500',
+                                isCenter
+                                  ? 'border-[#DFCEAA] shadow-[0_24px_60px_-24px_rgba(24,22,17,0.34)]'
+                                  : 'border-[#E5DFD0] shadow-sm',
                               )}
                             >
-                              <div className="relative h-14 w-20 lg:h-16 lg:w-24 shrink-0 rounded-xl overflow-hidden bg-black">
-                                {poster && (
-                                  // eslint-disable-next-line @next/next/no-img-element
-                                  <img
-                                    src={poster}
-                                    alt={`Highlight Reel ${idx + 1}`}
-                                    loading="lazy"
-                                    decoding="async"
-                                    className="h-full w-full object-cover opacity-90"
-                                  />
-                                )}
-                                <span className="absolute inset-0 flex items-center justify-center bg-black/30 text-white text-xs">
-                                  ▶
-                                </span>
-                              </div>
-                              <div className="min-w-0 flex-1 space-y-1">
-                                <div className="flex items-center justify-between gap-2">
-                                  <span
-                                    className={cn(
-                                      'text-[10px] font-bold uppercase tracking-wider',
-                                      isCurrent ? 'text-[#E7D1AA]' : 'text-[#9C937E]',
-                                    )}
-                                  >
-                                    {isCurrent ? 'Now Playing' : `Reel ${String(idx + 1).padStart(2, '0')}`}
+                              <AdaptiveVideoPlayer
+                                src={film.deliveryUrls?.fullUrl || film.secureUrl}
+                                posterUrl={poster}
+                                title={filmTitle}
+                                durationSeconds={film.durationSeconds}
+                                width={film.width}
+                                height={film.height}
+                                variant="card"
+                                isPlaying={isCenter && playingVideoId === film.id}
+                                onPlay={() => {
+                                  if (isCenter) {
+                                    setPlayingVideoId(film.id);
+                                  } else {
+                                    selectFilmSlide(idx);
+                                  }
+                                }}
+                              />
+
+                              {/* Click overlay on peeking neighbor cards dims cleanly in dark tone (no white wash) */}
+                              {!isCenter && (
+                                <button
+                                  type="button"
+                                  onClick={() => selectFilmSlide(idx)}
+                                  aria-label={`Focus ${filmTitle}`}
+                                  className="group absolute inset-0 z-20 flex items-end justify-center p-4 bg-black/40 hover:bg-black/15 transition-colors cursor-pointer"
+                                >
+                                  <span className="opacity-0 group-hover:opacity-100 transition-opacity rounded-full bg-black/70 backdrop-blur-xs border border-white/25 px-3 py-1 text-[11px] font-semibold text-white">
+                                    View Reel
                                   </span>
-                                  {duration && (
-                                    <span className="text-[10px] font-mono-code text-[#9C937E]">
-                                      {duration}
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-xs font-semibold text-white leading-snug truncate">
-                                  Highlight Film {String(idx + 1).padStart(2, '0')}
-                                </p>
-                              </div>
-                            </button>
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Centered Caption, Duration & Slim Pagination Dots */}
+                    <div className="flex flex-col items-center gap-2.5 text-center px-2">
+                      <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-0.5">
+                        <p className="font-editorial text-xl sm:text-2xl font-semibold text-[#181611]">
+                          {currentFilm.caption ||
+                            currentFilm.altText ||
+                            `Highlight Film ${String(safeFilmIndex + 1).padStart(2, '0')}`}
+                        </p>
+                        {formatFilmDuration(currentFilm.durationSeconds) && (
+                          <span className="rounded-full border border-[#DFCEAA] bg-[#F8F3E6] px-2.5 py-0.5 text-[11px] font-mono-code text-[#6B6352] tabular-nums">
+                            {formatFilmDuration(currentFilm.durationSeconds)}
+                          </span>
+                        )}
+                      </div>
+
+                      <div
+                        role="tablist"
+                        aria-label="Highlight film slides"
+                        className="flex items-center justify-center gap-2"
+                      >
+                        {filteredVideos.map((film, idx) => {
+                          const isCurrent = idx === safeFilmIndex;
+                          return (
+                            <button
+                              key={film.id}
+                              type="button"
+                              role="tab"
+                              aria-selected={isCurrent}
+                              aria-label={`Select Highlight Film ${idx + 1}`}
+                              onClick={() => selectFilmSlide(idx)}
+                              className={cn(
+                                'h-2 rounded-full transition-all duration-300 cursor-pointer',
+                                isCurrent
+                                  ? 'w-7 bg-[#8B6A21]'
+                                  : 'w-2 bg-[#DFCEAA] hover:bg-[#CAA650]',
+                              )}
+                            />
                           );
                         })}
                       </div>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -437,7 +524,7 @@ export function PublicPortfolioShowcase({
                   <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#ECE6D8] pb-3 min-w-0">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-[#CAA650]" />
-                      <h3 className="font-editorial text-xl sm:text-2xl font-semibold text-[#181611] truncate">
+                      <h3 className="font-editorial text-xl md:text-4xl font-semibold text-[#181611] truncate">
                         Photography
                       </h3>
                       <span className="rounded-full bg-[#F8F3E6] border border-[#DFCEAA] px-2.5 py-0.5 text-[11px] font-mono-code text-[#6B6352] tabular-nums shrink-0">
