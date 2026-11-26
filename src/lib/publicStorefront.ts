@@ -8,16 +8,20 @@ import {
   getPublicPortfolioEvents,
 } from '@/service/catalog/catalog.service';
 import { getPublicReviews } from '@/service/reviews/reviews.service';
+import {
+  getPublicAboutTeamShowcase,
+  getPublicServicesShowcase,
+} from '@/service/studio-content/studio-content.service';
 import { EDITORIAL_GRID_SLUG, HERO_SLIDER_SLUG } from '@/lib/heroSlider';
-import { ABOUT_TEAM_SLUG } from '@/lib/studioAboutTeam';
-import { SERVICES_SHOWCASE_SLUG } from '@/lib/studioServices';
 import {
   ClientReview,
   EventType,
   PortfolioItem,
   PortfolioMediaItem,
   PortfolioShowcaseEvent,
+  PublicAboutTeamResponse,
   PublicBranding,
+  PublicServicesResponse,
   StudioPackage,
 } from '@/types/event-management';
 
@@ -292,8 +296,8 @@ export async function loadPublicStorefront(): Promise<{
   portfolioEvents: PortfolioShowcaseEvent[];
   heroEvent: PortfolioShowcaseEvent | null;
   editorialGridEvent: PortfolioShowcaseEvent | null;
-  servicesEvent: PortfolioShowcaseEvent | null;
-  aboutTeamEvent: PortfolioShowcaseEvent | null;
+  servicesShowcase: PublicServicesResponse | null;
+  aboutTeamShowcase: PublicAboutTeamResponse | null;
   galleryImages: PortfolioMediaItem[];
   reviews: ClientReview[];
   isBackendConnected: boolean;
@@ -318,8 +322,8 @@ export async function loadPublicStorefront(): Promise<{
     getPublicPortfolioEvents(),
     getPublicPortfolioEventBySlug(HERO_SLIDER_SLUG),
     getPublicPortfolioEventBySlug(EDITORIAL_GRID_SLUG),
-    getPublicPortfolioEventBySlug(SERVICES_SHOWCASE_SLUG),
-    getPublicPortfolioEventBySlug(ABOUT_TEAM_SLUG),
+    getPublicServicesShowcase(),
+    getPublicAboutTeamShowcase(),
     getPublicGalleryMedia('IMAGE'),
     getPublicReviews(),
   ]);
@@ -333,8 +337,8 @@ export async function loadPublicStorefront(): Promise<{
       portfolioEvents: [],
       heroEvent: null,
       editorialGridEvent: null,
-      servicesEvent: null,
-      aboutTeamEvent: null,
+      servicesShowcase: null,
+      aboutTeamShowcase: null,
       galleryImages: [],
       reviews: [],
       isBackendConnected: false,
@@ -351,8 +355,8 @@ export async function loadPublicStorefront(): Promise<{
     heroEvent: heroRes.ok && heroRes.data ? heroRes.data : null,
     editorialGridEvent:
       editorialGridRes.ok && editorialGridRes.data ? editorialGridRes.data : null,
-    servicesEvent: servicesRes.ok && servicesRes.data ? servicesRes.data : null,
-    aboutTeamEvent: aboutTeamRes.ok && aboutTeamRes.data ? aboutTeamRes.data : null,
+    servicesShowcase: servicesRes.ok && servicesRes.data ? servicesRes.data : null,
+    aboutTeamShowcase: aboutTeamRes.ok && aboutTeamRes.data ? aboutTeamRes.data : null,
     galleryImages:
       galleryRes.ok && Array.isArray(galleryRes.data?.data)
         ? galleryRes.data.data

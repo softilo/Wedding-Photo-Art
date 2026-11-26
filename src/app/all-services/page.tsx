@@ -30,9 +30,8 @@ async function AllServicesContent() {
   const {
     branding,
     packages,
-    portfolio,
     portfolioEvents,
-    servicesEvent,
+    servicesShowcase,
     galleryImages,
   } = await loadPublicStorefront();
 
@@ -88,10 +87,7 @@ async function AllServicesContent() {
 
         <PublicServicesSection
           branding={branding}
-          servicesEvent={servicesEvent}
-          portfolioEvents={portfolioEvents}
-          galleryImages={galleryImages}
-          legacyPortfolio={portfolio}
+          servicesShowcase={servicesShowcase}
           variant="all"
         />
       </main>

@@ -11,16 +11,6 @@ import {
   serializeHeroSliderDescription,
 } from '@/lib/heroSlider';
 import {
-  DEFAULT_STUDIO_SERVICES_SETTINGS,
-  SERVICES_SHOWCASE_SLUG,
-  serializeStudioServicesDescription,
-} from '@/lib/studioServices';
-import {
-  ABOUT_TEAM_SLUG,
-  DEFAULT_ABOUT_TEAM_SETTINGS,
-  serializeAboutTeamDescription,
-} from '@/lib/studioAboutTeam';
-import {
   CloudinaryStatusSummary,
   DeliverableLabelTemplate,
   EventType,
@@ -762,66 +752,4 @@ export async function removeEditorialGridMedia(
   mediaId: string,
 ): Promise<ActionResult<PortfolioShowcaseEvent | null>> {
   return removeSystemPortfolioMedia(EDITORIAL_GRID_SLUG, eventId, mediaId);
-}
-
-export async function getAdminServicesShowcaseEvent(): Promise<
-  ActionResult<PortfolioShowcaseEvent | null>
-> {
-  return getAdminSystemPortfolioEvent(SERVICES_SHOWCASE_SLUG);
-}
-
-export async function ensureServicesShowcaseEvent(): Promise<
-  ActionResult<PortfolioShowcaseEvent>
-> {
-  return ensureSystemPortfolioEvent({
-    slug: SERVICES_SHOWCASE_SLUG,
-    title: 'Studio Services Showcase',
-    description: serializeStudioServicesDescription(DEFAULT_STUDIO_SERVICES_SETTINGS),
-    fallbackMessage: 'Could not initialize services showcase record',
-  });
-}
-
-export async function activateServicesShowcaseMedia(
-  eventId: string,
-  leadMediaId: string,
-  publishNow = true,
-): Promise<ActionResult<PortfolioShowcaseEvent>> {
-  return activateSystemPortfolioMedia(SERVICES_SHOWCASE_SLUG, eventId, leadMediaId, publishNow);
-}
-
-export async function removeServicesShowcaseMedia(
-  eventId: string,
-  mediaId: string,
-): Promise<ActionResult<PortfolioShowcaseEvent | null>> {
-  return removeSystemPortfolioMedia(SERVICES_SHOWCASE_SLUG, eventId, mediaId);
-}
-
-export async function getAdminAboutTeamEvent(): Promise<
-  ActionResult<PortfolioShowcaseEvent | null>
-> {
-  return getAdminSystemPortfolioEvent(ABOUT_TEAM_SLUG);
-}
-
-export async function ensureAboutTeamEvent(): Promise<ActionResult<PortfolioShowcaseEvent>> {
-  return ensureSystemPortfolioEvent({
-    slug: ABOUT_TEAM_SLUG,
-    title: 'Studio About & Creative Team',
-    description: serializeAboutTeamDescription(DEFAULT_ABOUT_TEAM_SETTINGS),
-    fallbackMessage: 'Could not initialize About & Team showcase record',
-  });
-}
-
-export async function activateAboutTeamMedia(
-  eventId: string,
-  leadMediaId: string,
-  publishNow = true,
-): Promise<ActionResult<PortfolioShowcaseEvent>> {
-  return activateSystemPortfolioMedia(ABOUT_TEAM_SLUG, eventId, leadMediaId, publishNow);
-}
-
-export async function removeAboutTeamMedia(
-  eventId: string,
-  mediaId: string,
-): Promise<ActionResult<PortfolioShowcaseEvent | null>> {
-  return removeSystemPortfolioMedia(ABOUT_TEAM_SLUG, eventId, mediaId);
 }

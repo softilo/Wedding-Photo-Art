@@ -28,9 +28,8 @@ async function AboutPageContent() {
   const {
     branding,
     packages,
-    portfolio,
     portfolioEvents,
-    aboutTeamEvent,
+    aboutTeamShowcase,
     galleryImages,
   } = await loadPublicStorefront();
 
@@ -47,10 +46,7 @@ async function AboutPageContent() {
       <Navbar branding={branding} />
       <AboutTeamShowcase
         branding={branding}
-        aboutTeamEvent={aboutTeamEvent}
-        portfolioEvents={portfolioEvents}
-        galleryImages={galleryImages}
-        legacyPortfolio={portfolio}
+        aboutTeamShowcase={aboutTeamShowcase}
       />
       <Footer branding={branding} />
     </div>

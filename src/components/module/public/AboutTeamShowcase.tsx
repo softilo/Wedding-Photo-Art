@@ -3,15 +3,13 @@
 import React, { useMemo } from 'react';
 import Link from 'next/link';
 import {
-  PortfolioItem,
-  PortfolioMediaItem,
-  PortfolioShowcaseEvent,
+  PublicAboutTeamResponse,
   PublicBranding,
 } from '@/types/event-management';
 import { BrandMark } from '@/components/common/BrandMark';
 import { buildWhatsAppUrl } from '@/components/common/FloatingWhatsAppButton';
 import { STUDIO_PROFILE } from '@/lib/publicStorefront';
-import { ResolvedTeamMember, resolveAboutTeam } from '@/lib/studioAboutTeam';
+import { ResolvedTeamMember, resolveAboutTeamFromDb } from '@/lib/studioAboutTeam';
 import { StudioCountStats } from './StudioCountStats';
 import {
   ArrowRightIcon,
@@ -26,20 +24,15 @@ import {
 
 interface AboutTeamShowcaseProps {
   branding: PublicBranding;
-  aboutTeamEvent?: PortfolioShowcaseEvent | null;
-  portfolioEvents: PortfolioShowcaseEvent[];
-  galleryImages: PortfolioMediaItem[];
-  legacyPortfolio: PortfolioItem[];
+  aboutTeamShowcase?: PublicAboutTeamResponse | null;
 }
 
 function FeaturedFounderSpotlight({
   member,
   branding,
-  accent,
 }: {
   member: ResolvedTeamMember;
   branding: PublicBranding;
-  accent: string;
 }) {
   const specialtyTags = member.specialty
     ? member.specialty
@@ -255,10 +248,7 @@ function TeamMemberCard({
 
 export function AboutTeamShowcase({
   branding,
-  aboutTeamEvent = null,
-  portfolioEvents,
-  galleryImages,
-  legacyPortfolio,
+  aboutTeamShowcase = null,
 }: AboutTeamShowcaseProps) {
   const accent = branding.themeTokens.accentColor || '#8B6A21';
   const contactPhone = branding.contactDetails?.phone || STUDIO_PROFILE.phoneIntl;
@@ -267,17 +257,23 @@ export function AboutTeamShowcase({
 
   const resolved = useMemo(
     () =>
-      resolveAboutTeam({
-        aboutEvent: aboutTeamEvent,
+      resolveAboutTeamFromDb({
+        aboutTeamShowcase,
         brandingName: branding.displayName,
-        portfolioEvents,
-        galleryImages,
-        legacyPortfolio,
       }),
-    [aboutTeamEvent, branding.displayName, portfolioEvents, galleryImages, legacyPortfolio],
+    [aboutTeamShowcase, branding.displayName],
   );
 
-  const { settings, featuredMember, otherMembers } = resolved;
+  const { profile, featuredMember, otherMembers } = resolved;
+  const storyEyebrow = profile?.storyEyebrow || 'Est. 2015 • Feni, Bangladesh';
+  const storyTitle =
+    profile?.storyTitle || 'Crafting Heirloom Wedding Stories Across Bangladesh';
+  const storyLead =
+    profile?.storyLead ||
+    `${branding.displayName} is a collective of dedicated photographers, cinematographers, and visual editors.`;
+  const storyBody =
+    profile?.storyBody ||
+    'Manage our studio heritage paragraph and creative team profiles from Dashboard → Public Page Setup.';
 
   return (
     <main className="flex-1 bg-[#F9F8F5] text-[#181611]">
@@ -287,13 +283,13 @@ export function AboutTeamShowcase({
           <div className="lg:col-span-8 space-y-4">
             <span className="inline-flex items-center gap-2 rounded-full border border-[#CAA650]/40 bg-[#CAA650]/15 px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#E7D1AA]">
               <CameraIcon className="w-3.5 h-3.5" />
-              <span>{settings.storyEyebrow}</span>
+              <span>{storyEyebrow}</span>
             </span>
             <h1 className="font-editorial text-4xl sm:text-5xl lg:text-[3.45rem] font-semibold text-white leading-[1.08]">
               About {branding.displayName}
             </h1>
             <p className="text-sm sm:text-base text-[#C7BFA9] max-w-2xl leading-relaxed">
-              {settings.storyLead}
+              {storyLead}
             </p>
           </div>
 
@@ -326,10 +322,10 @@ export function AboutTeamShowcase({
             className="font-editorial text-[2rem] sm:text-[2.65rem] lg:text-[3rem] font-normal leading-[1.15] tracking-tight"
             style={{ color: accent }}
           >
-            {settings.storyTitle}
+            {storyTitle}
           </h2>
           <p className="mx-auto max-w-2xl text-sm sm:text-base text-[#4A4438] leading-[1.85]">
-            {settings.storyBody}
+            {storyBody}
           </p>
 
           <StudioCountStats accentColor={accent} />
@@ -369,7 +365,6 @@ export function AboutTeamShowcase({
               <FeaturedFounderSpotlight
                 member={featuredMember}
                 branding={branding}
-                accent={accent}
               />
 
               {/* Remaining Creative Team Members Below */}

@@ -3,21 +3,16 @@
 import React, { useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import {
-  PortfolioItem,
-  PortfolioMediaItem,
-  PortfolioShowcaseEvent,
   PublicBranding,
+  PublicServicesResponse,
 } from '@/types/event-management';
 import { BrandMark } from '@/components/common/BrandMark';
-import { ResolvedStudioService, resolveStudioServices } from '@/lib/studioServices';
+import { ResolvedStudioService, resolveStudioServicesFromDb } from '@/lib/studioServices';
 import { ArrowRightIcon } from '@/components/shared/Icons';
 
 interface PublicServicesSectionProps {
   branding: PublicBranding;
-  servicesEvent?: PortfolioShowcaseEvent | null;
-  portfolioEvents: PortfolioShowcaseEvent[];
-  galleryImages: PortfolioMediaItem[];
-  legacyPortfolio: PortfolioItem[];
+  servicesShowcase?: PublicServicesResponse | null;
   variant?: 'home' | 'all';
 }
 
@@ -114,24 +109,18 @@ function ServiceShowcaseCard({
 
 export function PublicServicesSection({
   branding,
-  servicesEvent = null,
-  portfolioEvents,
-  galleryImages,
-  legacyPortfolio,
+  servicesShowcase = null,
   variant = 'home',
 }: PublicServicesSectionProps) {
   const accent = branding.themeTokens.accentColor || '#8B6A21';
 
   const resolved = useMemo(
     () =>
-      resolveStudioServices({
-        servicesEvent,
+      resolveStudioServicesFromDb({
+        servicesShowcase,
         brandingName: branding.displayName,
-        portfolioEvents,
-        galleryImages,
-        legacyPortfolio,
       }),
-    [servicesEvent, branding.displayName, portfolioEvents, galleryImages, legacyPortfolio],
+    [servicesShowcase, branding.displayName],
   );
 
   const visibleCount = useSyncExternalStore<ServiceSlideCount>(

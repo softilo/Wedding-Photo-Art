@@ -3,33 +3,22 @@
 import React, { useMemo, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
 import {
+  AdminServicesResponse,
   PortfolioMediaItem,
-  PortfolioShowcaseEvent,
 } from '@/types/event-management';
+import { listGalleryMedia } from '@/service/catalog/catalog.service';
 import {
-  activateServicesShowcaseMedia,
-  ensureServicesShowcaseEvent,
-  getAdminPortfolioEvent,
-  listGalleryMedia,
-  publishPortfolioEvent,
-  registerPortfolioMedia,
-  removeServicesShowcaseMedia,
-  signPortfolioUpload,
-  updatePortfolioEvent,
-} from '@/service/catalog/catalog.service';
+  resetServicesDefaults,
+  SaveServiceItemPayload,
+  saveServicesShowcaseBulk,
+  signServiceUpload,
+} from '@/service/studio-content/studio-content.service';
 import {
   detectImageFormat,
   measureImageDimensions,
   uploadImageToCloudinary,
 } from '@/lib/cloudinaryClientUpload';
-import { getHeroSlideThumbUrl } from '@/lib/heroSlider';
-import {
-  buildDefaultStudioServices,
-  parseStudioServicesSettings,
-  serializeStudioServicesDescription,
-  StudioServiceItem,
-  StudioServicesSettings,
-} from '@/lib/studioServices';
+import { buildCloudinaryImageUrl } from '@/lib/showcaseMedia';
 import { cn } from '@/lib/utils';
 import {
   CameraIcon,
@@ -39,12 +28,30 @@ import {
 import { StudioGalleryPickerModal } from './StudioGalleryPickerModal';
 
 interface ServicesShowcaseSetupProps {
-  initialServicesEvent: PortfolioShowcaseEvent | null;
+  initialServicesData: AdminServicesResponse | null;
   galleryPool: PortfolioMediaItem[];
   onGalleryPoolUpdate: (nextPool: PortfolioMediaItem[]) => void;
   studioName: string;
   onNotify: (type: 'ok' | 'err', text: string) => void;
-  onServicesEventChange?: (ev: PortfolioShowcaseEvent | null) => void;
+  onServicesDataChange?: (data: AdminServicesResponse) => void;
+}
+
+interface EditableServiceItem {
+  localKey: string;
+  id?: string;
+  title: string;
+  description: string;
+  imageUrl: string | null;
+  imageAssetId: string | null;
+  imagePublicId: string | null;
+  imageFormat: string | null;
+  imageBytes: number | null;
+  imageWidth: number | null;
+  imageHeight: number | null;
+  imageVersion: number | null;
+  imageResponseSignature: string | null;
+  showOnHome: boolean;
+  isActive: boolean;
 }
 
 interface ItemUploadState {
@@ -52,169 +59,118 @@ interface ItemUploadState {
   statusText: string;
 }
 
+function mapResponseToItems(data: AdminServicesResponse | null): EditableServiceItem[] {
+  return (data?.items || []).map((item) => ({
+    localKey: item.id,
+    id: item.id,
+    title: item.title,
+    description: item.description,
+    imageUrl: item.imageUrl,
+    imageAssetId: item.imageAssetId,
+    imagePublicId: item.imagePublicId,
+    imageFormat: item.imageFormat,
+    imageBytes: item.imageBytes,
+    imageWidth: item.imageWidth,
+    imageHeight: item.imageHeight,
+    imageVersion: null,
+    imageResponseSignature: null,
+    showOnHome: item.showOnHome,
+    isActive: item.isActive,
+  }));
+}
+
+function toSavePayload(items: EditableServiceItem[]): SaveServiceItemPayload[] {
+  return items.map((item) => ({
+    id: item.id,
+    title: item.title.trim(),
+    description: item.description.trim(),
+    imageUrl: item.imageUrl,
+    imageAssetId: item.imageAssetId,
+    imagePublicId: item.imagePublicId,
+    imageFormat: item.imageFormat,
+    imageBytes: item.imageBytes,
+    imageWidth: item.imageWidth,
+    imageHeight: item.imageHeight,
+    imageVersion: item.imageVersion,
+    imageResponseSignature: item.imageResponseSignature,
+    showOnHome: item.showOnHome,
+    isActive: item.isActive,
+  }));
+}
+
 export function ServicesShowcaseSetup({
-  initialServicesEvent,
+  initialServicesData,
   galleryPool,
   onGalleryPoolUpdate,
   studioName,
   onNotify,
-  onServicesEventChange,
+  onServicesDataChange,
 }: ServicesShowcaseSetupProps) {
-  const [servicesEvent, setServicesEvent] = useState<PortfolioShowcaseEvent | null>(
-    initialServicesEvent,
-  );
-  const [draft, setDraft] = useState<StudioServicesSettings>(() =>
-    parseStudioServicesSettings(initialServicesEvent?.description, studioName),
+  const [savedData, setSavedData] = useState<AdminServicesResponse | null>(initialServicesData);
+  const [enabled, setEnabled] = useState<boolean>(initialServicesData?.enabled ?? true);
+  const [items, setItems] = useState<EditableServiceItem[]>(() =>
+    mapResponseToItems(initialServicesData),
   );
   const [itemUploads, setItemUploads] = useState<Record<string, ItemUploadState>>({});
-  const [pickerItemId, setPickerItemId] = useState<string | null>(null);
+  const [pickerItemKey, setPickerItemKey] = useState<string | null>(null);
   const [gallerySearch, setGallerySearch] = useState('');
   const [landscapeOnly, setLandscapeOnly] = useState(true);
   const [isPending, startTransition] = useTransition();
 
-  const eventRef = useRef<PortfolioShowcaseEvent | null>(initialServicesEvent);
-  const ensurePromiseRef = useRef<Promise<PortfolioShowcaseEvent | null> | null>(null);
   const fileInputsRef = useRef<Record<string, HTMLInputElement | null>>({});
 
-  const syncEvent = (nextEvent: PortfolioShowcaseEvent | null) => {
-    eventRef.current = nextEvent;
-    setServicesEvent(nextEvent);
-    onServicesEventChange?.(nextEvent);
+  const applyServerSnapshot = (nextData: AdminServicesResponse) => {
+    setSavedData(nextData);
+    setEnabled(nextData.enabled);
+    setItems(mapResponseToItems(nextData));
+    onServicesDataChange?.(nextData);
   };
 
-  const savedSettings = useMemo(
-    () => parseStudioServicesSettings(servicesEvent?.description, studioName),
-    [servicesEvent?.description, studioName],
-  );
+  const hasUnsavedChanges = useMemo(() => {
+    const savedEnabled = savedData?.enabled ?? true;
+    if (enabled !== savedEnabled) return true;
+    const savedMapped = mapResponseToItems(savedData);
+    return JSON.stringify(toSavePayload(items)) !== JSON.stringify(toSavePayload(savedMapped));
+  }, [enabled, items, savedData]);
 
-  const hasUnsavedChanges = useMemo(
-    () => JSON.stringify(draft) !== JSON.stringify(savedSettings),
-    [draft, savedSettings],
-  );
-
-  const mediaById = useMemo(() => {
-    const map = new Map<string, PortfolioMediaItem>();
-    for (const m of servicesEvent?.media || []) {
-      if (m.resourceType === 'IMAGE' && m.status === 'READY') {
-        map.set(m.id, m);
-      }
-    }
-    return map;
-  }, [servicesEvent?.media]);
-
-  const getOrCreateEvent = async (): Promise<PortfolioShowcaseEvent | null> => {
-    if (eventRef.current) return eventRef.current;
-    if (ensurePromiseRef.current) return ensurePromiseRef.current;
-
-    const promise = (async () => {
-      const ensured = await ensureServicesShowcaseEvent();
-      if (!ensured.ok || !ensured.data) {
-        onNotify('err', ensured.message || 'Could not initialize Services Showcase container.');
-        return null;
-      }
-      syncEvent(ensured.data);
-      return ensured.data;
-    })();
-
-    ensurePromiseRef.current = promise;
-    try {
-      return await promise;
-    } finally {
-      ensurePromiseRef.current = null;
-    }
-  };
-
-  const ensurePublishedWithMedia = async (
-    targetEvent: PortfolioShowcaseEvent,
-    preferredMediaId?: string,
-  ): Promise<PortfolioShowcaseEvent> => {
-    const readyList = (targetEvent.media || []).filter(
-      (m) => m.resourceType === 'IMAGE' && m.status === 'READY',
-    );
-    if (readyList.length > 0) {
-      if (targetEvent.status === 'PUBLISHED' && targetEvent.coverMediaId) {
-        return targetEvent;
-      }
-      const leadId = preferredMediaId || readyList[0].id;
-      const actRes = await activateServicesShowcaseMedia(targetEvent.id, leadId, true);
-      if (actRes.ok && actRes.data) {
-        return actRes.data;
-      }
-      const pubRes = await publishPortfolioEvent(targetEvent.id);
-      return pubRes.ok && pubRes.data ? pubRes.data : targetEvent;
-    }
-
-    // Attach silent anchor photo from Studio Gallery if empty so backend publishes clean text edits too
-    const anchor = galleryPool.find(
-      (m) => m.resourceType === 'IMAGE' && m.status === 'READY' && Boolean(m.secureUrl),
-    );
-    if (!anchor) return targetEvent;
-
-    const regRes = await registerPortfolioMedia(targetEvent.id, {
-      assetId: anchor.assetId,
-      publicId: anchor.publicId,
-      resourceType: 'IMAGE',
-      format: anchor.format,
-      secureUrl: anchor.secureUrl,
-      bytes: anchor.bytes,
-      width: anchor.width ?? undefined,
-      height: anchor.height ?? undefined,
-      caption: 'Studio Services Anchor Cover',
-      altText: `${studioName} services showcase`,
-      status: 'READY',
-    });
-
-    if (!regRes.ok || !regRes.data) return targetEvent;
-
-    const actRes = await activateServicesShowcaseMedia(targetEvent.id, regRes.data.media.id, true);
-    return actRes.ok && actRes.data ? actRes.data : targetEvent;
-  };
-
-  const persistSettings = async (
-    nextSettings: StudioServicesSettings,
+  const persistAll = async (
+    nextEnabled: boolean,
+    nextItems: EditableServiceItem[],
     successMessage: string,
-    preferredMediaId?: string,
   ): Promise<boolean> => {
-    const targetEvent = await getOrCreateEvent();
-    if (!targetEvent) return false;
-
-    const updateRes = await updatePortfolioEvent(targetEvent.id, {
-      description: serializeStudioServicesDescription(nextSettings),
-    });
-    if (!updateRes.ok || !updateRes.data) {
-      onNotify('err', updateRes.message || 'Could not save services configuration.');
+    const valid = nextItems.filter((it) => it.title.trim().length > 0);
+    if (valid.length === 0) {
+      onNotify('err', 'Keep at least one service with a title before saving.');
       return false;
     }
 
-    const published = await ensurePublishedWithMedia(updateRes.data, preferredMediaId);
-    const refreshed = await getAdminPortfolioEvent(published.id);
-    const finalEvent = refreshed.ok && refreshed.data ? refreshed.data : published;
-    syncEvent(finalEvent);
+    const res = await saveServicesShowcaseBulk({
+      enabled: nextEnabled,
+      items: toSavePayload(valid),
+    });
+    if (!res.ok || !res.data) {
+      onNotify('err', res.message || 'Could not save services to database.');
+      return false;
+    }
+    applyServerSnapshot(res.data);
     onNotify('ok', successMessage);
     return true;
   };
 
   const handleSaveAll = () => {
-    const validCount = draft.items.filter((it) => it.title.trim().length > 0).length;
-    if (validCount === 0) {
-      onNotify('err', 'Keep at least one service with a title before saving.');
-      return;
-    }
     startTransition(async () => {
-      await persistSettings(draft, 'Services showcase updated and published!');
+      await persistAll(enabled, items, 'Services showcase saved to database and published!');
     });
   };
 
   const handleToggleSectionEnabled = () => {
-    const nextDraft: StudioServicesSettings = {
-      ...draft,
-      enabled: !draft.enabled,
-    };
-    setDraft(nextDraft);
+    const nextEnabled = !enabled;
+    setEnabled(nextEnabled);
     startTransition(async () => {
-      await persistSettings(
-        nextDraft,
-        nextDraft.enabled
+      await persistAll(
+        nextEnabled,
+        items,
+        nextEnabled
           ? 'Services Showcase section is now visible on homepage.'
           : 'Services Showcase section hidden from homepage.',
       );
@@ -222,191 +178,132 @@ export function ServicesShowcaseSetup({
   };
 
   const handleAddService = () => {
-    const newId = `srv-${Date.now().toString(36)}`;
-    const newItem: StudioServiceItem = {
-      id: newId,
+    const newItem: EditableServiceItem = {
+      localKey: `new-srv-${Date.now().toString(36)}`,
       title: 'New Photography Service',
       description: `Bespoke photography and storytelling tailored to your celebration by ${studioName}.`,
-      showOnHome: draft.items.filter((i) => i.showOnHome && i.isActive).length < 3,
+      imageUrl: null,
+      imageAssetId: null,
+      imagePublicId: null,
+      imageFormat: null,
+      imageBytes: null,
+      imageWidth: null,
+      imageHeight: null,
+      imageVersion: null,
+      imageResponseSignature: null,
+      showOnHome: items.filter((i) => i.showOnHome && i.isActive).length < 3,
       isActive: true,
     };
-    setDraft((prev) => ({
-      ...prev,
-      items: [newItem, ...prev.items],
-    }));
+    setItems((prev) => [newItem, ...prev]);
   };
 
-  const updateItemField = <K extends keyof StudioServiceItem>(
-    itemId: string,
+  const updateItemField = <K extends keyof EditableServiceItem>(
+    localKey: string,
     field: K,
-    value: StudioServiceItem[K],
+    value: EditableServiceItem[K],
   ) => {
-    setDraft((prev) => ({
-      ...prev,
-      items: prev.items.map((item) => (item.id === itemId ? { ...item, [field]: value } : item)),
-    }));
+    setItems((prev) =>
+      prev.map((item) => (item.localKey === localKey ? { ...item, [field]: value } : item)),
+    );
   };
 
   const moveItem = (idx: number, delta: -1 | 1) => {
     const targetIdx = idx + delta;
-    if (targetIdx < 0 || targetIdx >= draft.items.length) return;
-    setDraft((prev) => {
-      const next = [...prev.items];
+    if (targetIdx < 0 || targetIdx >= items.length) return;
+    setItems((prev) => {
+      const next = [...prev];
       const [moved] = next.splice(idx, 1);
-      next.splice(targetIdx, 0, moved);
-      return { ...prev, items: next };
+      if (moved) next.splice(targetIdx, 0, moved);
+      return next;
     });
   };
 
-  const removeServiceItem = (itemId: string) => {
-    if (draft.items.length <= 1) {
+  const removeServiceItem = (localKey: string) => {
+    if (items.length <= 1) {
       onNotify('err', 'Keep at least 1 service card or hide the section instead.');
       return;
     }
-    const removed = draft.items.find((i) => i.id === itemId);
-    const nextItems = draft.items.filter((i) => i.id !== itemId);
-    const nextSettings: StudioServicesSettings = { ...draft, items: nextItems };
-    setDraft(nextSettings);
-
-    if (servicesEvent) {
-      startTransition(async () => {
-        const ok = await persistSettings(nextSettings, 'Service removed from showcase.');
-        if (ok && removed?.mediaId) {
-          const stillUsed = nextItems.some((i) => i.mediaId === removed.mediaId);
-          if (!stillUsed && servicesEvent) {
-            const rmRes = await removeServicesShowcaseMedia(servicesEvent.id, removed.mediaId);
-            if (rmRes.ok && rmRes.data) {
-              syncEvent(rmRes.data);
-            }
-          }
-        }
-      });
-    }
+    const nextItems = items.filter((i) => i.localKey !== localKey);
+    setItems(nextItems);
+    startTransition(async () => {
+      await persistAll(enabled, nextItems, 'Service removed from database.');
+    });
   };
 
-  const assignMediaToService = async (itemId: string, newMedia: PortfolioMediaItem) => {
-    const targetEvent = eventRef.current;
-    if (!targetEvent) return;
-
-    const existingItem = draft.items.find((i) => i.id === itemId);
-    const prevMediaId = existingItem?.mediaId;
-
-    const nextSettings: StudioServicesSettings = {
-      ...draft,
-      items: draft.items.map((i) => (i.id === itemId ? { ...i, mediaId: newMedia.id } : i)),
-    };
-    setDraft(nextSettings);
-
-    const saved = await persistSettings(
-      nextSettings,
-      `Updated photo for "${existingItem?.title || 'Service'}".`,
-      newMedia.id,
-    );
-
-    if (saved && prevMediaId && prevMediaId !== newMedia.id) {
-      const usedElsewhere = nextSettings.items.some(
-        (i) => i.id !== itemId && i.mediaId === prevMediaId,
-      );
-      if (!usedElsewhere) {
-        const cleanupRes = await removeServicesShowcaseMedia(targetEvent.id, prevMediaId);
-        if (cleanupRes.ok && cleanupRes.data) {
-          syncEvent(cleanupRes.data);
-        }
-      }
-    }
-  };
-
-  const handleUploadPhoto = (itemId: string, file: File) => {
+  const handleUploadPhoto = (localKey: string, file: File) => {
     const { valid, format } = detectImageFormat(file);
     if (!valid) {
       onNotify('err', 'Please select a valid image file (JPG, PNG, WebP, AVIF, or HEIC).');
       return;
     }
 
-    const itemMeta = draft.items.find((i) => i.id === itemId);
+    const itemMeta = items.find((i) => i.localKey === localKey);
 
     void (async () => {
       setItemUploads((prev) => ({
         ...prev,
-        [itemId]: { progress: 10, statusText: 'Signing upload...' },
+        [localKey]: { progress: 12, statusText: 'Signing upload...' },
       }));
 
-      const targetEvent = await getOrCreateEvent();
-      if (!targetEvent) {
-        setItemUploads((prev) => {
-          const next = { ...prev };
-          delete next[itemId];
-          return next;
-        });
-        return;
-      }
-
-      const dims = await measureImageDimensions(file);
-      const signRes = await signPortfolioUpload(targetEvent.id, {
-        resourceType: 'IMAGE',
-        format,
-        bytes: file.size,
-      });
-
-      if (!signRes.ok || !signRes.data) {
-        onNotify('err', signRes.message || 'Could not authorize Cloudinary upload.');
-        setItemUploads((prev) => {
-          const next = { ...prev };
-          delete next[itemId];
-          return next;
-        });
-        return;
-      }
-
       try {
+        const [dims, signRes] = await Promise.all([
+          measureImageDimensions(file),
+          signServiceUpload({ format, bytes: file.size }),
+        ]);
+
+        if (!signRes.ok || !signRes.data) {
+          onNotify('err', signRes.message || 'Could not authorize Cloudinary upload.');
+          return;
+        }
+
         const cld = await uploadImageToCloudinary(file, signRes.data, (pct) => {
           setItemUploads((prev) => ({
             ...prev,
-            [itemId]: { progress: pct, statusText: `${pct}%` },
+            [localKey]: { progress: pct, statusText: `${pct}%` },
           }));
         });
 
         setItemUploads((prev) => ({
           ...prev,
-          [itemId]: { progress: 96, statusText: 'Saving...' },
+          [localKey]: { progress: 96, statusText: 'Saving...' },
         }));
 
-        const cleanName = file.name.replace(/\.[^/.]+$/, '');
-        const regRes = await registerPortfolioMedia(targetEvent.id, {
-          assetId: cld.asset_id,
-          publicId: cld.public_id,
-          resourceType: 'IMAGE',
-          format: cld.format || format,
-          secureUrl: cld.secure_url,
-          bytes: cld.bytes || file.size,
-          width: cld.width ?? dims.width,
-          height: cld.height ?? dims.height,
-          status: 'READY',
-          version: cld.version,
-          responseSignature: cld.signature,
-          caption: `${itemMeta?.title || 'Service'} — ${cleanName}`,
-          altText: `${itemMeta?.title || 'Service'} — ${studioName}`,
-        });
-
-        if (!regRes.ok || !regRes.data) {
-          throw new Error(regRes.message || 'Failed to register uploaded service photo.');
-        }
-
-        await assignMediaToService(itemId, regRes.data.media);
+        const nextItems = items.map((item) =>
+          item.localKey === localKey
+            ? {
+                ...item,
+                imageUrl: cld.secure_url,
+                imageAssetId: cld.asset_id,
+                imagePublicId: cld.public_id,
+                imageFormat: cld.format || format,
+                imageBytes: cld.bytes || file.size,
+                imageWidth: cld.width ?? dims.width ?? null,
+                imageHeight: cld.height ?? dims.height ?? null,
+                imageVersion: cld.version ?? null,
+                imageResponseSignature: cld.signature ?? null,
+              }
+            : item,
+        );
+        setItems(nextItems);
+        await persistAll(
+          enabled,
+          nextItems,
+          `Uploaded isolated service photo for "${itemMeta?.title || 'Service'}".`,
+        );
       } catch (err) {
         onNotify('err', err instanceof Error ? err.message : 'Service photo upload failed.');
       } finally {
         setItemUploads((prev) => {
           const next = { ...prev };
-          delete next[itemId];
+          delete next[localKey];
           return next;
         });
       }
     })();
   };
 
-  const handleOpenPicker = (itemId: string) => {
-    setPickerItemId(itemId);
+  const handleOpenPicker = (localKey: string) => {
+    setPickerItemKey(localKey);
     startTransition(async () => {
       const res = await listGalleryMedia('IMAGE');
       if (res.ok && res.data) {
@@ -416,89 +313,89 @@ export function ServicesShowcaseSetup({
   };
 
   const handlePickFromGallery = (img: PortfolioMediaItem) => {
-    if (!pickerItemId) return;
-    const targetId = pickerItemId;
-
+    if (!pickerItemKey) return;
+    const targetKey = pickerItemKey;
+    const targetItem = items.find((i) => i.localKey === targetKey);
+    const nextItems = items.map((item) =>
+      item.localKey === targetKey
+        ? {
+            ...item,
+            imageUrl: img.secureUrl,
+            imageAssetId: img.assetId,
+            imagePublicId: img.publicId,
+            imageFormat: img.format,
+            imageBytes: img.bytes,
+            imageWidth: img.width ?? null,
+            imageHeight: img.height ?? null,
+            imageVersion: null,
+            imageResponseSignature: null,
+          }
+        : item,
+    );
+    setItems(nextItems);
+    setPickerItemKey(null);
     startTransition(async () => {
-      const targetEvent = await getOrCreateEvent();
-      if (!targetEvent) return;
-
-      const regRes = await registerPortfolioMedia(targetEvent.id, {
-        assetId: img.assetId,
-        publicId: img.publicId,
-        resourceType: 'IMAGE',
-        format: img.format,
-        secureUrl: img.secureUrl,
-        bytes: img.bytes,
-        width: img.width ?? undefined,
-        height: img.height ?? undefined,
-        caption: img.caption ?? undefined,
-        altText: img.altText ?? img.caption ?? undefined,
-        status: 'READY',
-      });
-
-      if (!regRes.ok || !regRes.data) {
-        onNotify('err', regRes.message || 'Could not assign gallery photo.');
-        return;
-      }
-
-      await assignMediaToService(targetId, regRes.data.media);
-      setPickerItemId(null);
+      await persistAll(
+        enabled,
+        nextItems,
+        `Updated cover photo for "${targetItem?.title || 'Service'}".`,
+      );
     });
   };
 
-  const handleClearPhoto = (itemId: string) => {
-    const item = draft.items.find((i) => i.id === itemId);
-    if (!item?.mediaId || !servicesEvent) return;
-
-    const removedId = item.mediaId;
-    const nextSettings: StudioServicesSettings = {
-      ...draft,
-      items: draft.items.map((i) => (i.id === itemId ? { ...i, mediaId: undefined } : i)),
-    };
-    setDraft(nextSettings);
-
-    startTransition(async () => {
-      const ok = await persistSettings(
-        nextSettings,
-        `Reset photo for "${item.title}" to studio fallback.`,
-      );
-      if (ok && servicesEvent) {
-        const stillUsed = nextSettings.items.some((i) => i.mediaId === removedId);
-        if (!stillUsed) {
-          const rmRes = await removeServicesShowcaseMedia(servicesEvent.id, removedId);
-          if (rmRes.ok && rmRes.data) {
-            syncEvent(rmRes.data);
+  const handleClearPhoto = (localKey: string) => {
+    const target = items.find((i) => i.localKey === localKey);
+    if (!target?.imageUrl) return;
+    const nextItems = items.map((item) =>
+      item.localKey === localKey
+        ? {
+            ...item,
+            imageUrl: null,
+            imageAssetId: null,
+            imagePublicId: null,
+            imageFormat: null,
+            imageBytes: null,
+            imageWidth: null,
+            imageHeight: null,
+            imageVersion: null,
+            imageResponseSignature: null,
           }
-        }
-      }
+        : item,
+    );
+    setItems(nextItems);
+    startTransition(async () => {
+      await persistAll(
+        enabled,
+        nextItems,
+        `Cleared cover photo for "${target.title}".`,
+      );
     });
   };
 
   const handleRestoreDefaults = () => {
-    const nextSettings: StudioServicesSettings = {
-      enabled: true,
-      items: buildDefaultStudioServices(studioName),
-    };
-    setDraft(nextSettings);
     startTransition(async () => {
-      await persistSettings(nextSettings, 'Restored default 6 studio services.');
+      const res = await resetServicesDefaults();
+      if (!res.ok || !res.data) {
+        onNotify('err', res.message || 'Unable to reset default services.');
+        return;
+      }
+      applyServerSnapshot(res.data);
+      onNotify('ok', 'Restored default 6 wedding services in database.');
     });
   };
 
-  const homeFeaturedIds = useMemo(() => {
-    const active = draft.items.filter((i) => i.isActive);
+  const homeFeaturedKeys = useMemo(() => {
+    const active = items.filter((i) => i.isActive);
     const chosen = active.filter((i) => i.showOnHome);
-    return new Set((chosen.length > 0 ? chosen : active).slice(0, 3).map((i) => i.id));
-  }, [draft.items]);
+    return new Set((chosen.length > 0 ? chosen : active).slice(0, 3).map((i) => i.localKey));
+  }, [items]);
 
   const pickerPublicIds = useMemo(() => {
     const set = new Set<string>();
-    const currentItem = draft.items.find((i) => i.id === pickerItemId);
-    const media = currentItem?.mediaId ? mediaById.get(currentItem.mediaId) : undefined;
-    if (media?.publicId) set.add(media.publicId);
+    const currentItem = items.find((i) => i.localKey === pickerItemKey);
+    if (currentItem?.imagePublicId) set.add(currentItem.imagePublicId);
     return set;
-  }, [draft.items, pickerItemId, mediaById]);
+  }, [items, pickerItemKey]);
 
   return (
     <div className="space-y-5">
@@ -507,31 +404,23 @@ export function ServicesShowcaseSetup({
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-base sm:text-lg font-semibold text-[var(--admin-text)]">
-              Studio Services Cards (3 on Homepage • Full Grid on All Services)
+              Studio Services Cards (Stored in DB • Isolated from Portfolio)
             </h2>
             <span
               className={cn(
                 'inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold',
-                draft.enabled
+                enabled
                   ? 'border-emerald-500/35 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300'
                   : 'border-amber-500/35 bg-amber-500/10 text-amber-700 dark:text-amber-300',
               )}
             >
-              {draft.enabled ? `${homeFeaturedIds.size} on Homepage` : 'Hidden'}
+              {enabled ? `${homeFeaturedKeys.size} on Homepage` : 'Hidden'}
             </span>
           </div>
           <p className="text-xs text-[var(--admin-muted)]">
-            Customize photos, titles, descriptions, order, and homepage selection. Clicking{' '}
-            <span className="font-semibold text-[var(--admin-text)]">See All Services</span> on
-            the homepage opens{' '}
-            <Link
-              href="/all-services"
-              target="_blank"
-              className="font-mono-code underline text-[var(--admin-accent)]"
-            >
-              /all-services
-            </Link>
-            .
+            Service photos upload directly into your isolated{' '}
+            <span className="font-mono-code text-[var(--admin-text)]">/services</span> folder and
+            will never show inside Client Portfolios or Gallery.
           </p>
         </div>
 
@@ -552,7 +441,7 @@ export function ServicesShowcaseSetup({
             onClick={handleToggleSectionEnabled}
             className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-xs font-semibold text-[var(--admin-text)] hover:bg-[var(--admin-surface-hover)] transition-colors cursor-pointer"
           >
-            {draft.enabled ? 'Hide Section' : 'Show Section'}
+            {enabled ? 'Hide Section' : 'Show Section'}
           </button>
 
           <button
@@ -582,33 +471,38 @@ export function ServicesShowcaseSetup({
 
       {/* Editable Cards Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {draft.items.map((item, idx) => {
-          const media = item.mediaId ? mediaById.get(item.mediaId) : undefined;
-          const thumbUrl = media ? getHeroSlideThumbUrl(media) : null;
-          const uploadState = itemUploads[item.id];
-          const isFeaturedHome = homeFeaturedIds.has(item.id);
+        {items.map((item, idx) => {
+          const thumbUrl = item.imageUrl
+            ? buildCloudinaryImageUrl(item.imageUrl, {
+                width: 640,
+                height: 440,
+                crop: 'fill',
+                quality: 'auto',
+              })
+            : null;
+          const uploadState = itemUploads[item.localKey];
+          const isFeaturedHome = homeFeaturedKeys.has(item.localKey);
 
           return (
             <div
-              key={item.id}
+              key={item.localKey}
               className={cn(
                 'admin-card p-4 flex flex-col justify-between gap-3.5',
                 !item.isActive && 'opacity-65',
               )}
             >
               <div className="space-y-3">
-                {/* Image Slot Preview & Direct Upload */}
                 <div className="relative aspect-[3/2] w-full rounded-xl overflow-hidden border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)]">
                   <input
                     ref={(el) => {
-                      fileInputsRef.current[item.id] = el;
+                      fileInputsRef.current[item.localKey] = el;
                     }}
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/avif,image/heic"
                     className="hidden"
                     onChange={(e) => {
                       const f = e.target.files?.[0];
-                      if (f) handleUploadPhoto(item.id, f);
+                      if (f) handleUploadPhoto(item.localKey, f);
                       e.target.value = '';
                     }}
                   />
@@ -624,12 +518,11 @@ export function ServicesShowcaseSetup({
                     <div className="flex h-full w-full flex-col items-center justify-center p-3 text-center">
                       <CameraIcon className="w-6 h-6 text-[var(--admin-muted)] mb-1" />
                       <span className="text-[11px] font-medium text-[var(--admin-muted)]">
-                        Auto-fallback photo (or pick/upload)
+                        Upload Service Photo
                       </span>
                     </div>
                   )}
 
-                  {/* Top Badges */}
                   <div className="absolute top-2 left-2 right-2 flex items-center justify-between gap-1.5">
                     <span className="rounded-full bg-black/75 px-2.5 py-0.5 text-[10px] font-semibold text-white">
                       #{idx + 1}
@@ -654,12 +547,11 @@ export function ServicesShowcaseSetup({
                   )}
                 </div>
 
-                {/* Image Action Buttons */}
                 <div className="flex flex-wrap items-center gap-1.5">
                   <button
                     type="button"
                     disabled={isPending}
-                    onClick={() => fileInputsRef.current[item.id]?.click()}
+                    onClick={() => fileInputsRef.current[item.localKey]?.click()}
                     className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-2.5 py-1.5 text-[11px] font-semibold text-[var(--admin-text)] hover:bg-[var(--admin-surface-hover)] cursor-pointer"
                   >
                     {thumbUrl ? 'Replace Photo' : 'Upload Photo'}
@@ -667,16 +559,16 @@ export function ServicesShowcaseSetup({
                   <button
                     type="button"
                     disabled={isPending}
-                    onClick={() => handleOpenPicker(item.id)}
+                    onClick={() => handleOpenPicker(item.localKey)}
                     className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-2.5 py-1.5 text-[11px] font-semibold text-[var(--admin-accent)] hover:bg-[var(--admin-surface-hover)] cursor-pointer"
                   >
                     Pick Gallery
                   </button>
-                  {item.mediaId && (
+                  {item.imageUrl && (
                     <button
                       type="button"
                       disabled={isPending}
-                      onClick={() => handleClearPhoto(item.id)}
+                      onClick={() => handleClearPhoto(item.localKey)}
                       className="rounded-lg px-2 py-1.5 text-[11px] font-medium text-rose-500 hover:bg-rose-500/10 cursor-pointer"
                     >
                       Clear
@@ -684,7 +576,6 @@ export function ServicesShowcaseSetup({
                   )}
                 </div>
 
-                {/* Title & Description Inputs */}
                 <div className="space-y-2">
                   <div>
                     <label className="block text-[10.5px] font-semibold uppercase tracking-wider text-[var(--admin-muted)] mb-1">
@@ -693,10 +584,10 @@ export function ServicesShowcaseSetup({
                     <input
                       type="text"
                       value={item.title}
-                      maxLength={90}
-                      onChange={(e) => updateItemField(item.id, 'title', e.target.value)}
+                      maxLength={120}
+                      onChange={(e) => updateItemField(item.localKey, 'title', e.target.value)}
                       placeholder="e.g. Wedding Photography"
-                      className="w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-xs sm:text-sm font-semibold text-[var(--admin-text)] focus:outline-none focus:border-[var(--admin-accent)]"
+                      className="w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-input)] px-3 py-2 text-xs sm:text-sm font-semibold text-[var(--admin-text)] focus:outline-none focus:border-[var(--admin-accent)]"
                     />
                   </div>
                   <div>
@@ -706,23 +597,26 @@ export function ServicesShowcaseSetup({
                     <textarea
                       rows={3}
                       value={item.description}
-                      maxLength={420}
-                      onChange={(e) => updateItemField(item.id, 'description', e.target.value)}
+                      maxLength={600}
+                      onChange={(e) =>
+                        updateItemField(item.localKey, 'description', e.target.value)
+                      }
                       placeholder="Describe what families & couples receive with this service..."
-                      className="w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-xs text-[var(--admin-text)] leading-relaxed focus:outline-none focus:border-[var(--admin-accent)] resize-none"
+                      className="w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-input)] px-3 py-2 text-xs text-[var(--admin-text)] leading-relaxed focus:outline-none focus:border-[var(--admin-accent)] resize-none"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Card Bottom Controls */}
               <div className="pt-2.5 border-t border-[var(--admin-border-subtle)] flex items-center justify-between gap-2 text-[11px]">
                 <div className="flex items-center gap-3">
                   <label className="inline-flex items-center gap-1.5 cursor-pointer text-[var(--admin-text)] font-medium">
                     <input
                       type="checkbox"
                       checked={item.showOnHome}
-                      onChange={(e) => updateItemField(item.id, 'showOnHome', e.target.checked)}
+                      onChange={(e) =>
+                        updateItemField(item.localKey, 'showOnHome', e.target.checked)
+                      }
                       className="h-3.5 w-3.5 accent-[var(--admin-accent)]"
                     />
                     <span>Show on Home</span>
@@ -731,7 +625,9 @@ export function ServicesShowcaseSetup({
                     <input
                       type="checkbox"
                       checked={item.isActive}
-                      onChange={(e) => updateItemField(item.id, 'isActive', e.target.checked)}
+                      onChange={(e) =>
+                        updateItemField(item.localKey, 'isActive', e.target.checked)
+                      }
                       className="h-3.5 w-3.5 accent-[var(--admin-accent)]"
                     />
                     <span>Active</span>
@@ -753,7 +649,7 @@ export function ServicesShowcaseSetup({
                   <button
                     type="button"
                     onClick={() => moveItem(idx, 1)}
-                    disabled={idx === draft.items.length - 1}
+                    disabled={idx === items.length - 1}
                     aria-label="Move service later"
                     className="rounded-lg border border-[var(--admin-border)] p-1 text-[var(--admin-muted)] hover:text-[var(--admin-text)] disabled:opacity-35 cursor-pointer"
                   >
@@ -764,7 +660,7 @@ export function ServicesShowcaseSetup({
                   <button
                     type="button"
                     disabled={isPending}
-                    onClick={() => removeServiceItem(item.id)}
+                    onClick={() => removeServiceItem(item.localKey)}
                     className="rounded-lg px-2 py-1 font-medium text-rose-500 hover:bg-rose-500/10 cursor-pointer"
                   >
                     Delete
@@ -794,10 +690,10 @@ export function ServicesShowcaseSetup({
       </div>
 
       <StudioGalleryPickerModal
-        open={pickerItemId !== null}
-        onClose={() => setPickerItemId(null)}
-        title="Pick Service Cover Photo"
-        subtitle="Select a landscape wedding, ceremony, or portrait photograph from the Studio Gallery."
+        open={pickerItemKey !== null}
+        onClose={() => setPickerItemKey(null)}
+        title="Pick Existing Gallery Photo"
+        subtitle="Optionally reuse an existing Studio Gallery image (prefer Upload Photo above for isolated service covers)."
         actionLabel="Use Photo"
         activeLabel="Current"
         galleryImages={galleryPool}

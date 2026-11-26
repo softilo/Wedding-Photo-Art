@@ -9,6 +9,7 @@ import {
   PortfolioMediaItem,
   PortfolioShowcaseEvent,
   PublicBranding,
+  PublicServicesResponse,
   StudioPackage,
 } from '@/types/event-management';
 import { isSystemPortfolioEventSlug } from '@/lib/heroSlider';
@@ -41,7 +42,7 @@ interface PublicAgencyHomeProps {
   portfolioEvents?: PortfolioShowcaseEvent[];
   heroEvent?: PortfolioShowcaseEvent | null;
   editorialGridEvent?: PortfolioShowcaseEvent | null;
-  servicesEvent?: PortfolioShowcaseEvent | null;
+  servicesShowcase?: PublicServicesResponse | null;
   galleryImages?: PortfolioMediaItem[];
   reviews?: ClientReview[];
   isBackendConnected: boolean;
@@ -55,7 +56,7 @@ export function PublicAgencyHome({
   portfolio,
   portfolioEvents = [],
   heroEvent = null,
-  servicesEvent = null,
+  servicesShowcase = null,
   galleryImages = [],
   reviews = [],
   isBackendConnected,
@@ -189,10 +190,7 @@ export function PublicAgencyHome({
       ===================================================================== */}
       <PublicServicesSection
         branding={branding}
-        servicesEvent={servicesEvent}
-        portfolioEvents={allClientPortfolios}
-        galleryImages={galleryImages}
-        legacyPortfolio={portfolio}
+        servicesShowcase={servicesShowcase}
         variant="home"
       />
 

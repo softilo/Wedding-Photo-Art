@@ -853,3 +853,75 @@ export interface AdminReviewsListResponse {
   uploadStatus: CloudinaryStatusSummary;
 }
 
+export interface StudioServiceRecord {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string | null;
+  imageAssetId: string | null;
+  imagePublicId: string | null;
+  imageFormat: string | null;
+  imageBytes: number | null;
+  imageWidth: number | null;
+  imageHeight: number | null;
+  deliveryUrls: PortfolioMediaDeliveryUrls | null;
+  showOnHome: boolean;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PublicServicesResponse {
+  enabled: boolean;
+  items: StudioServiceRecord[];
+}
+
+export interface AdminServicesResponse extends PublicServicesResponse {
+  uploadStatus: CloudinaryStatusSummary;
+}
+
+export interface StudioAboutProfileRecord {
+  storyEyebrow: string;
+  storyTitle: string;
+  storyLead: string;
+  storyBody: string;
+  servicesSectionEnabled?: boolean;
+  updatedAt?: string;
+}
+
+export interface StudioTeamMemberRecord {
+  id: string;
+  name: string;
+  subtitle: string | null;
+  role: string;
+  specialty: string;
+  bio: string;
+  quote: string | null;
+  phone: string | null;
+  instagram: string | null;
+  location: string | null;
+  isFeatured: boolean;
+  imageUrl: string | null;
+  imageAssetId: string | null;
+  imagePublicId: string | null;
+  imageFormat: string | null;
+  imageBytes: number | null;
+  imageWidth: number | null;
+  imageHeight: number | null;
+  deliveryUrls: PortfolioMediaDeliveryUrls | null;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PublicAboutTeamResponse {
+  profile: StudioAboutProfileRecord;
+  members: StudioTeamMemberRecord[];
+}
+
+export interface AdminAboutTeamResponse extends PublicAboutTeamResponse {
+  uploadStatus: CloudinaryStatusSummary;
+}
+

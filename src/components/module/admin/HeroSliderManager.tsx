@@ -3,6 +3,8 @@
 import React, { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
 import {
+  AdminAboutTeamResponse,
+  AdminServicesResponse,
   CloudinaryStatusSummary,
   PortfolioMediaItem,
   PortfolioShowcaseEvent,
@@ -48,15 +50,13 @@ import {
 import { AboutTeamSetup } from './AboutTeamSetup';
 import { ServicesShowcaseSetup } from './ServicesShowcaseSetup';
 import { StudioGalleryPickerModal } from './StudioGalleryPickerModal';
-import { parseAboutTeamSettings } from '@/lib/studioAboutTeam';
-import { parseStudioServicesSettings } from '@/lib/studioServices';
 
 type SetupSectionTab = 'hero' | 'services' | 'about';
 
 interface HeroSliderManagerProps {
   initialHeroEvent: PortfolioShowcaseEvent | null;
-  initialServicesEvent?: PortfolioShowcaseEvent | null;
-  initialAboutTeamEvent?: PortfolioShowcaseEvent | null;
+  initialServicesData?: AdminServicesResponse | null;
+  initialAboutTeamData?: AdminAboutTeamResponse | null;
   galleryImages: PortfolioMediaItem[];
   cloudinaryStatus: CloudinaryStatusSummary | null;
   studioName: string;
@@ -93,19 +93,19 @@ const SPEED_OPTIONS: Array<{ value: HeroSlideSpeed; label: string; hint: string 
 
 export function HeroSliderManager({
   initialHeroEvent,
-  initialServicesEvent = null,
-  initialAboutTeamEvent = null,
+  initialServicesData = null,
+  initialAboutTeamData = null,
   galleryImages,
   cloudinaryStatus,
   studioName,
 }: HeroSliderManagerProps) {
   const [activeTab, setActiveTab] = useState<SetupSectionTab>('hero');
   const [heroEvent, setHeroEvent] = useState<PortfolioShowcaseEvent | null>(initialHeroEvent);
-  const [servicesEventState, setServicesEventState] = useState<PortfolioShowcaseEvent | null>(
-    initialServicesEvent,
+  const [servicesDataState, setServicesDataState] = useState<AdminServicesResponse | null>(
+    initialServicesData,
   );
-  const [aboutTeamEventState, setAboutTeamEventState] = useState<PortfolioShowcaseEvent | null>(
-    initialAboutTeamEvent,
+  const [aboutTeamDataState, setAboutTeamDataState] = useState<AdminAboutTeamResponse | null>(
+    initialAboutTeamData,
   );
   const [galleryPool, setGalleryPool] = useState<PortfolioMediaItem[]>(galleryImages);
   const [settingsDraft, setSettingsDraft] = useState<HeroSliderSettings>(() =>
@@ -159,16 +159,6 @@ export function HeroSliderManager({
   const existingHeroPublicIds = useMemo(
     () => new Set(orderedSlides.map((m) => m.publicId)),
     [orderedSlides],
-  );
-
-  const servicesSettings = useMemo(
-    () => parseStudioServicesSettings(servicesEventState?.description, studioName),
-    [servicesEventState?.description, studioName],
-  );
-
-  const aboutTeamSettings = useMemo(
-    () => parseAboutTeamSettings(aboutTeamEventState?.description, studioName),
-    [aboutTeamEventState?.description, studioName],
   );
 
   const previewSlots =
@@ -639,7 +629,7 @@ export function HeroSliderManager({
               <span
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold',
-                  servicesSettings.enabled
+                  (servicesDataState?.enabled ?? true)
                     ? 'border-emerald-500/35 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300'
                     : 'border-amber-500/35 bg-amber-500/10 text-amber-700 dark:text-amber-300',
                 )}
@@ -647,17 +637,17 @@ export function HeroSliderManager({
                 <span
                   className={cn(
                     'h-1.5 w-1.5 rounded-full',
-                    servicesSettings.enabled ? 'bg-emerald-500' : 'bg-amber-500',
+                    (servicesDataState?.enabled ?? true) ? 'bg-emerald-500' : 'bg-amber-500',
                   )}
                 />
-                {servicesSettings.enabled
-                  ? `${servicesSettings.items.filter((i) => i.isActive).length} Active Services`
+                {(servicesDataState?.enabled ?? true)
+                  ? `${(servicesDataState?.items || []).filter((i) => i.isActive).length} Active Services`
                   : 'Services Hidden'}
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/35 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                {aboutTeamSettings.members.filter((m) => m.isActive).length} Team Profiles
+                {(aboutTeamDataState?.members || []).filter((m) => m.isActive).length} Team Profiles
               </span>
             )}
           </div>
@@ -775,7 +765,7 @@ export function HeroSliderManager({
             </div>
           </div>
           <span className="font-mono-code text-xs font-bold text-[var(--admin-muted)] shrink-0">
-            {servicesSettings.items.filter((i) => i.isActive).length} items
+            {(servicesDataState?.items || []).filter((i) => i.isActive).length} items
           </span>
         </button>
 
@@ -813,7 +803,7 @@ export function HeroSliderManager({
             </div>
           </div>
           <span className="font-mono-code text-xs font-bold text-[var(--admin-muted)] shrink-0">
-            {aboutTeamSettings.members.filter((m) => m.isActive).length} team
+            {(aboutTeamDataState?.members || []).filter((m) => m.isActive).length} team
           </span>
         </button>
       </div>
@@ -852,21 +842,21 @@ export function HeroSliderManager({
 
       {activeTab === 'services' ? (
         <ServicesShowcaseSetup
-          initialServicesEvent={servicesEventState}
+          initialServicesData={servicesDataState}
           galleryPool={galleryPool}
           onGalleryPoolUpdate={setGalleryPool}
           studioName={studioName}
           onNotify={notify}
-          onServicesEventChange={setServicesEventState}
+          onServicesDataChange={setServicesDataState}
         />
       ) : activeTab === 'about' ? (
         <AboutTeamSetup
-          initialAboutTeamEvent={aboutTeamEventState}
+          initialAboutTeamData={aboutTeamDataState}
           galleryPool={galleryPool}
           onGalleryPoolUpdate={setGalleryPool}
           studioName={studioName}
           onNotify={notify}
-          onAboutTeamEventChange={setAboutTeamEventState}
+          onAboutTeamDataChange={setAboutTeamDataState}
         />
       ) : (
         <>

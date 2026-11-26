@@ -35,7 +35,7 @@ async function RootStorefrontContent() {
     portfolioEvents,
     heroEvent,
     editorialGridEvent,
-    servicesEvent,
+    servicesShowcase,
     galleryImages,
     reviews,
     isBackendConnected,
@@ -60,7 +60,7 @@ async function RootStorefrontContent() {
         portfolioEvents={portfolioEvents}
         heroEvent={heroEvent}
         editorialGridEvent={editorialGridEvent}
-        servicesEvent={servicesEvent}
+        servicesShowcase={servicesShowcase}
         galleryImages={galleryImages}
         reviews={reviews}
         isBackendConnected={isBackendConnected}

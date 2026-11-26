@@ -2,12 +2,14 @@ import React, { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { getMe } from '@/service/auth';
 import {
-  getAdminAboutTeamEvent,
   getAdminHeroSliderEvent,
-  getAdminServicesShowcaseEvent,
   getGalleryStatus,
   listGalleryMedia,
 } from '@/service/catalog/catalog.service';
+import {
+  getAdminAboutTeamShowcase,
+  getAdminServicesShowcase,
+} from '@/service/studio-content/studio-content.service';
 import { HeroSliderManager } from '@/components/module/admin/HeroSliderManager';
 import { PageSkeleton } from '@/components/shared/PageSkeleton';
 
@@ -18,14 +20,14 @@ async function AdminHeroContent() {
 
   const [
     heroEventRes,
-    servicesEventRes,
-    aboutTeamEventRes,
+    servicesRes,
+    aboutTeamRes,
     galleryRes,
     statusRes,
   ] = await Promise.all([
     getAdminHeroSliderEvent(),
-    getAdminServicesShowcaseEvent(),
-    getAdminAboutTeamEvent(),
+    getAdminServicesShowcase(),
+    getAdminAboutTeamShowcase(),
     listGalleryMedia('IMAGE'),
     getGalleryStatus(),
   ]);
@@ -33,8 +35,8 @@ async function AdminHeroContent() {
   return (
     <HeroSliderManager
       initialHeroEvent={heroEventRes.ok ? (heroEventRes.data ?? null) : null}
-      initialServicesEvent={servicesEventRes.ok ? (servicesEventRes.data ?? null) : null}
-      initialAboutTeamEvent={aboutTeamEventRes.ok ? (aboutTeamEventRes.data ?? null) : null}
+      initialServicesData={servicesRes.ok ? (servicesRes.data ?? null) : null}
+      initialAboutTeamData={aboutTeamRes.ok ? (aboutTeamRes.data ?? null) : null}
       galleryImages={galleryRes.ok && galleryRes.data ? galleryRes.data.data : []}
       cloudinaryStatus={statusRes.ok && statusRes.data ? statusRes.data : null}
       studioName={session.studioName || 'Wedding PhotoArt'}
