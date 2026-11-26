@@ -1248,13 +1248,14 @@ export function PortfolioEventManager({
                       {copiedLink === 'msg' ? 'Copied Message ✓' : 'Copy WhatsApp Text'}
                     </button>
                     {selectedEvent.status === 'PUBLISHED' && (
-                      <Link
+                      <a
                         href={`/album/${selectedEvent.slug}`}
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-700 transition-colors"
                       >
                         Open Page ↗
-                      </Link>
+                      </a>
                     )}
                   </div>
                 </div>

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState, useTransition } from 'react';
-import Link from 'next/link';
 import {
   AdminAboutTeamResponse,
   AdminServicesResponse,
@@ -658,15 +657,15 @@ export function HeroSliderManager({
         </div>
 
         <div className="flex flex-wrap items-center gap-2 shrink-0">
-          <Link
-            href="/"
+          <a
+            href="/?external=1"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-2 text-xs font-semibold text-[var(--admin-text)] hover:bg-[var(--admin-surface-hover)] transition-colors"
           >
             <span>View Live Homepage</span>
             <ExternalLinkIcon className="w-3.5 h-3.5" />
-          </Link>
+          </a>
           {activeTab === 'hero' && (
             <>
               <button

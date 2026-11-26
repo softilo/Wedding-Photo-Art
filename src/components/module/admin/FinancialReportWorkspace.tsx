@@ -675,99 +675,99 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
       </div>
 
       {/* 4 Calm Soft-Surface Profit Equation KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="admin-card p-4 sm:p-5 space-y-2">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="admin-card p-3.5 sm:p-5 space-y-1.5 sm:space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-[var(--admin-muted)]">
+            <span className="inline-flex items-center gap-1.5 text-[11.5px] sm:text-[12.5px] font-medium text-[var(--admin-muted)]">
               <span className="h-[7px] w-[7px] rounded-full bg-emerald-500 shrink-0" />
-              <span>Net Collected (+)</span>
+              <span className="truncate">Net Collected</span>
             </span>
-            <span className="font-mono-code text-[11px] font-medium text-[var(--admin-muted)] tabular-nums">
-              {summary.collectionRatePercent.toFixed(0)}% rate
+            <span className="font-mono-code text-[10.5px] sm:text-[11px] font-medium text-[var(--admin-muted)] tabular-nums shrink-0">
+              {summary.collectionRatePercent.toFixed(0)}%
             </span>
           </div>
-          <p className="font-mono-code text-[22px] font-semibold tracking-tight text-[var(--admin-text)] tabular-nums">
+          <p className="font-mono-code text-lg sm:text-[22px] font-semibold tracking-tight text-[var(--admin-text)] tabular-nums truncate">
             {formatPoisha(summary.netCollectedRevenuePoisha, currency)}
           </p>
-          <p className="admin-meta tabular-nums truncate">
+          <p className="admin-meta tabular-nums truncate hidden sm:block">
             Verified receipts minus refunds
           </p>
         </div>
 
-        <div className="admin-card p-4 sm:p-5 space-y-2">
+        <div className="admin-card p-3.5 sm:p-5 space-y-1.5 sm:space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-[var(--admin-muted)]">
+            <span className="inline-flex items-center gap-1.5 text-[11.5px] sm:text-[12.5px] font-medium text-[var(--admin-muted)]">
               <span className="h-[7px] w-[7px] rounded-full bg-rose-400 shrink-0" />
-              <span>Studio Expenses (−)</span>
+              <span className="truncate">Expenses (−)</span>
             </span>
-            <span className="font-mono-code text-[11px] font-medium text-[var(--admin-muted)] tabular-nums">
-              {summary.expensesCount} entries
+            <span className="font-mono-code text-[10.5px] sm:text-[11px] font-medium text-[var(--admin-muted)] tabular-nums shrink-0">
+              {summary.expensesCount}
             </span>
           </div>
-          <p className="font-mono-code text-[22px] font-semibold tracking-tight text-[var(--admin-text)] tabular-nums">
+          <p className="font-mono-code text-lg sm:text-[22px] font-semibold tracking-tight text-[var(--admin-text)] tabular-nums truncate">
             {formatPoisha(totalExpensesPoisha, currency)}
           </p>
-          <p className="admin-meta tabular-nums truncate">
+          <p className="admin-meta tabular-nums truncate hidden sm:block">
             Event: {formatPoisha(summary.directBookingExpensesPoisha ?? 0, currency)} • Overhead:{' '}
             {formatPoisha(summary.generalOverheadExpensesPoisha ?? 0, currency)}
           </p>
         </div>
 
-        <div className="admin-card p-4 sm:p-5 space-y-2 border-[var(--admin-accent)]/35">
+        <div className="admin-card p-3.5 sm:p-5 space-y-1.5 sm:space-y-2 border-[var(--admin-accent)]/35">
           <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-[var(--admin-text)]">
+            <span className="inline-flex items-center gap-1.5 text-[11.5px] sm:text-[12.5px] font-medium text-[var(--admin-text)]">
               <span
                 className={cn(
                   'h-[7px] w-[7px] rounded-full shrink-0',
                   netCashProfitPoisha >= 0 ? 'bg-emerald-500' : 'bg-rose-400',
                 )}
               />
-              <span>Net Cash Profit (=)</span>
+              <span className="truncate">Net Profit</span>
             </span>
             <span
               className={cn(
-                'font-mono-code rounded-md px-2 py-0.5 text-[11px] font-medium tabular-nums',
+                'font-mono-code rounded-md px-1.5 sm:px-2 py-0.5 text-[10.5px] sm:text-[11px] font-medium tabular-nums shrink-0',
                 netCashProfitPoisha >= 0
                   ? 'bg-emerald-50 text-emerald-700'
                   : 'bg-rose-50 text-rose-700',
               )}
             >
-              {(summary.profitMarginPercent ?? 0).toFixed(1)}% margin
+              {(summary.profitMarginPercent ?? 0).toFixed(1)}%
             </span>
           </div>
           <p
             className={cn(
-              'font-mono-code text-[22px] font-semibold tracking-tight tabular-nums',
+              'font-mono-code text-lg sm:text-[22px] font-semibold tracking-tight tabular-nums truncate',
               netCashProfitPoisha >= 0 ? 'text-emerald-700' : 'text-rose-700',
             )}
           >
             {formatPoisha(netCashProfitPoisha, currency)}
           </p>
-          <p className="admin-meta truncate">Actual cash surplus after expenses</p>
+          <p className="admin-meta truncate hidden sm:block">Actual cash surplus after expenses</p>
         </div>
 
-        <div className="admin-card p-4 sm:p-5 space-y-2">
+        <div className="admin-card p-3.5 sm:p-5 space-y-1.5 sm:space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-[var(--admin-muted)]">
+            <span className="inline-flex items-center gap-1.5 text-[11.5px] sm:text-[12.5px] font-medium text-[var(--admin-muted)]">
               <span className="h-[7px] w-[7px] rounded-full bg-[#CAA650] shrink-0" />
-              <span>Projected Profit</span>
+              <span className="truncate">Projected</span>
             </span>
-            <span className="font-mono-code text-[11px] font-medium text-[var(--admin-muted)] tabular-nums">
+            <span className="font-mono-code text-[10.5px] sm:text-[11px] font-medium text-[var(--admin-muted)] tabular-nums shrink-0">
               {summary.bookingsWithDueCount} due
             </span>
           </div>
-          <p className="font-mono-code text-[22px] font-semibold tracking-tight text-[var(--admin-text)] tabular-nums">
+          <p className="font-mono-code text-lg sm:text-[22px] font-semibold tracking-tight text-[var(--admin-text)] tabular-nums truncate">
             {formatPoisha(projectedNetProfitPoisha, currency)}
           </p>
-          <p className="admin-meta tabular-nums truncate">
+          <p className="admin-meta tabular-nums truncate hidden sm:block">
             Incl. {formatPoisha(summary.totalOutstandingDuePoisha, currency)} client due
           </p>
         </div>
       </div>
 
       {/* Compact Unified Filter Strip */}
-      <div className="admin-card px-4 py-3 flex flex-col xl:flex-row xl:items-center justify-between gap-3 print:hidden">
-        <div className="inline-flex flex-wrap rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-1 gap-1 self-start">
+      <div className="admin-card px-3.5 sm:px-4 py-3 flex flex-col xl:flex-row xl:items-center justify-between gap-3 print:hidden">
+        <div className="flex items-center overflow-x-auto no-scrollbar max-w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-1 gap-1 self-start">
           {[
             { id: 'ALL' as const, label: 'All Time' },
             { id: 'THIS_MONTH' as const, label: 'This Month' },
@@ -871,7 +871,7 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
 
       {/* 5 Clean Category Tabs */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="inline-flex flex-wrap rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-1 gap-1">
+        <div className="flex items-center overflow-x-auto no-scrollbar max-w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-1 gap-1">
           {[
             { id: 'overview' as const, label: 'Overview & Charts' },
             { id: 'breakdown' as const, label: 'Channels & Costs' },
@@ -1668,8 +1668,8 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
 
       {/* RECORD EXPENSE MODAL */}
       {showExpenseModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1020]/55 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-xl rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-5 sm:p-6 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#0B1020]/55 p-0 sm:p-4 backdrop-blur-xs admin-sheet-fade">
+          <div className="w-full sm:max-w-xl rounded-t-3xl sm:rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 max-h-[92dvh] overflow-y-auto space-y-4 admin-sheet-up">
             <div className="flex items-start justify-between gap-3 border-b border-[var(--admin-border)] pb-3">
               <div>
                 <h2 className="admin-section-title">Record Studio or Event Expense</h2>

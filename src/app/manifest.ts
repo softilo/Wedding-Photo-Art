@@ -3,10 +3,12 @@ import { STUDIO_PROFILE } from '@/lib/publicStorefront';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${STUDIO_PROFILE.name} — Wedding Photography & Cinematography`,
+    id: '/login',
+    name: `${STUDIO_PROFILE.name} — Studio App`,
     short_name: STUDIO_PROFILE.name,
     description: STUDIO_PROFILE.description,
     start_url: '/login',
+    scope: '/',
     display: 'standalone',
     background_color: '#F9F8F5',
     theme_color: '#8B6A21',

@@ -69,6 +69,11 @@ export function buildRootMetadata(): Metadata {
     },
     description: defaultDesc,
     applicationName: STUDIO_PROFILE.name,
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: 'default',
+      title: STUDIO_PROFILE.name,
+    },
     keywords: STUDIO_SEO_KEYWORDS,
     authors: [{ name: STUDIO_PROFILE.name, url: siteUrl }],
     creator: STUDIO_PROFILE.name,

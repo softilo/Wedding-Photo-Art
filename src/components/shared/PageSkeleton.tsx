@@ -778,30 +778,33 @@ export function PageSkeleton({
         className="min-h-screen flex items-center justify-center bg-[#F9F8F5] px-4 py-12"
       >
         <span className="sr-only">{label}</span>
-        <div className="w-full max-w-4xl grid lg:grid-cols-12 atelier-card overflow-hidden bg-white shadow-[0_28px_64px_-24px_rgba(24,22,17,0.16)]">
-          <div className="lg:col-span-5 bg-[#14120E] p-8 sm:p-9 flex flex-col justify-between space-y-8">
+        <div className="w-full max-w-4xl grid lg:grid-cols-12 rounded-3xl lg:rounded-[1.125rem] border border-[#e5dfd0] overflow-hidden bg-white shadow-[0_24px_60px_-24px_rgba(24,22,17,0.16)]">
+          <div className="lg:col-span-5 bg-[#14120E] p-5 sm:p-8 lg:p-9 flex flex-col justify-between lg:space-y-8">
             <div className="space-y-6">
-              <div className="flex items-center gap-3.5">
-                <div className="h-14 w-14 rounded-2xl skeleton-bone-dark border border-[#CAA650]/40" />
-                <div className="space-y-1.5">
-                  <div className="h-5 w-36 rounded-md skeleton-bone-dark" />
-                  <div className="h-3 w-24 rounded-md skeleton-bone-dark" />
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="h-11 w-11 rounded-xl skeleton-bone-dark border border-[#CAA650]/40" />
+                  <div className="space-y-1.5">
+                    <div className="h-5 w-32 rounded-md skeleton-bone-dark" />
+                    <div className="h-2.5 w-20 rounded-md skeleton-bone-dark" />
+                  </div>
                 </div>
+                <div className="lg:hidden h-6 w-20 rounded-full skeleton-bone-dark" />
               </div>
-              <div className="space-y-3">
+              <div className="hidden lg:block space-y-3">
                 <div className="h-3 w-28 rounded-md skeleton-bone-dark" />
                 <div className="h-9 w-40 rounded-lg skeleton-bone-dark" />
                 <div className="h-3.5 w-full rounded-md skeleton-bone-dark" />
                 <div className="h-3.5 w-5/6 rounded-md skeleton-bone-dark" />
               </div>
             </div>
-            <div className="pt-6 border-t border-white/10 space-y-2">
+            <div className="hidden lg:block pt-6 border-t border-white/10 space-y-2">
               <div className="h-3.5 w-36 rounded-md skeleton-bone-dark" />
               <div className="h-3 w-full rounded-md skeleton-bone-dark" />
             </div>
           </div>
 
-          <div className="lg:col-span-7 p-8 sm:p-10 space-y-5">
+          <div className="lg:col-span-7 p-5 sm:p-8 lg:p-10 space-y-5">
             <div className="space-y-2">
               <div className="h-8 w-28 rounded-lg skeleton-bone" />
               <div className="h-4 w-72 max-w-full rounded-md skeleton-bone" />
@@ -861,13 +864,21 @@ export function PageSkeleton({
           <div className="h-14 border-b border-[var(--admin-border)] bg-[var(--admin-header)] px-4 sm:px-6 flex items-center justify-between">
             <div className="h-4 w-32 rounded-md skeleton-bone" />
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg skeleton-bone" />
-              <div className="h-8 w-24 rounded-lg skeleton-bone" />
+              <div className="h-8 w-8 rounded-full sm:rounded-lg skeleton-bone" />
+              <div className="h-8 w-8 sm:w-24 rounded-full sm:rounded-lg skeleton-bone" />
               <div className="hidden sm:block h-8 w-24 rounded-lg skeleton-bone" />
             </div>
           </div>
-          <div className="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto">
+          <div className="flex-1 p-3.5 sm:p-6 pb-24 lg:pb-6 max-w-7xl w-full mx-auto">
             <AdminOverviewSkeletonBody />
+          </div>
+          <div className="lg:hidden fixed bottom-0 inset-x-0 h-16 border-t border-[var(--admin-border)] bg-[var(--admin-header)] px-3 grid grid-cols-5 items-center gap-2">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex flex-col items-center gap-1">
+                <div className="h-6 w-10 rounded-full skeleton-bone" />
+                <div className="h-2.5 w-10 rounded skeleton-bone" />
+              </div>
+            ))}
           </div>
         </div>
       </div>

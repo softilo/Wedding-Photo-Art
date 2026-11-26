@@ -487,7 +487,7 @@ export function AdminOverview({
               </div>
             </div>
 
-            <div className="inline-flex flex-wrap rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-1 gap-1">
+            <div className="flex items-center overflow-x-auto no-scrollbar max-w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-1 gap-1">
               {[
                 {
                   id: 'payments' as const,
@@ -519,7 +519,7 @@ export function AdminOverview({
                   type="button"
                   onClick={() => setAlertTab(t.id)}
                   className={cn(
-                    'inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer tabular-nums',
+                    'inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 sm:py-1 text-xs font-medium whitespace-nowrap shrink-0 transition-colors cursor-pointer tabular-nums',
                     alertTab === t.id
                       ? 'bg-[var(--admin-surface)] text-[var(--admin-text)] border border-[var(--admin-border)]'
                       : 'text-[var(--admin-muted)] hover:text-[var(--admin-text)]',

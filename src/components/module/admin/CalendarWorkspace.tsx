@@ -783,8 +783,8 @@ export function CalendarWorkspace({
 
       {/* Modal: Google Calendar Sync */}
       {activePanel === 'google' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 shadow-xl space-y-5">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/50 p-0 sm:p-4 backdrop-blur-xs admin-sheet-fade">
+          <div className="w-full sm:max-w-2xl rounded-t-3xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 max-h-[90dvh] overflow-y-auto shadow-xl space-y-5 admin-sheet-up">
             <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-3">
               <div>
                 <h2 className="text-base font-bold tracking-tight text-slate-900">
@@ -878,10 +878,10 @@ export function CalendarWorkspace({
 
       {/* Modal: Schedule Event Form */}
       {activePanel === 'schedule' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-xs overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/50 p-0 sm:p-4 backdrop-blur-xs overflow-y-auto admin-sheet-fade">
           <form
             onSubmit={handleCreateSession}
-            className="w-full max-w-xl rounded-2xl border border-slate-200 bg-white p-6 shadow-xl space-y-4 my-8"
+            className="w-full sm:max-w-xl rounded-t-3xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 max-h-[92dvh] overflow-y-auto shadow-xl space-y-4 sm:my-8 admin-sheet-up"
           >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
@@ -1157,17 +1157,17 @@ export function CalendarWorkspace({
       )}
 
       {/* Main Calendar Workspace Card */}
-      <div className="atelier-card p-6 space-y-5">
+      <div className="atelier-card p-3.5 sm:p-6 space-y-4 sm:space-y-5">
         {/* Toolbar: View Tabs + Search + Filters + Date Range */}
         <div className="flex flex-col gap-3 border-b border-slate-100 pb-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             {/* View Mode Tabs */}
-            <div className="inline-flex rounded-xl bg-slate-100 p-1">
+            <div className="grid grid-cols-3 w-full sm:w-auto sm:inline-flex rounded-xl bg-slate-100 p-1 gap-1">
               {(
                 [
-                  { id: 'month', label: 'Month Calendar' },
-                  { id: 'agenda', label: 'Agenda List' },
-                  { id: 'resources', label: 'By Crew & Gear' },
+                  { id: 'month', label: 'Month' },
+                  { id: 'agenda', label: 'Agenda' },
+                  { id: 'resources', label: 'Crew & Gear' },
                 ] as const
               ).map((tab) => (
                 <button
@@ -1175,7 +1175,7 @@ export function CalendarWorkspace({
                   type="button"
                   onClick={() => setViewMode(tab.id)}
                   className={cn(
-                    'rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors',
+                    'rounded-lg px-2.5 sm:px-3 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap text-center cursor-pointer',
                     viewMode === tab.id
                       ? 'bg-white text-slate-900 shadow-xs'
                       : 'text-slate-600 hover:text-slate-900',
@@ -1317,121 +1317,135 @@ export function CalendarWorkspace({
               </div>
             </div>
 
-            <div className="overflow-x-auto">
-              <div className="min-w-[680px] rounded-xl border border-slate-200 overflow-hidden">
-                <div className="grid grid-cols-7 bg-slate-50 border-b border-slate-200">
-                  {WEEKDAYS.map((day) => (
+            <div className="rounded-xl border border-slate-200 overflow-hidden">
+              <div className="grid grid-cols-7 bg-slate-50 border-b border-slate-200">
+                {WEEKDAYS.map((day) => (
+                  <div
+                    key={day}
+                    className="px-1 md:px-2.5 py-2 text-center text-[11px] md:text-xs font-semibold uppercase tracking-wider text-slate-500"
+                  >
+                    <span className="md:hidden">{day.slice(0, 1)}</span>
+                    <span className="hidden md:inline">{day}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7 divide-x divide-y divide-slate-200 bg-[var(--admin-surface)]">
+                {monthGridCells.map((cell) => {
+                  const isToday = cell.ymd === todayIso;
+                  const isSelected = cell.ymd === selectedDay;
+                  const hasSessions = cell.items.length > 0;
+                  const allCompleted =
+                    hasSessions && cell.items.every((s) => s.status === 'COMPLETED');
+
+                  return (
                     <div
-                      key={day}
-                      className="px-2.5 py-2 text-center text-xs font-semibold uppercase tracking-wider text-slate-500"
+                      key={cell.ymd}
+                      onClick={() => setSelectedDay(cell.ymd)}
+                      className={cn(
+                        'relative min-h-[60px] md:min-h-[110px] p-1 md:p-2 cursor-pointer transition-all flex flex-col justify-between md:justify-start gap-1 md:gap-1.5 active:scale-[0.97] md:active:scale-100',
+                        hasSessions
+                          ? allCompleted
+                            ? 'bg-emerald-500/12 hover:bg-emerald-500/18 shadow-[inset_0_3px_0_0_#10b981]'
+                            : 'bg-[var(--admin-accent-soft)] hover:bg-[var(--admin-accent)]/25 shadow-[inset_0_3px_0_0_var(--admin-accent)]'
+                          : !cell.inCurrentMonth
+                            ? 'bg-[var(--admin-surface-subtle)]/55 text-[var(--admin-muted)]/60'
+                            : 'bg-[var(--admin-surface)] hover:bg-[var(--admin-surface-subtle)]/65',
+                        isSelected && 'ring-2 ring-inset ring-[var(--admin-text)] z-10',
+                      )}
                     >
-                      {day}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="grid grid-cols-7 divide-x divide-y divide-slate-200 bg-[var(--admin-surface)]">
-                  {monthGridCells.map((cell) => {
-                    const isToday = cell.ymd === todayIso;
-                    const isSelected = cell.ymd === selectedDay;
-                    const hasSessions = cell.items.length > 0;
-                    const allCompleted =
-                      hasSessions && cell.items.every((s) => s.status === 'COMPLETED');
-
-                    return (
-                      <div
-                        key={cell.ymd}
-                        onClick={() => setSelectedDay(cell.ymd)}
-                        className={cn(
-                          'relative min-h-[110px] p-2 cursor-pointer transition-all flex flex-col gap-1.5',
-                          hasSessions
-                            ? allCompleted
-                              ? 'bg-emerald-500/12 hover:bg-emerald-500/18 shadow-[inset_0_3px_0_0_#10b981]'
-                              : 'bg-[var(--admin-accent-soft)] hover:bg-[var(--admin-accent)]/25 shadow-[inset_0_3px_0_0_var(--admin-accent)]'
-                            : !cell.inCurrentMonth
-                              ? 'bg-[var(--admin-surface-subtle)]/55 text-[var(--admin-muted)]/60'
-                              : 'bg-[var(--admin-surface)] hover:bg-[var(--admin-surface-subtle)]/65',
-                          isSelected && 'ring-2 ring-inset ring-[var(--admin-text)] z-10',
-                        )}
-                      >
-                        <div className="flex items-center justify-between gap-1">
-                          <div className="flex items-center gap-1">
-                            <span
-                              className={cn(
-                                'inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold tabular-nums',
-                                hasSessions
-                                  ? allCompleted
-                                    ? 'bg-emerald-600 text-white'
-                                    : 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)]'
-                                  : isToday
-                                    ? 'border-2 border-[var(--admin-accent)] text-[var(--admin-accent)]'
-                                    : cell.inCurrentMonth
-                                      ? 'text-[var(--admin-text)] font-semibold'
-                                      : 'text-[var(--admin-muted)]/60 font-medium',
-                              )}
-                            >
-                              {cell.dayOfMonth}
-                            </span>
-                            {isToday && (
-                              <span className="text-[9.5px] font-bold uppercase tracking-wider text-[var(--admin-accent)]">
-                                Today
-                              </span>
-                            )}
-                          </div>
-
-                          {hasSessions && (
-                            <span
-                              className={cn(
-                                'rounded-full px-2 py-0.5 text-[10px] font-bold tracking-tight tabular-nums',
-                                allCompleted
+                      <div className="flex items-center justify-center md:justify-between gap-1">
+                        <div className="flex items-center gap-1">
+                          <span
+                            className={cn(
+                              'inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold tabular-nums',
+                              hasSessions
+                                ? allCompleted
                                   ? 'bg-emerald-600 text-white'
-                                  : 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)]',
-                              )}
-                            >
-                              {cell.items.length} {cell.items.length === 1 ? 'shoot' : 'shoots'}
+                                  : 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)]'
+                                : isToday
+                                  ? 'border-2 border-[var(--admin-accent)] text-[var(--admin-accent)]'
+                                  : cell.inCurrentMonth
+                                    ? 'text-[var(--admin-text)] font-semibold'
+                                    : 'text-[var(--admin-muted)]/60 font-medium',
+                            )}
+                          >
+                            {cell.dayOfMonth}
+                          </span>
+                          {isToday && (
+                            <span className="hidden md:inline text-[9.5px] font-bold uppercase tracking-wider text-[var(--admin-accent)]">
+                              Today
                             </span>
                           )}
                         </div>
 
-                        <div className="space-y-1">
-                          {cell.items.slice(0, 2).map((sess) => {
-                            const isDone = sess.status === 'COMPLETED';
-                            return (
-                              <div
-                                key={sess.id}
-                                className={cn(
-                                  'rounded-lg px-2 py-1 text-[11px] font-semibold truncate border flex items-center gap-1.5',
-                                  isDone
-                                    ? 'bg-[var(--admin-surface)] border-emerald-500/45 text-emerald-700 dark:text-emerald-300'
-                                    : 'bg-[var(--admin-surface)] border-[var(--admin-accent)]/50 text-[var(--admin-text)]',
-                                )}
-                                title={`${formatTimeShortInTz(sess.startAt, timezone)} • ${sess.title}`}
-                              >
-                                <span
-                                  className={cn(
-                                    'h-1.5 w-1.5 rounded-full shrink-0',
-                                    isDone ? 'bg-emerald-500' : 'bg-[var(--admin-accent)]',
-                                  )}
-                                />
-                                <span className="truncate">
-                                  <span className="font-mono-code font-bold">
-                                    {formatTimeShortInTz(sess.startAt, timezone)}
-                                  </span>{' '}
-                                  {sess.title}
-                                </span>
-                              </div>
-                            );
-                          })}
-                          {cell.items.length > 2 && (
-                            <p className="text-[10px] font-bold text-[var(--admin-accent)] pl-1">
-                              +{cell.items.length - 2} more scheduled
-                            </p>
-                          )}
-                        </div>
+                        {hasSessions && (
+                          <span
+                            className={cn(
+                              'hidden md:inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold tracking-tight tabular-nums',
+                              allCompleted
+                                ? 'bg-emerald-600 text-white'
+                                : 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)]',
+                            )}
+                          >
+                            {cell.items.length} {cell.items.length === 1 ? 'shoot' : 'shoots'}
+                          </span>
+                        )}
                       </div>
-                    );
-                  })}
-                </div>
+
+                      {hasSessions && (
+                        <div className="md:hidden flex items-center justify-center gap-1 pb-0.5">
+                          <span
+                            className={cn(
+                              'rounded-full px-1.5 py-[1px] text-[9.5px] font-bold leading-tight tabular-nums',
+                              allCompleted
+                                ? 'bg-emerald-600 text-white'
+                                : 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)]',
+                            )}
+                          >
+                            {cell.items.length}
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="hidden md:block space-y-1">
+                        {cell.items.slice(0, 2).map((sess) => {
+                          const isDone = sess.status === 'COMPLETED';
+                          return (
+                            <div
+                              key={sess.id}
+                              className={cn(
+                                'rounded-lg px-2 py-1 text-[11px] font-semibold truncate border flex items-center gap-1.5',
+                                isDone
+                                  ? 'bg-[var(--admin-surface)] border-emerald-500/45 text-emerald-700 dark:text-emerald-300'
+                                  : 'bg-[var(--admin-surface)] border-[var(--admin-accent)]/50 text-[var(--admin-text)]',
+                              )}
+                              title={`${formatTimeShortInTz(sess.startAt, timezone)} • ${sess.title}`}
+                            >
+                              <span
+                                className={cn(
+                                  'h-1.5 w-1.5 rounded-full shrink-0',
+                                  isDone ? 'bg-emerald-500' : 'bg-[var(--admin-accent)]',
+                                )}
+                              />
+                              <span className="truncate">
+                                <span className="font-mono-code font-bold">
+                                  {formatTimeShortInTz(sess.startAt, timezone)}
+                                </span>{' '}
+                                {sess.title}
+                              </span>
+                            </div>
+                          );
+                        })}
+                        {cell.items.length > 2 && (
+                          <p className="text-[10px] font-bold text-[var(--admin-accent)] pl-1">
+                            +{cell.items.length - 2} more scheduled
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -1650,10 +1664,10 @@ export function CalendarWorkspace({
 
       {/* Modal: Reschedule Session */}
       {rescheduleTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/50 p-0 sm:p-4 overflow-y-auto admin-sheet-fade">
           <form
             onSubmit={handleRescheduleSubmit}
-            className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 space-y-4 my-8"
+            className="w-full sm:max-w-lg rounded-t-3xl sm:rounded-2xl bg-white p-4 sm:p-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 max-h-[92dvh] overflow-y-auto shadow-2xl border border-slate-200 space-y-4 sm:my-8 admin-sheet-up"
           >
             <div className="flex items-start justify-between border-b border-slate-100 pb-3">
               <div>
@@ -1835,10 +1849,10 @@ export function CalendarWorkspace({
 
       {/* Modal: Cancel Session */}
       {cancelTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/50 p-0 sm:p-4 admin-sheet-fade">
           <form
             onSubmit={handleCancelSubmit}
-            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 space-y-4"
+            className="w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl bg-white p-4 sm:p-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 shadow-2xl border border-slate-200 space-y-4 admin-sheet-up"
           >
             <div>
               <h3 className="text-lg font-bold text-slate-900">Cancel Session</h3>

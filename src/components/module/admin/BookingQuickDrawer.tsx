@@ -85,11 +85,16 @@ export function BookingQuickDrawer({
 
   useEffect(() => {
     if (!bookingId) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', handleKey);
+    };
   }, [bookingId, onClose]);
 
   if (!bookingId) return null;
@@ -215,14 +220,17 @@ export function BookingQuickDrawer({
       role="dialog"
       aria-modal="true"
       aria-label="Booking quick inspection drawer"
-      className="fixed inset-0 z-50 flex justify-end bg-slate-950/35 backdrop-blur-[1px]"
+      className="fixed inset-0 z-50 flex items-end sm:items-stretch justify-end bg-slate-950/45 backdrop-blur-[2px] admin-sheet-fade"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <aside className="h-full w-full max-w-xl flex flex-col border-l border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text)]">
+      <aside className="h-[90dvh] sm:h-full w-full sm:max-w-xl flex flex-col rounded-t-3xl sm:rounded-none border-t sm:border-t-0 sm:border-l border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text)] admin-sheet-up">
+        <div className="sm:hidden pt-2.5 pb-1 flex justify-center shrink-0">
+          <span className="h-1 w-10 rounded-full bg-[var(--admin-border)]" />
+        </div>
         {/* Drawer Header */}
-        <div className="shrink-0 flex items-start justify-between gap-3 px-5 py-4 border-b border-[var(--admin-border)]">
+        <div className="shrink-0 flex items-start justify-between gap-3 px-4 sm:px-5 py-3.5 sm:py-4 border-b border-[var(--admin-border)]">
           <div className="min-w-0 space-y-1">
             {booking ? (
               <>
@@ -641,7 +649,7 @@ export function BookingQuickDrawer({
 
         {/* Drawer Footer */}
         {booking && (
-          <div className="shrink-0 px-5 py-3.5 border-t border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] flex items-center justify-between gap-3">
+          <div className="shrink-0 px-4 sm:px-5 py-3.5 pb-[calc(0.875rem+env(safe-area-inset-bottom))] sm:pb-3.5 border-t border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] flex items-center justify-between gap-3">
             <a
               href={`/api/bookings/${encodeURIComponent(booking.id)}/invoice.pdf`}
               target="_blank"

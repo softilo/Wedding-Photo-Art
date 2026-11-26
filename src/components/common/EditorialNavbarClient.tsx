@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { BrandMark } from './BrandMark';
+import { PwaStandaloneGuard } from './PwaStandaloneGuard';
 import {
   ArrowRightIcon,
   CloseIcon,
@@ -112,6 +113,7 @@ export function EditorialNavbarClient({
 
   return (
     <>
+      <PwaStandaloneGuard />
       <header className="sticky top-0 z-40 border-b border-[#E5DFD0]/90 bg-[#F9F8F5]/95 backdrop-blur-xl">
         <div
           className="h-[2px] w-full"

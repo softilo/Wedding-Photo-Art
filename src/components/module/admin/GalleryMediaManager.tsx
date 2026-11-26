@@ -546,10 +546,10 @@ export function GalleryMediaManager({
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-border/60 bg-slate-50/80 text-xs font-medium text-muted-foreground">
-                    <th className="py-3 px-4">File</th>
-                    <th className="py-3 px-3">Category</th>
-                    <th className="py-3 px-3">Size</th>
-                    <th className="py-3 px-4 text-right">Action</th>
+                    <th className="py-3 px-3 sm:px-4">File</th>
+                    <th className="hidden sm:table-cell py-3 px-3">Category</th>
+                    <th className="hidden md:table-cell py-3 px-3">Size</th>
+                    <th className="py-3 px-3 sm:px-4 text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/50">
@@ -577,7 +577,7 @@ export function GalleryMediaManager({
                           isSelected ? 'bg-indigo-50/70' : 'hover:bg-slate-50/80',
                         )}
                       >
-                        <td className="py-3 px-4">
+                        <td className="py-3 px-3 sm:px-4">
                           <div className="flex items-center gap-3 min-w-0">
                             <div className="h-11 w-14 shrink-0 rounded-lg bg-slate-100 border border-border/60 overflow-hidden relative flex items-center justify-center">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -594,7 +594,7 @@ export function GalleryMediaManager({
                               )}
                             </div>
                             <div className="min-w-0">
-                              <p className="text-sm font-medium text-slate-900 truncate max-w-[200px]">
+                              <p className="text-sm font-medium text-slate-900 truncate max-w-[155px] sm:max-w-[200px]">
                                 {displayTitle}
                               </p>
                               <p className="text-xs text-muted-foreground font-medium">
@@ -603,7 +603,7 @@ export function GalleryMediaManager({
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 px-3">
+                        <td className="hidden sm:table-cell py-3 px-3">
                           <span
                             className={cn(
                               'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset',
@@ -621,10 +621,10 @@ export function GalleryMediaManager({
                             {item.resourceType === 'VIDEO' ? 'Video' : 'Photo'}
                           </span>
                         </td>
-                        <td className="py-3 px-3 font-mono-code text-xs text-muted-foreground tabular-nums">
+                        <td className="hidden md:table-cell py-3 px-3 font-mono-code text-xs text-muted-foreground tabular-nums">
                           {formatBytes(item.bytes)}
                         </td>
-                        <td className="py-3 px-4 text-right">
+                        <td className="py-3 px-3 sm:px-4 text-right">
                           <button
                             type="button"
                             disabled={isPending}
