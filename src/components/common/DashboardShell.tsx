@@ -386,13 +386,13 @@ export function DashboardShell({
 
         {/* Native-Style Mobile Top App Bar */}
         <header className="lg:hidden sticky top-0 z-30 border-b border-[var(--admin-border)] bg-[var(--admin-header)] backdrop-blur-xl pt-[env(safe-area-inset-top)]">
-          <div className="h-14 px-3.5 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2.5 min-w-0">
+          <div className="h-12 px-3 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
               {isBookingDetail ? (
                 <Link
                   href="/admin/bookings"
                   aria-label="Back to Bookings"
-                  className="h-9 w-9 shrink-0 rounded-full border border-[var(--admin-border)] bg-[var(--admin-surface)] inline-flex items-center justify-center text-[var(--admin-text)] active:scale-95 transition-transform"
+                  className="h-8 w-8 shrink-0 rounded-full border border-[var(--admin-border)] bg-[var(--admin-surface)] inline-flex items-center justify-center text-[var(--admin-text)] active:scale-95 transition-transform"
                 >
                   <svg
                     className="w-4 h-4"
@@ -417,19 +417,19 @@ export function DashboardShell({
                   className="shrink-0 rounded-xl active:scale-95 transition-transform cursor-pointer"
                 >
                   <BrandMark
-                    size={32}
+                    size={28}
                     variant={theme === 'dark' ? 'dark' : 'light'}
                     alt={session.studioName || 'Wedding PhotoArt'}
-                    className="rounded-xl"
+                    className="rounded-lg"
                   />
                 </button>
               )}
 
               <div className="min-w-0 leading-tight">
-                <p className="text-[15px] font-semibold tracking-tight text-[var(--admin-text)] truncate">
+                <p className="text-[14.5px] font-semibold tracking-tight text-[var(--admin-text)] truncate">
                   {mobileScreenTitle}
                 </p>
-                <p className="text-[10.5px] font-medium text-[var(--admin-muted)] truncate">
+                <p className="text-[10px] font-medium text-[var(--admin-muted)] truncate">
                   {session.studioName || 'Wedding PhotoArt'} • {session.role}
                 </p>
               </div>
@@ -444,7 +444,7 @@ export function DashboardShell({
                     setQuickCreateOpen(true);
                   }}
                   aria-label="Quick create"
-                  className="h-9 w-9 rounded-full bg-[var(--admin-accent)] text-[var(--admin-accent-fg)] inline-flex items-center justify-center active:scale-95 transition-transform cursor-pointer"
+                  className="h-8 w-8 rounded-full bg-[var(--admin-accent)] text-[var(--admin-accent-fg)] inline-flex items-center justify-center active:scale-95 transition-transform cursor-pointer"
                 >
                   <PlusIcon className="w-4 h-4" />
                 </button>
@@ -456,7 +456,7 @@ export function DashboardShell({
                 type="button"
                 onClick={toggleTheme}
                 aria-label="Toggle theme"
-                className="h-9 w-9 rounded-full border border-[var(--admin-border)] bg-[var(--admin-surface)] inline-flex items-center justify-center text-[var(--admin-text)] active:scale-95 transition-transform cursor-pointer"
+                className="h-8 w-8 rounded-full border border-[var(--admin-border)] bg-[var(--admin-surface)] inline-flex items-center justify-center text-[var(--admin-text)] active:scale-95 transition-transform cursor-pointer"
               >
                 <ThemeModeIcon mode={theme} />
               </button>
@@ -464,7 +464,7 @@ export function DashboardShell({
           </div>
         </header>
 
-        <main className="flex-1 px-3.5 py-4 sm:p-6 pb-[calc(5.25rem+env(safe-area-inset-bottom))] lg:pb-6 max-w-7xl w-full mx-auto overflow-x-clip">
+        <main className="flex-1 px-3 py-3 sm:p-6 pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-6 max-w-7xl w-full mx-auto overflow-x-clip">
           {children}
         </main>
 
@@ -474,7 +474,7 @@ export function DashboardShell({
           className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-[var(--admin-border)] bg-[var(--admin-header)]/95 backdrop-blur-xl pb-[env(safe-area-inset-bottom)] shadow-[0_-10px_28px_-16px_rgba(0,0,0,0.18)]"
         >
           {isStaffOnly ? (
-            <div className="grid grid-cols-3 h-16 px-2 items-center gap-1">
+            <div className="grid grid-cols-3 h-14 px-2 items-center gap-1">
               <Link
                 href="/staff"
                 className="flex flex-col items-center justify-center gap-0.5 min-h-[48px] rounded-xl active:scale-95 transition-transform"
@@ -545,7 +545,7 @@ export function DashboardShell({
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-5 h-16 px-1.5 items-center">
+            <div className="grid grid-cols-5 h-14 px-1 items-center">
               {mobilePrimaryTabs.map((item) => {
                 const Icon = item.icon;
                 const active = isItemActive(item) && !mobileMenuOpen;
@@ -553,11 +553,11 @@ export function DashboardShell({
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="flex flex-col items-center justify-center gap-0.5 min-h-[48px] rounded-xl active:scale-95 transition-transform"
+                    className="flex flex-col items-center justify-center gap-0.5 min-h-[44px] rounded-xl active:scale-95 transition-transform"
                   >
                     <span
                       className={cn(
-                        'px-3.5 py-1 rounded-full transition-colors',
+                        'px-3 py-0.5 rounded-full transition-colors',
                         active
                           ? 'bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]'
                           : 'text-[var(--admin-muted)]',
@@ -567,7 +567,7 @@ export function DashboardShell({
                     </span>
                     <span
                       className={cn(
-                        'text-[10.5px] leading-none truncate max-w-full px-0.5',
+                        'text-[10px] leading-none truncate max-w-full px-0.5',
                         active
                           ? 'font-semibold text-[var(--admin-accent)]'
                           : 'font-medium text-[var(--admin-muted)]',
@@ -586,11 +586,11 @@ export function DashboardShell({
                   setMobileMenuOpen(true);
                 }}
                 aria-expanded={mobileMenuOpen}
-                className="flex flex-col items-center justify-center gap-0.5 min-h-[48px] rounded-xl active:scale-95 transition-transform cursor-pointer"
+                className="flex flex-col items-center justify-center gap-0.5 min-h-[44px] rounded-xl active:scale-95 transition-transform cursor-pointer"
               >
                 <span
                   className={cn(
-                    'px-3.5 py-1 rounded-full transition-colors',
+                    'px-3 py-0.5 rounded-full transition-colors',
                     isStudioMenuActive
                       ? 'bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]'
                       : 'text-[var(--admin-muted)]',
@@ -600,7 +600,7 @@ export function DashboardShell({
                 </span>
                 <span
                   className={cn(
-                    'text-[10.5px] leading-none',
+                    'text-[10px] leading-none',
                     isStudioMenuActive
                       ? 'font-semibold text-[var(--admin-accent)]'
                       : 'font-medium text-[var(--admin-muted)]',

@@ -732,35 +732,37 @@ export function CalendarWorkspace({
       </div>
 
       {/* KPI Summary Strip */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="atelier-card p-5">
-          <p className="admin-meta font-medium">Sessions in Range</p>
-          <p className="text-2xl font-semibold tracking-tight text-slate-900 mt-2 tabular-nums">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <div className="atelier-card p-3 sm:p-5">
+          <p className="admin-meta font-medium truncate">Sessions in Range</p>
+          <p className="text-lg sm:text-2xl font-semibold tracking-tight text-slate-900 mt-1 sm:mt-2 tabular-nums">
             {sessions.length}
           </p>
         </div>
-        <div className="atelier-card p-5">
-          <p className="admin-meta font-medium">Upcoming Scheduled</p>
-          <p className="text-2xl font-semibold tracking-tight text-[var(--admin-accent)] mt-2 tabular-nums">
+        <div className="atelier-card p-3 sm:p-5">
+          <p className="admin-meta font-medium truncate">Upcoming Scheduled</p>
+          <p className="text-lg sm:text-2xl font-semibold tracking-tight text-[var(--admin-accent)] mt-1 sm:mt-2 tabular-nums">
             {scheduledCount}
           </p>
         </div>
-        <div className="atelier-card p-5">
-          <p className="admin-meta font-medium">Completed Shoots</p>
-          <p className="text-2xl font-semibold tracking-tight text-emerald-600 mt-2 tabular-nums">
+        <div className="atelier-card p-3 sm:p-5">
+          <p className="admin-meta font-medium truncate">Completed Shoots</p>
+          <p className="text-lg sm:text-2xl font-semibold tracking-tight text-emerald-600 mt-1 sm:mt-2 tabular-nums">
             {completedCount}
           </p>
         </div>
         <Link
           href="/admin/crew"
-          className="atelier-card p-5 block hover:border-[var(--admin-accent)] transition-colors"
+          className="atelier-card p-3 sm:p-5 block hover:border-[var(--admin-accent)] transition-colors"
         >
-          <p className="admin-meta font-medium">Crew &amp; Equipment Pool</p>
-          <div className="flex items-baseline justify-between mt-2">
-            <p className="text-2xl font-semibold tracking-tight text-slate-900 tabular-nums">
+          <p className="admin-meta font-medium truncate">Crew &amp; Gear</p>
+          <div className="flex items-baseline justify-between mt-1 sm:mt-2">
+            <p className="text-lg sm:text-2xl font-semibold tracking-tight text-slate-900 tabular-nums">
               {resources.length}
             </p>
-            <span className="text-xs font-medium text-[var(--admin-accent)]">Manage →</span>
+            <span className="text-[11px] sm:text-xs font-medium text-[var(--admin-accent)]">
+              Manage →
+            </span>
           </div>
         </Link>
       </div>

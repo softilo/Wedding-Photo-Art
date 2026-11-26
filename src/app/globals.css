@@ -429,3 +429,34 @@ body {
     animation: none;
   }
 }
+
+/* Compact Android/iOS mobile app sizing across all admin cards & text */
+@media (max-width: 639px) {
+  .admin-shell .atelier-card,
+  .admin-shell .admin-card {
+    border-radius: 0.75rem;
+  }
+
+  .admin-shell :is(.atelier-card, .admin-card):is(.p-5, .p-6, .p-8, .p-10) {
+    padding: 0.75rem;
+  }
+
+  .admin-shell .admin-page-title {
+    font-size: 17.5px;
+    line-height: 1.25;
+  }
+
+  .admin-shell .admin-section-title {
+    font-size: 13px;
+  }
+
+  .admin-shell .admin-row-title {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .admin-shell .admin-meta {
+    font-size: 11px;
+    line-height: 1.35;
+  }
+}

@@ -675,18 +675,18 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
       </div>
 
       {/* 4 Calm Soft-Surface Profit Equation KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="admin-card p-3.5 sm:p-5 space-y-1.5 sm:space-y-2">
-          <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5 text-[11.5px] sm:text-[12.5px] font-medium text-[var(--admin-muted)]">
-              <span className="h-[7px] w-[7px] rounded-full bg-emerald-500 shrink-0" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+        <div className="admin-card p-2.5 sm:p-5 space-y-1 sm:space-y-2">
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="inline-flex items-center gap-1.5 text-[10.5px] sm:text-[12.5px] font-medium text-[var(--admin-muted)]">
+              <span className="h-[6px] w-[6px] sm:h-[7px] sm:w-[7px] rounded-full bg-emerald-500 shrink-0" />
               <span className="truncate">Net Collected</span>
             </span>
-            <span className="font-mono-code text-[10.5px] sm:text-[11px] font-medium text-[var(--admin-muted)] tabular-nums shrink-0">
+            <span className="font-mono-code text-[10px] sm:text-[11px] font-medium text-[var(--admin-muted)] tabular-nums shrink-0">
               {summary.collectionRatePercent.toFixed(0)}%
             </span>
           </div>
-          <p className="font-mono-code text-lg sm:text-[22px] font-semibold tracking-tight text-[var(--admin-text)] tabular-nums truncate">
+          <p className="font-mono-code text-base sm:text-[22px] font-semibold tracking-tight text-[var(--admin-text)] tabular-nums truncate">
             {formatPoisha(summary.netCollectedRevenuePoisha, currency)}
           </p>
           <p className="admin-meta tabular-nums truncate hidden sm:block">
@@ -694,17 +694,17 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
           </p>
         </div>
 
-        <div className="admin-card p-3.5 sm:p-5 space-y-1.5 sm:space-y-2">
-          <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5 text-[11.5px] sm:text-[12.5px] font-medium text-[var(--admin-muted)]">
-              <span className="h-[7px] w-[7px] rounded-full bg-rose-400 shrink-0" />
+        <div className="admin-card p-2.5 sm:p-5 space-y-1 sm:space-y-2">
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="inline-flex items-center gap-1.5 text-[10.5px] sm:text-[12.5px] font-medium text-[var(--admin-muted)]">
+              <span className="h-[6px] w-[6px] sm:h-[7px] sm:w-[7px] rounded-full bg-rose-400 shrink-0" />
               <span className="truncate">Expenses (−)</span>
             </span>
-            <span className="font-mono-code text-[10.5px] sm:text-[11px] font-medium text-[var(--admin-muted)] tabular-nums shrink-0">
+            <span className="font-mono-code text-[10px] sm:text-[11px] font-medium text-[var(--admin-muted)] tabular-nums shrink-0">
               {summary.expensesCount}
             </span>
           </div>
-          <p className="font-mono-code text-lg sm:text-[22px] font-semibold tracking-tight text-[var(--admin-text)] tabular-nums truncate">
+          <p className="font-mono-code text-base sm:text-[22px] font-semibold tracking-tight text-[var(--admin-text)] tabular-nums truncate">
             {formatPoisha(totalExpensesPoisha, currency)}
           </p>
           <p className="admin-meta tabular-nums truncate hidden sm:block">
@@ -713,12 +713,12 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
           </p>
         </div>
 
-        <div className="admin-card p-3.5 sm:p-5 space-y-1.5 sm:space-y-2 border-[var(--admin-accent)]/35">
-          <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5 text-[11.5px] sm:text-[12.5px] font-medium text-[var(--admin-text)]">
+        <div className="admin-card p-2.5 sm:p-5 space-y-1 sm:space-y-2 border-[var(--admin-accent)]/35">
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="inline-flex items-center gap-1.5 text-[10.5px] sm:text-[12.5px] font-medium text-[var(--admin-text)]">
               <span
                 className={cn(
-                  'h-[7px] w-[7px] rounded-full shrink-0',
+                  'h-[6px] w-[6px] sm:h-[7px] sm:w-[7px] rounded-full shrink-0',
                   netCashProfitPoisha >= 0 ? 'bg-emerald-500' : 'bg-rose-400',
                 )}
               />
@@ -726,7 +726,7 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
             </span>
             <span
               className={cn(
-                'font-mono-code rounded-md px-1.5 sm:px-2 py-0.5 text-[10.5px] sm:text-[11px] font-medium tabular-nums shrink-0',
+                'font-mono-code rounded-md px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-[11px] font-medium tabular-nums shrink-0',
                 netCashProfitPoisha >= 0
                   ? 'bg-emerald-50 text-emerald-700'
                   : 'bg-rose-50 text-rose-700',
@@ -737,7 +737,7 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
           </div>
           <p
             className={cn(
-              'font-mono-code text-lg sm:text-[22px] font-semibold tracking-tight tabular-nums truncate',
+              'font-mono-code text-base sm:text-[22px] font-semibold tracking-tight tabular-nums truncate',
               netCashProfitPoisha >= 0 ? 'text-emerald-700' : 'text-rose-700',
             )}
           >
@@ -746,17 +746,17 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
           <p className="admin-meta truncate hidden sm:block">Actual cash surplus after expenses</p>
         </div>
 
-        <div className="admin-card p-3.5 sm:p-5 space-y-1.5 sm:space-y-2">
-          <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5 text-[11.5px] sm:text-[12.5px] font-medium text-[var(--admin-muted)]">
-              <span className="h-[7px] w-[7px] rounded-full bg-[#CAA650] shrink-0" />
+        <div className="admin-card p-2.5 sm:p-5 space-y-1 sm:space-y-2">
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="inline-flex items-center gap-1.5 text-[10.5px] sm:text-[12.5px] font-medium text-[var(--admin-muted)]">
+              <span className="h-[6px] w-[6px] sm:h-[7px] sm:w-[7px] rounded-full bg-[#CAA650] shrink-0" />
               <span className="truncate">Projected</span>
             </span>
-            <span className="font-mono-code text-[10.5px] sm:text-[11px] font-medium text-[var(--admin-muted)] tabular-nums shrink-0">
+            <span className="font-mono-code text-[10px] sm:text-[11px] font-medium text-[var(--admin-muted)] tabular-nums shrink-0">
               {summary.bookingsWithDueCount} due
             </span>
           </div>
-          <p className="font-mono-code text-lg sm:text-[22px] font-semibold tracking-tight text-[var(--admin-text)] tabular-nums truncate">
+          <p className="font-mono-code text-base sm:text-[22px] font-semibold tracking-tight text-[var(--admin-text)] tabular-nums truncate">
             {formatPoisha(projectedNetProfitPoisha, currency)}
           </p>
           <p className="admin-meta tabular-nums truncate hidden sm:block">

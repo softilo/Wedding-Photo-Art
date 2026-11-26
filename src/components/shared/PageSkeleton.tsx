@@ -775,11 +775,11 @@ export function PageSkeleton({
         role="status"
         aria-busy="true"
         aria-label={label}
-        className="min-h-screen flex items-center justify-center bg-[#F9F8F5] px-4 py-12"
+        className="min-h-dvh w-full flex flex-col bg-[#14120E] lg:bg-[#F9F8F5] lg:items-center lg:justify-center lg:px-4 lg:py-12"
       >
         <span className="sr-only">{label}</span>
-        <div className="w-full max-w-4xl grid lg:grid-cols-12 rounded-3xl lg:rounded-[1.125rem] border border-[#e5dfd0] overflow-hidden bg-white shadow-[0_24px_60px_-24px_rgba(24,22,17,0.16)]">
-          <div className="lg:col-span-5 bg-[#14120E] p-5 sm:p-8 lg:p-9 flex flex-col justify-between lg:space-y-8">
+        <div className="w-full flex-1 flex flex-col lg:flex-none lg:max-w-4xl lg:grid lg:grid-cols-12 lg:rounded-[1.125rem] lg:border lg:border-[#e5dfd0] lg:overflow-hidden lg:bg-white lg:shadow-[0_28px_64px_-24px_rgba(24,22,17,0.16)]">
+          <div className="lg:col-span-5 bg-[#14120E] px-5 pt-[calc(1.75rem+env(safe-area-inset-top))] pb-10 sm:px-8 lg:p-9 flex flex-col justify-between lg:space-y-8">
             <div className="space-y-6">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
@@ -804,7 +804,7 @@ export function PageSkeleton({
             </div>
           </div>
 
-          <div className="lg:col-span-7 p-5 sm:p-8 lg:p-10 space-y-5">
+          <div className="lg:col-span-7 bg-white flex-1 rounded-t-[26px] -mt-5 px-5 pt-6 pb-6 sm:px-8 lg:mt-0 lg:rounded-none lg:p-10 space-y-5">
             <div className="space-y-2">
               <div className="h-8 w-28 rounded-lg skeleton-bone" />
               <div className="h-4 w-72 max-w-full rounded-md skeleton-bone" />

@@ -210,7 +210,7 @@ export function NotificationBell({
         onClick={handleToggle}
         aria-label={`Notifications (${feed.unreadCount} unread)`}
         aria-expanded={open}
-        className="relative inline-flex items-center justify-center rounded-full sm:rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] h-9 w-9 sm:h-8 sm:w-8 text-[var(--admin-muted)] hover:text-[var(--admin-text)] hover:bg-[var(--admin-surface-subtle)] active:scale-95 transition-all cursor-pointer"
+        className="relative inline-flex items-center justify-center rounded-full sm:rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] h-8 w-8 text-[var(--admin-muted)] hover:text-[var(--admin-text)] hover:bg-[var(--admin-surface-subtle)] active:scale-95 transition-all cursor-pointer"
       >
         <BellIcon className="w-4 h-4" />
         {feed.unreadCount > 0 && (

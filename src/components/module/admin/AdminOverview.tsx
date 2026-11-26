@@ -214,95 +214,95 @@ export function AdminOverview({
     (alerts?.counts.urgentDeliverables ?? 0);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-3 sm:space-y-5">
       {/* Compact Minimal Studio KPI Cards */}
-      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-2 sm:gap-3 grid-cols-2 lg:grid-cols-4">
         <Link
           href="/admin/inquiries"
-          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-3 hover:border-[var(--admin-accent)]/60 transition-colors group flex items-center justify-between gap-2.5"
+          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-2.5 py-2 sm:px-3.5 sm:py-3 hover:border-[var(--admin-accent)]/60 transition-colors group flex items-center justify-between gap-2"
         >
           <div className="min-w-0">
-            <p className="text-[11.5px] font-medium text-[var(--admin-muted)] truncate">
+            <p className="text-[10.5px] sm:text-[11.5px] font-medium text-[var(--admin-muted)] truncate">
               Inquiries
             </p>
-            <p className="text-lg sm:text-xl font-semibold tracking-tight text-[var(--admin-text)] mt-0.5 tabular-nums">
+            <p className="text-base sm:text-xl font-semibold tracking-tight text-[var(--admin-text)] mt-0.5 tabular-nums truncate">
               {newInquiriesCount}
-              <span className="text-[11px] font-normal text-[var(--admin-muted)] ml-1">
+              <span className="text-[10px] sm:text-[11px] font-normal text-[var(--admin-muted)] ml-1">
                 new • {inquiries.length} total
               </span>
             </p>
           </div>
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
-            <ApertureIcon className="w-4 h-4" />
+          <span className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
+            <ApertureIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </span>
         </Link>
 
         <Link
           href="/admin/quotes"
-          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-3 hover:border-[var(--admin-accent)]/60 transition-colors group flex items-center justify-between gap-2.5"
+          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-2.5 py-2 sm:px-3.5 sm:py-3 hover:border-[var(--admin-accent)]/60 transition-colors group flex items-center justify-between gap-2"
         >
           <div className="min-w-0">
-            <p className="text-[11.5px] font-medium text-[var(--admin-muted)] truncate">
+            <p className="text-[10.5px] sm:text-[11.5px] font-medium text-[var(--admin-muted)] truncate">
               Price Quotes
             </p>
-            <p className="text-lg sm:text-xl font-semibold tracking-tight text-[var(--admin-text)] mt-0.5 tabular-nums">
+            <p className="text-base sm:text-xl font-semibold tracking-tight text-[var(--admin-text)] mt-0.5 tabular-nums truncate">
               {openQuotesCount}
-              <span className="text-[11px] font-normal text-[var(--admin-muted)] ml-1">
+              <span className="text-[10px] sm:text-[11px] font-normal text-[var(--admin-muted)] ml-1">
                 active • {quotes.length} total
               </span>
             </p>
           </div>
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#CAA650]/15 text-[#8B6A21]">
-            <ReceiptIcon className="w-4 h-4" />
+          <span className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-[#CAA650]/15 text-[#8B6A21]">
+            <ReceiptIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </span>
         </Link>
 
         <Link
           href="/admin/bookings"
-          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-3 hover:border-[var(--admin-accent)]/60 transition-colors group flex items-center justify-between gap-2.5"
+          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-2.5 py-2 sm:px-3.5 sm:py-3 hover:border-[var(--admin-accent)]/60 transition-colors group flex items-center justify-between gap-2"
         >
           <div className="min-w-0">
-            <p className="text-[11.5px] font-medium text-[var(--admin-muted)] truncate">
+            <p className="text-[10.5px] sm:text-[11.5px] font-medium text-[var(--admin-muted)] truncate">
               Bookings
             </p>
-            <p className="text-lg sm:text-xl font-semibold tracking-tight text-[var(--admin-text)] mt-0.5 tabular-nums truncate">
+            <p className="text-base sm:text-xl font-semibold tracking-tight text-[var(--admin-text)] mt-0.5 tabular-nums truncate">
               {confirmedCount}
-              <span className="text-[11px] font-normal text-[var(--admin-muted)] ml-1">
+              <span className="text-[10px] sm:text-[11px] font-normal text-[var(--admin-muted)] ml-1">
                 {pendingConfirmCount > 0
-                  ? `confirmed • ${pendingConfirmCount} pending`
+                  ? `conf • ${pendingConfirmCount} pend`
                   : `• ${formatPoisha(totalAgreedPoisha, currency)}`}
               </span>
             </p>
           </div>
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/12 text-emerald-600">
-            <UsersIcon className="w-4 h-4" />
+          <span className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/12 text-emerald-600">
+            <UsersIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </span>
         </Link>
 
         <Link
           href="/admin/calendar"
-          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-3 hover:border-[var(--admin-accent)]/60 transition-colors group flex items-center justify-between gap-2.5"
+          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-2.5 py-2 sm:px-3.5 sm:py-3 hover:border-[var(--admin-accent)]/60 transition-colors group flex items-center justify-between gap-2"
         >
           <div className="min-w-0">
-            <p className="text-[11.5px] font-medium text-[var(--admin-muted)] truncate">
+            <p className="text-[10.5px] sm:text-[11.5px] font-medium text-[var(--admin-muted)] truncate">
               Upcoming Shoots
             </p>
-            <p className="text-lg sm:text-xl font-semibold tracking-tight text-[var(--admin-text)] mt-0.5 tabular-nums">
+            <p className="text-base sm:text-xl font-semibold tracking-tight text-[var(--admin-text)] mt-0.5 tabular-nums truncate">
               {upcomingSessions.length}
-              <span className="text-[11px] font-normal text-[var(--admin-muted)] ml-1">
+              <span className="text-[10px] sm:text-[11px] font-normal text-[var(--admin-muted)] ml-1">
                 next 14d
               </span>
             </p>
           </div>
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
-            <CalendarIcon className="w-4 h-4" />
+          <span className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
+            <CalendarIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </span>
         </Link>
       </div>
 
       {/* Studio Analytics Charts Row */}
-      <div className="grid gap-5 lg:grid-cols-12">
-        <section className="lg:col-span-7 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 space-y-4">
+      <div className="grid gap-3 sm:gap-5 lg:grid-cols-12">
+        <section className="lg:col-span-7 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 sm:p-5 space-y-3 sm:space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[var(--admin-border)] pb-3">
             <div className="flex items-center gap-2.5">
               <BarChartIcon className="w-4 h-4 text-[var(--admin-accent)] shrink-0" />
@@ -415,8 +415,8 @@ export function AdminOverview({
           )}
         </section>
 
-        <section className="lg:col-span-5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 flex flex-col">
-          <div className="flex items-center justify-between border-b border-[var(--admin-border)] pb-3 mb-3">
+        <section className="lg:col-span-5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 sm:p-5 flex flex-col">
+          <div className="flex items-center justify-between border-b border-[var(--admin-border)] pb-2.5 sm:pb-3 mb-2.5 sm:mb-3">
             <div>
               <h2 className="admin-section-title">Upcoming Shoots</h2>
               <p className="admin-meta">Next 14 days in {timezone}</p>
@@ -434,7 +434,7 @@ export function AdminOverview({
               <p className="admin-meta">No sessions scheduled in the next 14 days.</p>
             </div>
           ) : (
-            <div className="space-y-2.5">
+            <div className="space-y-2 sm:space-y-2.5">
               {upcomingSessions.slice(0, 4).map((s) => (
                 <button
                   key={s.id}
@@ -446,7 +446,7 @@ export function AdminOverview({
                       router.push('/admin/calendar');
                     }
                   }}
-                  className="w-full text-left block rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] hover:border-[var(--admin-accent)]/50 hover:bg-[var(--admin-surface-hover)] p-3 space-y-1 transition-colors cursor-pointer"
+                  className="w-full text-left block rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] hover:border-[var(--admin-accent)]/50 hover:bg-[var(--admin-surface-hover)] p-2.5 sm:p-3 space-y-0.5 sm:space-y-1 transition-colors cursor-pointer"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-mono-code font-medium text-[var(--admin-accent)] tabular-nums">
@@ -473,8 +473,8 @@ export function AdminOverview({
 
       {/* Needs Your Attention — Interactive Quick-Drawer Queue */}
       {alerts && (
-        <section className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 space-y-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-[var(--admin-border)] pb-3.5">
+        <section className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 sm:p-5 space-y-3 sm:space-y-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 sm:gap-3 border-b border-[var(--admin-border)] pb-2.5 sm:pb-3.5">
             <div className="flex items-center gap-2.5">
               <CheckCircleIcon className="w-4 h-4 text-[var(--admin-accent)] shrink-0" />
               <div>
@@ -711,8 +711,8 @@ export function AdminOverview({
       )}
 
       {/* Full-Width Recent Bookings Section */}
-      <section className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 space-y-4">
-        <div className="flex items-center justify-between border-b border-[var(--admin-border)] pb-3">
+      <section className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 sm:p-5 space-y-3 sm:space-y-4">
+        <div className="flex items-center justify-between border-b border-[var(--admin-border)] pb-2.5 sm:pb-3">
           <div>
             <h2 className="admin-section-title">Recent Bookings</h2>
             <p className="admin-meta">
@@ -732,13 +732,13 @@ export function AdminOverview({
             No bookings yet. Accept a quote in Price Quotes to create one.
           </p>
         ) : (
-          <div className="grid gap-2.5 md:grid-cols-2">
+          <div className="grid gap-2 sm:gap-2.5 md:grid-cols-2">
             {bookings.slice(0, 6).map((b) => (
               <button
                 key={b.id}
                 type="button"
                 onClick={() => setDrawerState({ bookingId: b.id, focus: 'overview' })}
-                className="w-full text-left rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] px-3.5 py-3 hover:border-[var(--admin-accent)]/50 hover:bg-[var(--admin-surface-hover)] transition-colors flex items-center justify-between gap-4 group cursor-pointer"
+                className="w-full text-left rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] px-2.5 py-2 sm:px-3.5 sm:py-3 hover:border-[var(--admin-accent)]/50 hover:bg-[var(--admin-surface-hover)] transition-colors flex items-center justify-between gap-3 group cursor-pointer"
               >
                 <div className="min-w-0 space-y-0.5">
                   <div className="flex items-center gap-2.5">
