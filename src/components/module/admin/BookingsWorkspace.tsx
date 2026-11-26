@@ -1308,9 +1308,9 @@ export function BookingsWorkspace({
           MODE 1: DEDICATED INQUIRIES ROUTE (/admin/inquiries)
       ===================================================================== */}
       {resolvedMode === 'inquiries' && (
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
+        <div className="space-y-3 sm:space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
+            <div className="hidden lg:block">
               <h1 className="admin-page-title">
                 1. Client Inquiries
               </h1>
@@ -1321,7 +1321,7 @@ export function BookingsWorkspace({
             <button
               type="button"
               onClick={() => setShowInquiryForm(true)}
-              className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 transition-all duration-200"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs sm:text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 transition-all duration-200 cursor-pointer"
             >
               <PlusIcon className="w-4 h-4" />
               <span>Log Phone / Walk-In Inquiry</span>
@@ -1329,8 +1329,8 @@ export function BookingsWorkspace({
           </div>
 
           {/* Search & Status Filters */}
-          <div className="rounded-2xl border border-border/60 bg-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="relative flex-1 max-w-sm">
+          <div className="rounded-xl sm:rounded-2xl border border-border/60 bg-card p-2.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
+            <div className="relative flex-1 sm:max-w-sm">
               <SearchIcon className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="search"
@@ -1366,7 +1366,7 @@ export function BookingsWorkspace({
           </div>
 
           {lastCreatedQuote && (
-            <div className="rounded-xl border border-indigo-200 bg-indigo-50/70 px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="rounded-xl border border-indigo-200 bg-indigo-50/70 px-3 sm:px-4 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2.5 text-xs">
               <span className="font-medium text-indigo-950">
                 Quote <strong className="font-mono-code">{lastCreatedQuote.reference}</strong>{' '}
                 created for <strong>{lastCreatedQuote.eventTitle}</strong>. Ready to send or accept
@@ -1390,32 +1390,31 @@ export function BookingsWorkspace({
             </div>
           )}
 
-          <div className="atelier-card p-4 sm:p-5">
+          <div className="sm:rounded-[0.875rem] sm:border sm:border-[var(--admin-border)] sm:bg-[var(--admin-surface)] sm:p-5">
             {filteredInquiries.length === 0 ? (
-              <div className="py-10 text-center space-y-2">
+              <div className="atelier-card sm:border-0 sm:bg-transparent py-10 px-4 text-center space-y-2">
                 <p className="text-sm font-semibold text-slate-800">No matching inquiries</p>
                 <p className="text-xs text-slate-500">
                   Click &ldquo;Log Phone / Walk-In Inquiry&rdquo; to add a new client request.
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="space-y-2 sm:space-y-0 sm:divide-y sm:divide-[var(--admin-border)]">
                 {filteredInquiries.map((inq) => (
                   <div
                     key={inq.id}
-                    className="py-3.5 flex flex-wrap items-center justify-between gap-3"
+                    className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 sm:rounded-none sm:border-0 sm:bg-transparent sm:px-0 sm:py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3"
                   >
-                    <div className="min-w-0 flex-1 space-y-1">
+                    <div className="min-w-0 sm:flex-1 space-y-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-mono-code text-xs font-medium text-slate-500 tabular-nums">
                           {inq.reference}
                         </span>
                         <StatusBadge status={inq.status} />
                       </div>
-                      <p className="admin-row-title line-clamp-1">{inq.eventTitle}</p>
+                      <p className="admin-row-title font-medium line-clamp-1">{inq.eventTitle}</p>
                       <p className="admin-meta line-clamp-1 tabular-nums">
-                        {inq.clientName} ({inq.clientPhone}) • Requested Date:{' '}
-                        {formatLocalDate(inq.requestedDate)}
+                        {inq.clientName} ({inq.clientPhone}) • {formatLocalDate(inq.requestedDate)}
                       </p>
                       {inq.notes && (
                         <p className="admin-meta text-slate-400 line-clamp-1 max-w-2xl">
@@ -1423,11 +1422,11 @@ export function BookingsWorkspace({
                         </p>
                       )}
                     </div>
-                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto sm:shrink-0 pt-1 sm:pt-0">
                       {inq.status === 'CONVERTED' ? (
                         <Link
                           href="/admin/bookings"
-                          className="rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 transition-colors"
+                          className="w-full sm:w-auto text-center rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 transition-colors"
                         >
                           Converted • View Bookings →
                         </Link>
@@ -1435,14 +1434,14 @@ export function BookingsWorkspace({
                         <>
                           <Link
                             href="/admin/quotes"
-                            className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                            className="flex-1 sm:flex-initial text-center rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
                           >
                             View Quotes →
                           </Link>
                           <button
                             type="button"
                             onClick={() => openQuoteBuilder(inq)}
-                            className="rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                            className="flex-1 sm:flex-initial text-center rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition-colors cursor-pointer"
                           >
                             + New Quote
                           </button>
@@ -1455,7 +1454,7 @@ export function BookingsWorkspace({
                         <button
                           type="button"
                           onClick={() => openQuoteBuilder(inq)}
-                          className="rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                          className="w-full sm:w-auto text-center rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition-colors cursor-pointer"
                         >
                           Create Quote →
                         </button>
@@ -1634,9 +1633,9 @@ export function BookingsWorkspace({
           MODE 2: DEDICATED QUOTES ROUTE (/admin/quotes)
       ===================================================================== */}
       {resolvedMode === 'quotes' && (
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
+        <div className="space-y-3 sm:space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
+            <div className="hidden lg:block">
               <h1 className="admin-page-title">
                 2. Price Quotes
               </h1>
@@ -1647,7 +1646,7 @@ export function BookingsWorkspace({
             <button
               type="button"
               onClick={() => openQuoteBuilder()}
-              className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 transition-all duration-200 cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs sm:text-sm font-medium text-white shadow-xs hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 transition-all duration-200 cursor-pointer"
             >
               <PlusIcon className="w-4 h-4" />
               <span>Create Price Quote</span>
@@ -1655,8 +1654,8 @@ export function BookingsWorkspace({
           </div>
 
           {/* Search & Status Filters */}
-          <div className="rounded-2xl border border-border/60 bg-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="relative flex-1 max-w-sm">
+          <div className="rounded-xl sm:rounded-2xl border border-border/60 bg-card p-2.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
+            <div className="relative flex-1 sm:max-w-sm">
               <SearchIcon className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="search"
@@ -1691,56 +1690,63 @@ export function BookingsWorkspace({
             </div>
           </div>
 
-          <div className="atelier-card p-4 sm:p-5">
+          <div className="sm:rounded-[0.875rem] sm:border sm:border-[var(--admin-border)] sm:bg-[var(--admin-surface)] sm:p-5">
             {filteredQuotes.length === 0 ? (
-              <div className="py-10 text-center space-y-2">
+              <div className="atelier-card sm:border-0 sm:bg-transparent py-10 px-4 text-center space-y-2">
                 <p className="text-sm font-semibold text-slate-800">No quotes found</p>
                 <p className="text-xs text-slate-500">
                   Click &ldquo;Create Price Quote&rdquo; or convert a client inquiry.
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="space-y-2 sm:space-y-0 sm:divide-y sm:divide-[var(--admin-border)]">
                 {filteredQuotes.map((item) => {
                   const latest = item.versions?.[0] || item.currentVersion;
                   return (
                     <div
                       key={item.id}
-                      className="py-3.5 flex flex-wrap items-center justify-between gap-3"
+                      className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 sm:rounded-none sm:border-0 sm:bg-transparent sm:px-0 sm:py-3.5 flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 sm:gap-3"
                     >
-                      <div className="min-w-0 flex-1 space-y-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-mono-code text-xs font-medium text-slate-500 tabular-nums">
-                            {item.reference}
-                          </span>
-                          <StatusBadge status={item.status} />
+                      <div className="min-w-0 lg:flex-1 space-y-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 min-w-0">
+                            <span className="font-mono-code text-xs font-medium text-slate-500 tabular-nums">
+                              {item.reference}
+                            </span>
+                            <StatusBadge status={item.status} />
+                            {latest && (
+                              <span className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] font-mono-code text-slate-600 tabular-nums">
+                                v{latest.versionNumber}
+                              </span>
+                            )}
+                          </div>
                           {latest && (
-                            <span className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] font-mono-code text-slate-600 tabular-nums">
-                              v{latest.versionNumber}
+                            <span className="lg:hidden font-mono-code text-sm font-semibold text-slate-900 tabular-nums shrink-0">
+                              {formatPoisha(latest.totalPoisha, item.currency)}
                             </span>
                           )}
                         </div>
-                        <p className="admin-row-title line-clamp-1">{item.eventTitle}</p>
+                        <p className="admin-row-title font-medium line-clamp-1">{item.eventTitle}</p>
                         <p className="admin-meta line-clamp-1 tabular-nums">
                           {item.clientName} ({item.clientPhone})
                           {item.requestedDate
-                            ? ` • Requested: ${formatLocalDate(item.requestedDate)}`
+                            ? ` • ${formatLocalDate(item.requestedDate)}`
                             : ''}
                         </p>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-2 shrink-0">
+                      <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto lg:shrink-0 pt-1 lg:pt-0">
                         {latest && (
-                          <span className="text-sm font-semibold text-slate-900 tabular-nums mr-1">
+                          <span className="hidden lg:inline text-sm font-semibold text-slate-900 tabular-nums mr-1">
                             {formatPoisha(latest.totalPoisha, item.currency)}
                           </span>
                         )}
                         <a
                           href={`/api/quotes/${encodeURIComponent(item.id)}/invoice.pdf`}
                           download
-                          className="rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 transition-colors"
+                          className="rounded-xl border border-indigo-200 bg-indigo-50 px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 transition-colors"
                         >
-                          PDF Invoice ↓
+                          PDF ↓
                         </a>
                         {item.status !== 'ACCEPTED' && (
                           <>
@@ -1748,7 +1754,7 @@ export function BookingsWorkspace({
                               type="button"
                               disabled={isPending}
                               onClick={() => startReviseQuote(item)}
-                              className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                              className="rounded-xl border border-slate-200 bg-white px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                             >
                               Revise
                             </button>
@@ -1757,7 +1763,7 @@ export function BookingsWorkspace({
                                 type="button"
                                 disabled={isPending}
                                 onClick={() => handleSendQuote(item)}
-                                className="rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100"
+                                className="rounded-xl border border-indigo-200 bg-indigo-50 px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100"
                               >
                                 Mark Sent
                               </button>
@@ -1782,7 +1788,7 @@ export function BookingsWorkspace({
                               type="button"
                               disabled={isPending}
                               onClick={() => handleAcceptQuote(item)}
-                              className="rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 transition-colors"
+                              className="flex-1 sm:flex-initial text-center rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 transition-colors whitespace-nowrap"
                             >
                               Accept &amp; Book →
                             </button>
@@ -2140,8 +2146,8 @@ export function BookingsWorkspace({
           MODE 3: DEDICATED BOOKINGS LIST ROUTE (/admin/bookings)
       ===================================================================== */}
       {resolvedMode === 'bookings' && (
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-3 sm:space-y-5">
+          <div className="hidden lg:flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="admin-page-title">
                 3. Bookings &amp; Ledger
@@ -2159,8 +2165,8 @@ export function BookingsWorkspace({
           </div>
 
           {/* Search & Status Filters */}
-          <div className="rounded-2xl border border-border/60 bg-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="relative flex-1 max-w-sm">
+          <div className="rounded-xl sm:rounded-2xl border border-border/60 bg-card p-2.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
+            <div className="relative flex-1 sm:max-w-sm">
               <SearchIcon className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="search"
@@ -2195,45 +2201,50 @@ export function BookingsWorkspace({
             </div>
           </div>
 
-          <div className="atelier-card p-4 sm:p-5">
+          <div className="sm:rounded-[0.875rem] sm:border sm:border-[var(--admin-border)] sm:bg-[var(--admin-surface)] sm:p-5">
             {filteredBookings.length === 0 ? (
-              <p className="admin-meta py-10 text-center">
+              <p className="atelier-card sm:border-0 sm:bg-transparent admin-meta py-10 px-4 text-center">
                 No matching bookings. Accept a quote in Price Quotes to create one.
               </p>
             ) : (
-              <div className="divide-y divide-[var(--admin-border)]">
+              <div className="space-y-2 sm:space-y-0 sm:divide-y sm:divide-[var(--admin-border)]">
                 {filteredBookings.map((b) => (
                   <div
                     key={b.id}
-                    className="py-3.5 px-2.5 -mx-2.5 rounded-lg hover:bg-[var(--admin-surface-subtle)] transition-colors flex flex-wrap items-center justify-between gap-4"
+                    className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 sm:rounded-lg sm:border-0 sm:bg-transparent sm:py-3.5 sm:px-2.5 sm:-mx-2.5 hover:bg-[var(--admin-surface-subtle)] transition-colors flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-4"
                   >
                     <button
                       type="button"
                       onClick={() => setQuickDrawerBookingId(b.id)}
-                      className="flex-1 min-w-0 text-left space-y-1 cursor-pointer group focus-visible:outline-none"
+                      className="w-full sm:flex-1 sm:min-w-0 text-left space-y-1 cursor-pointer group focus-visible:outline-none"
                     >
-                      <div className="flex flex-wrap items-center gap-2.5">
-                        <span className="font-mono-code text-xs font-medium text-[var(--admin-muted)] tabular-nums">
-                          {b.reference}
-                        </span>
-                        <StatusBadge status={b.status} />
-                        {b.eventType && (
-                          <span className="text-xs font-medium text-[var(--admin-accent)]">
-                            • {b.eventType.name}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 min-w-0">
+                          <span className="font-mono-code text-[11px] sm:text-xs font-medium text-[var(--admin-muted)] tabular-nums">
+                            {b.reference}
                           </span>
-                        )}
+                          <StatusBadge status={b.status} />
+                          {b.eventType && (
+                            <span className="text-[11px] sm:text-xs font-medium text-[var(--admin-accent)] truncate">
+                              • {b.eventType.name}
+                            </span>
+                          )}
+                        </div>
+                        <span className="sm:hidden font-mono-code text-[13.5px] font-bold text-[var(--admin-text)] tabular-nums shrink-0">
+                          {formatPoisha(b.agreedTotalPoisha, b.currency)}
+                        </span>
                       </div>
-                      <p className="admin-row-title group-hover:text-[var(--admin-accent)] transition-colors line-clamp-1">
+
+                      <p className="admin-row-title font-semibold group-hover:text-[var(--admin-accent)] transition-colors line-clamp-1">
                         {b.eventTitle}
                       </p>
                       <p className="admin-meta line-clamp-1 tabular-nums">
-                        {b.clientName} ({b.clientPhone}) • Event Date:{' '}
-                        {formatLocalDate(b.eventDate)}
+                        {b.clientName} ({b.clientPhone}) • {formatLocalDate(b.eventDate)}
                       </p>
                     </button>
 
-                    <div className="flex items-center gap-3 shrink-0">
-                      <div className="text-right">
+                    <div className="grid grid-cols-2 sm:flex items-center gap-2 sm:gap-3 w-full sm:w-auto sm:shrink-0 pt-2 sm:pt-0 border-t border-[var(--admin-border)]/70 sm:border-t-0">
+                      <div className="hidden sm:block text-right">
                         <p className="text-[11px] font-medium uppercase tracking-wider text-[var(--admin-muted)]">
                           Agreed Price
                         </p>
@@ -2244,13 +2255,13 @@ export function BookingsWorkspace({
                       <button
                         type="button"
                         onClick={() => setQuickDrawerBookingId(b.id)}
-                        className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-1.5 text-xs font-medium text-[var(--admin-text)] hover:border-[var(--admin-accent)]/50 transition-colors cursor-pointer"
+                        className="w-full sm:w-auto text-center rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 sm:py-1.5 text-xs font-medium text-[var(--admin-text)] hover:border-[var(--admin-accent)]/50 transition-colors cursor-pointer"
                       >
                         Quick View
                       </button>
                       <Link
                         href={`/admin/bookings/${b.id}`}
-                        className="rounded-lg bg-[var(--admin-accent)] px-3 py-1.5 text-xs font-semibold text-[#FCFDFD] hover:opacity-95 transition-opacity"
+                        className="w-full sm:w-auto text-center rounded-lg bg-[var(--admin-accent)] px-3 py-2 sm:py-1.5 text-xs font-semibold text-[var(--admin-accent-fg)] hover:opacity-95 transition-opacity"
                       >
                         Workspace →
                       </Link>
