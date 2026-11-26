@@ -512,27 +512,15 @@ function CareerSkeletonBody() {
 
 function AdminOverviewSkeletonBody() {
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="space-y-2">
-          <div className="h-6 w-52 rounded-lg skeleton-bone" />
-          <div className="h-3.5 w-80 max-w-full rounded-md skeleton-bone" />
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="h-9 w-28 rounded-lg skeleton-bone" />
-          <div className="h-9 w-32 rounded-lg skeleton-bone" />
-        </div>
-      </div>
-
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+    <div className="space-y-5">
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="admin-card p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="h-3 w-24 rounded-md skeleton-bone" />
-              <div className="h-7 w-7 rounded-lg skeleton-bone" />
+          <div key={i} className="admin-card px-3.5 py-3 flex items-center justify-between gap-2.5">
+            <div className="space-y-2 flex-1">
+              <div className="h-3 w-20 rounded-md skeleton-bone" />
+              <div className="h-6 w-24 rounded-md skeleton-bone" />
             </div>
-            <div className="h-7 w-28 rounded-lg skeleton-bone" />
-            <div className="h-2.5 w-20 rounded-md skeleton-bone" />
+            <div className="h-8 w-8 rounded-lg skeleton-bone shrink-0" />
           </div>
         ))}
       </div>
@@ -545,24 +533,27 @@ function AdminOverviewSkeletonBody() {
           </div>
           <div className="h-56 w-full rounded-xl skeleton-bone" />
         </div>
-        <div className="lg:col-span-5 admin-card p-5 space-y-4">
+        <div className="lg:col-span-5 admin-card p-5 space-y-3">
           <div className="flex items-center justify-between">
             <div className="h-4 w-36 rounded-md skeleton-bone" />
-            <div className="h-7 w-32 rounded-lg skeleton-bone" />
+            <div className="h-4 w-24 rounded-md skeleton-bone" />
           </div>
-          <div className="h-56 w-full rounded-xl skeleton-bone" />
+          {[1, 2, 3].map((row) => (
+            <div key={row} className="h-16 w-full rounded-lg skeleton-bone" />
+          ))}
         </div>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        {[1, 2].map((i) => (
-          <div key={i} className="admin-card p-5 space-y-3">
-            <div className="h-4 w-44 rounded-md skeleton-bone" />
-            {[1, 2, 3].map((row) => (
-              <div key={row} className="h-12 w-full rounded-lg skeleton-bone" />
-            ))}
-          </div>
-        ))}
+      <div className="admin-card p-5 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="h-4 w-40 rounded-md skeleton-bone" />
+          <div className="h-4 w-20 rounded-md skeleton-bone" />
+        </div>
+        <div className="grid gap-2.5 md:grid-cols-2">
+          {[1, 2, 3, 4].map((row) => (
+            <div key={row} className="h-16 w-full rounded-lg skeleton-bone" />
+          ))}
+        </div>
       </div>
     </div>
   );

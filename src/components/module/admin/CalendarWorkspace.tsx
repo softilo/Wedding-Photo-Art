@@ -1274,27 +1274,43 @@ export function CalendarWorkspace({
         {/* VIEW 1: Interactive Month Calendar Grid */}
         {viewMode === 'month' && (
           <div className="space-y-5">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-slate-900">{monthLabel}</h2>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-4">
+                <h2 className="text-lg font-bold text-[var(--admin-text)]">{monthLabel}</h2>
+                <div className="flex items-center gap-3 text-[11px] text-[var(--admin-muted)]">
+                  <span className="inline-flex items-center gap-1.5 font-medium">
+                    <span className="h-2.5 w-2.5 rounded-xs bg-[var(--admin-accent)]" />
+                    Scheduled
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 font-medium">
+                    <span className="h-2.5 w-2.5 rounded-xs bg-emerald-500" />
+                    Completed
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 font-medium">
+                    <span className="h-2.5 w-2.5 rounded-full border-2 border-[var(--admin-accent)]" />
+                    Today
+                  </span>
+                </div>
+              </div>
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => navigateMonth(-1)}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
                 >
                   ← Prev
                 </button>
                 <button
                   type="button"
                   onClick={jumpToToday}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
                 >
                   Today
                 </button>
                 <button
                   type="button"
                   onClick={() => navigateMonth(1)}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
                 >
                   Next →
                 </button>
@@ -1314,58 +1330,101 @@ export function CalendarWorkspace({
                   ))}
                 </div>
 
-                <div className="grid grid-cols-7 divide-x divide-y divide-slate-200 bg-white">
+                <div className="grid grid-cols-7 divide-x divide-y divide-slate-200 bg-[var(--admin-surface)]">
                   {monthGridCells.map((cell) => {
                     const isToday = cell.ymd === todayIso;
                     const isSelected = cell.ymd === selectedDay;
+                    const hasSessions = cell.items.length > 0;
+                    const allCompleted =
+                      hasSessions && cell.items.every((s) => s.status === 'COMPLETED');
+
                     return (
                       <div
                         key={cell.ymd}
                         onClick={() => setSelectedDay(cell.ymd)}
                         className={cn(
-                          'min-h-[104px] p-1.5 cursor-pointer transition-colors flex flex-col gap-1',
-                          !cell.inCurrentMonth && 'bg-slate-50/70 text-slate-400',
-                          isSelected && 'bg-indigo-50/60 ring-2 ring-inset ring-indigo-500',
+                          'relative min-h-[110px] p-2 cursor-pointer transition-all flex flex-col gap-1.5',
+                          hasSessions
+                            ? allCompleted
+                              ? 'bg-emerald-500/12 hover:bg-emerald-500/18 shadow-[inset_0_3px_0_0_#10b981]'
+                              : 'bg-[var(--admin-accent-soft)] hover:bg-[var(--admin-accent)]/25 shadow-[inset_0_3px_0_0_var(--admin-accent)]'
+                            : !cell.inCurrentMonth
+                              ? 'bg-[var(--admin-surface-subtle)]/55 text-[var(--admin-muted)]/60'
+                              : 'bg-[var(--admin-surface)] hover:bg-[var(--admin-surface-subtle)]/65',
+                          isSelected && 'ring-2 ring-inset ring-[var(--admin-text)] z-10',
                         )}
                       >
-                        <div className="flex items-center justify-between">
-                          <span
-                            className={cn(
-                              'inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold',
-                              isToday
-                                ? 'bg-indigo-600 text-white'
-                                : cell.inCurrentMonth
-                                  ? 'text-slate-700'
-                                  : 'text-slate-400',
+                        <div className="flex items-center justify-between gap-1">
+                          <div className="flex items-center gap-1">
+                            <span
+                              className={cn(
+                                'inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold tabular-nums',
+                                hasSessions
+                                  ? allCompleted
+                                    ? 'bg-emerald-600 text-white'
+                                    : 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)]'
+                                  : isToday
+                                    ? 'border-2 border-[var(--admin-accent)] text-[var(--admin-accent)]'
+                                    : cell.inCurrentMonth
+                                      ? 'text-[var(--admin-text)] font-semibold'
+                                      : 'text-[var(--admin-muted)]/60 font-medium',
+                              )}
+                            >
+                              {cell.dayOfMonth}
+                            </span>
+                            {isToday && (
+                              <span className="text-[9.5px] font-bold uppercase tracking-wider text-[var(--admin-accent)]">
+                                Today
+                              </span>
                             )}
-                          >
-                            {cell.dayOfMonth}
-                          </span>
-                          {cell.items.length > 0 && (
-                            <span className="text-[10px] font-semibold text-slate-500">
-                              {cell.items.length}
+                          </div>
+
+                          {hasSessions && (
+                            <span
+                              className={cn(
+                                'rounded-full px-2 py-0.5 text-[10px] font-bold tracking-tight tabular-nums',
+                                allCompleted
+                                  ? 'bg-emerald-600 text-white'
+                                  : 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)]',
+                              )}
+                            >
+                              {cell.items.length} {cell.items.length === 1 ? 'shoot' : 'shoots'}
                             </span>
                           )}
                         </div>
 
                         <div className="space-y-1">
-                          {cell.items.slice(0, 2).map((sess) => (
-                            <div
-                              key={sess.id}
-                              className={cn(
-                                'rounded-md px-1.5 py-0.5 text-[11px] font-medium truncate border',
-                                sess.status === 'COMPLETED'
-                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                                  : 'bg-indigo-50 text-indigo-800 border-indigo-200',
-                              )}
-                              title={`${formatTimeShortInTz(sess.startAt, timezone)} • ${sess.title}`}
-                            >
-                              {formatTimeShortInTz(sess.startAt, timezone)} {sess.title}
-                            </div>
-                          ))}
+                          {cell.items.slice(0, 2).map((sess) => {
+                            const isDone = sess.status === 'COMPLETED';
+                            return (
+                              <div
+                                key={sess.id}
+                                className={cn(
+                                  'rounded-lg px-2 py-1 text-[11px] font-semibold truncate border flex items-center gap-1.5',
+                                  isDone
+                                    ? 'bg-[var(--admin-surface)] border-emerald-500/45 text-emerald-700 dark:text-emerald-300'
+                                    : 'bg-[var(--admin-surface)] border-[var(--admin-accent)]/50 text-[var(--admin-text)]',
+                                )}
+                                title={`${formatTimeShortInTz(sess.startAt, timezone)} • ${sess.title}`}
+                              >
+                                <span
+                                  className={cn(
+                                    'h-1.5 w-1.5 rounded-full shrink-0',
+                                    isDone ? 'bg-emerald-500' : 'bg-[var(--admin-accent)]',
+                                  )}
+                                />
+                                <span className="truncate">
+                                  <span className="font-mono-code font-bold">
+                                    {formatTimeShortInTz(sess.startAt, timezone)}
+                                  </span>{' '}
+                                  {sess.title}
+                                </span>
+                              </div>
+                            );
+                          })}
                           {cell.items.length > 2 && (
-                            <p className="text-[10px] font-semibold text-indigo-600 pl-1">
-                              +{cell.items.length - 2} more
+                            <p className="text-[10px] font-bold text-[var(--admin-accent)] pl-1">
+                              +{cell.items.length - 2} more scheduled
                             </p>
                           )}
                         </div>

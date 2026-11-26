@@ -14,28 +14,18 @@ import {
 } from '@/types/event-management';
 import { cn, formatDateTimeInTz, formatLocalDate, formatPoisha } from '@/lib/utils';
 import { StatusBadge } from '@/components/shared/StatusBadge';
-import { BrandMark } from '@/components/common/BrandMark';
 import {
   ApertureIcon,
-  ArrowRightIcon,
   BarChartIcon,
   CalendarIcon,
-  CameraIcon,
   CheckCircleIcon,
-  ClockIcon,
-  ExternalLinkIcon,
-  FilmIcon,
-  PlusIcon,
   ReceiptIcon,
-  StarIcon,
   UsersIcon,
 } from '@/components/shared/Icons';
 import {
-  BreakdownDonutChart,
   formatCompactPoisha,
   formatMonthShort,
   GroupedBarChart,
-  HorizontalRankBars,
 } from './AdminCharts';
 import { BookingQuickDrawer } from './BookingQuickDrawer';
 
@@ -52,15 +42,6 @@ interface AdminOverviewProps {
 
 type AlertTab = 'payments' | 'confirm' | 'unscheduled' | 'deliverables';
 type TrendChartMode = 'cashflow' | 'activity' | 'shoots';
-type MixChartMode = 'status' | 'categories' | 'funnel';
-
-const CHART_PALETTE = ['#CAA650', '#8B6A21', '#E7D1AA', '#A88332', '#6F6130'];
-
-function parseUtcDayMs(dateKey: string): number {
-  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(dateKey.trim());
-  if (!match) return Number.NaN;
-  return Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
-}
 
 function toLocalMonthKey(dateInput: string, timezone: string): string | null {
   const d = new Date(dateInput);
@@ -129,7 +110,6 @@ export function AdminOverview({
   const [trendMode, setTrendMode] = useState<TrendChartMode>(
     hasCashflowData ? 'cashflow' : 'activity',
   );
-  const [mixMode, setMixMode] = useState<MixChartMode>('status');
 
   const cashflowChartData = useMemo(() => {
     if (!financialReport) return [];
@@ -212,204 +192,6 @@ export function AdminOverview({
     return days;
   }, [upcomingSessions, timezone, anchorDate]);
 
-  const bookingStatusSegments = useMemo(() => {
-    const buckets: Array<{
-      id: Booking['status'];
-      label: string;
-      color: string;
-    }> = [
-      { id: 'CONFIRMED', label: 'Confirmed', color: '#10B981' },
-      { id: 'PENDING_CONFIRMATION', label: 'Pending Confirm', color: '#CAA650' },
-      { id: 'COMPLETED', label: 'Completed', color: '#8B6A21' },
-      { id: 'CANCELLED', label: 'Cancelled', color: '#9E6359' },
-    ];
-
-    return buckets.map((bucket) => {
-      const matched = bookings.filter((b) => b.status === bucket.id);
-      const sumPoisha = matched.reduce((acc, b) => acc + b.agreedTotalPoisha, 0);
-      return {
-        id: bucket.id,
-        label: bucket.label,
-        value: matched.length,
-        displayValue: String(matched.length),
-        hint: matched.length > 0 ? formatPoisha(sumPoisha, currency) : undefined,
-        color: bucket.color,
-      };
-    });
-  }, [bookings, currency]);
-
-  const categorySegments = useMemo(() => {
-    if (financialReport && financialReport.byEventType.length > 0) {
-      return financialReport.byEventType.slice(0, 5).map((et, idx) => ({
-        id: et.eventTypeId,
-        label: et.eventTypeName,
-        value: et.agreedTotalPoisha,
-        displayValue: formatCompactPoisha(et.agreedTotalPoisha, currency),
-        hint: `${et.bookingsCount} ${et.bookingsCount === 1 ? 'booking' : 'bookings'}`,
-        color: CHART_PALETTE[idx % CHART_PALETTE.length],
-      }));
-    }
-
-    const agg = new Map<string, { name: string; totalPoisha: number; count: number }>();
-    for (const b of bookings) {
-      if (b.status === 'CANCELLED') continue;
-      const key = b.eventType?.id || 'custom';
-      const name = b.eventType?.name || 'Custom Event';
-      const prev = agg.get(key) || { name, totalPoisha: 0, count: 0 };
-      prev.totalPoisha += b.agreedTotalPoisha;
-      prev.count += 1;
-      agg.set(key, prev);
-    }
-
-    return Array.from(agg.entries())
-      .sort((a, b) => b[1].totalPoisha - a[1].totalPoisha)
-      .slice(0, 5)
-      .map(([id, entry], idx) => ({
-        id,
-        label: entry.name,
-        value: entry.totalPoisha,
-        displayValue: formatCompactPoisha(entry.totalPoisha, currency),
-        hint: `${entry.count} ${entry.count === 1 ? 'booking' : 'bookings'}`,
-        color: CHART_PALETTE[idx % CHART_PALETTE.length],
-      }));
-  }, [financialReport, bookings, currency]);
-
-  const funnelItems = useMemo(() => {
-    const activeQuotesCount = quotes.filter(
-      (q) => q.status === 'SENT' || q.status === 'ACCEPTED',
-    ).length;
-    const acceptedQuotesCount = quotes.filter((q) => q.status === 'ACCEPTED').length;
-    const activeBookingsCount = bookings.filter((b) => b.status !== 'CANCELLED').length;
-    const confirmedOrDone = bookings.filter(
-      (b) => b.status === 'CONFIRMED' || b.status === 'COMPLETED',
-    ).length;
-
-    const base = Math.max(inquiries.length, activeQuotesCount, activeBookingsCount, 1);
-
-    return [
-      {
-        id: 'inq',
-        label: 'Inquiries Logged',
-        value: inquiries.length,
-        displayValue: `${inquiries.length}`,
-        percent: (inquiries.length / base) * 100,
-        subtext: `${newInquiriesCount} awaiting triage`,
-        color: '#E7D1AA',
-      },
-      {
-        id: 'quotes',
-        label: 'Proposals Sent / Accepted',
-        value: activeQuotesCount,
-        displayValue: `${activeQuotesCount}`,
-        percent: (activeQuotesCount / base) * 100,
-        subtext: `${acceptedQuotesCount} accepted by client`,
-        color: '#CAA650',
-      },
-      {
-        id: 'bookings',
-        label: 'Active Bookings',
-        value: activeBookingsCount,
-        displayValue: `${activeBookingsCount}`,
-        percent: (activeBookingsCount / base) * 100,
-        subtext: `${pendingConfirmCount} awaiting confirmation`,
-        color: '#8B6A21',
-      },
-      {
-        id: 'confirmed',
-        label: 'Confirmed & Completed',
-        value: confirmedOrDone,
-        displayValue: `${confirmedOrDone}`,
-        percent: (confirmedOrDone / base) * 100,
-        subtext: formatPoisha(totalAgreedPoisha, currency),
-        color: '#10B981',
-      },
-    ];
-  }, [
-    inquiries.length,
-    newInquiriesCount,
-    quotes,
-    bookings,
-    pendingConfirmCount,
-    totalAgreedPoisha,
-    currency,
-  ]);
-
-  const nextShootSpotlight = useMemo(() => {
-    const active = upcomingSessions
-      .filter((s) => s.status !== 'CANCELLED')
-      .sort((a, b) => (Date.parse(a.startAt) || 0) - (Date.parse(b.startAt) || 0));
-    if (active.length === 0) return null;
-
-    const anchorMs = parseUtcDayMs(anchorDate);
-    const chosen =
-      active.find((s) => {
-        const dk = s.agencyLocalDate || toLocalDateKey(s.startAt, timezone);
-        const ms = parseUtcDayMs(dk);
-        return Number.isNaN(anchorMs) || Number.isNaN(ms) || ms >= anchorMs;
-      }) || active[0];
-
-    const chosenDateKey =
-      chosen.agencyLocalDate || toLocalDateKey(chosen.startAt, timezone);
-    const chosenMs = parseUtcDayMs(chosenDateKey);
-    const diffDays =
-      !Number.isNaN(anchorMs) && !Number.isNaN(chosenMs)
-        ? Math.round((chosenMs - anchorMs) / 86400000)
-        : 0;
-
-    const countdownLabel =
-      diffDays <= 0
-        ? 'Shoot Today'
-        : diffDays === 1
-          ? 'Tomorrow'
-          : `In ${diffDays} Days`;
-
-    return {
-      session: chosen,
-      dateKey: chosenDateKey,
-      countdownLabel,
-    };
-  }, [upcomingSessions, anchorDate, timezone]);
-
-  const formattedAnchorDate = useMemo(() => {
-    const parsed = new Date(`${anchorDate}T12:00:00.000Z`);
-    if (Number.isNaN(parsed.getTime())) return anchorDate;
-    try {
-      return new Intl.DateTimeFormat('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        timeZone: 'UTC',
-      }).format(parsed);
-    } catch {
-      return anchorDate;
-    }
-  }, [anchorDate]);
-
-  const activeBookingsTotal = bookings.filter((b) => b.status !== 'CANCELLED').length;
-  const meterPercent = financialReport
-    ? Math.max(0, Math.min(100, financialReport.summary.collectionRatePercent))
-    : activeBookingsTotal > 0
-      ? Math.round((confirmedCount / activeBookingsTotal) * 100)
-      : 0;
-
-  const inquiriesRatio =
-    inquiries.length > 0
-      ? Math.min(100, Math.max(10, Math.round((newInquiriesCount / inquiries.length) * 100)))
-      : 0;
-  const quotesRatio =
-    quotes.length > 0
-      ? Math.min(100, Math.max(10, Math.round((openQuotesCount / quotes.length) * 100)))
-      : 0;
-  const confirmedRatio =
-    activeBookingsTotal > 0
-      ? Math.min(100, Math.max(10, Math.round((confirmedCount / activeBookingsTotal) * 100)))
-      : 0;
-  const shootsRatio =
-    upcomingSessions.length > 0
-      ? Math.min(100, Math.max(14, upcomingSessions.length * 10))
-      : 0;
-
   const defaultAlertTab: AlertTab =
     (alerts?.counts.pendingPayments ?? 0) > 0
       ? 'payments'
@@ -432,443 +214,89 @@ export function AdminOverview({
     (alerts?.counts.urgentDeliverables ?? 0);
 
   return (
-    <div className="space-y-6">
-      {/* Wedding PhotoArt Obsidian Noir & Gold Studio Command Spotlight */}
-      <section className="relative overflow-hidden rounded-2xl border border-[#D4AF56]/35 bg-gradient-to-br from-[#14141B] via-[#121218] to-[#1D1912] text-[#F7F5EF] shadow-sm">
-        <div className="h-[2px] w-full bg-gradient-to-r from-[#8B6A21] via-[#E7D1AA] to-[#8B6A21]" />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full opacity-20 blur-3xl"
-          style={{
-            background: 'radial-gradient(circle, #D4AF56 0%, transparent 70%)',
-          }}
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -left-16 -bottom-24 h-60 w-60 rounded-full opacity-10 blur-3xl"
-          style={{
-            background: 'radial-gradient(circle, #8B6A21 0%, transparent 70%)',
-          }}
-        />
-
-        <div className="relative grid gap-5 p-5 sm:p-6 xl:grid-cols-12 items-stretch">
-          <div className="xl:col-span-6 flex flex-col justify-between gap-4">
-            <div className="space-y-3">
-              <div className="flex flex-wrap items-center gap-3">
-                <BrandMark
-                  logoUrl={settings?.logoUrl}
-                  alt={settings?.displayName || 'Wedding PhotoArt'}
-                  variant="dark"
-                  size={52}
-                  className="rounded-xl shadow-sm"
-                />
-                <div className="min-w-0">
-                  <div className="inline-flex items-center gap-1.5 rounded-full border border-[#D4AF56]/35 bg-[#D4AF56]/10 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider text-[#E7D1AA]">
-                    <StarIcon className="w-3 h-3 text-[#D4AF56]" />
-                    <span>Studio Command Cockpit</span>
-                  </div>
-                  <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-[#F7F5EF] mt-1.5 truncate">
-                    {settings?.displayName || 'Wedding PhotoArt'}
-                  </h1>
-                </div>
-              </div>
-
-              <p className="text-[13px] leading-relaxed text-[#D8D4CA] tabular-nums">
-                <span className="text-[#E7D1AA] font-medium">{formattedAnchorDate}</span> •{' '}
-                {confirmedCount} confirmed bookings • {newInquiriesCount} new inquiries •{' '}
-                {upcomingSessions.length} shoots in the next 14 days
-                {totalAlerts > 0 ? ` • ${totalAlerts} items awaiting action` : ''}
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2.5 pt-1">
-              <Link
-                href="/admin/calendar"
-                className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3.5 py-2 text-[13px] font-medium text-[#F7F5EF] hover:border-[#D4AF56]/55 hover:bg-white/10 transition-colors"
-              >
-                <CalendarIcon className="w-4 h-4 text-[#D4AF56]" />
-                <span>Shoot Calendar</span>
-              </Link>
-              <Link
-                href="/admin/bookings"
-                className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-b from-[#E2C06C] to-[#CCA449] px-3.5 py-2 text-[13px] font-semibold text-[#12100B] hover:from-[#EBD089] hover:to-[#D4AF56] transition-all"
-              >
-                <span>All Bookings</span>
-                <ArrowRightIcon className="w-4 h-4" />
-              </Link>
-              {financialReport && (
-                <Link
-                  href="/admin/finance"
-                  className="inline-flex items-center gap-2 rounded-lg border border-[#D4AF56]/30 px-3.5 py-2 text-[13px] font-medium text-[#E7D1AA] hover:border-[#D4AF56]/60 hover:bg-white/5 transition-colors"
-                >
-                  <ReceiptIcon className="w-4 h-4 text-[#D4AF56]" />
-                  <span>Finance Ledger</span>
-                </Link>
-              )}
-            </div>
-          </div>
-
-          <div className="xl:col-span-6 grid gap-3.5 sm:grid-cols-2">
-            {/* Next Shoot Countdown Card */}
-            {nextShootSpotlight ? (
-              nextShootSpotlight.session.bookingId ? (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setDrawerState({
-                      bookingId: nextShootSpotlight.session.bookingId!,
-                      focus: 'schedule',
-                    })
-                  }
-                  className="group w-full text-left rounded-xl border border-[#D4AF56]/25 bg-[#1A1A22] p-4 flex flex-col justify-between gap-3 hover:border-[#D4AF56]/70 hover:bg-[#22222C] transition-all cursor-pointer"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-[#E7D1AA]">
-                      <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                      Next Shoot Countdown
-                    </span>
-                    <ClockIcon className="w-4 h-4 text-[#D4AF56]" />
-                  </div>
-
-                  <div>
-                    <p className="text-2xl font-semibold tracking-tight text-[#D4AF56] tabular-nums">
-                      {nextShootSpotlight.countdownLabel}
-                    </p>
-                    <p className="text-[13.5px] font-medium text-[#F7F5EF] line-clamp-1 mt-0.5">
-                      {nextShootSpotlight.session.title}
-                    </p>
-                    <p className="text-[12px] text-[#A1A1AA] mt-1 tabular-nums line-clamp-1">
-                      {nextShootSpotlight.dateKey} •{' '}
-                      {formatDateTimeInTz(nextShootSpotlight.session.startAt, timezone)}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between border-t border-white/10 pt-2.5 text-[12px]">
-                    <span className="text-[#C7C5BE] truncate">
-                      {nextShootSpotlight.session.booking?.reference || 'Scheduled session'}
-                    </span>
-                    <span className="font-medium text-[#D4AF56] group-hover:translate-x-0.5 transition-transform">
-                      Open slot →
-                    </span>
-                  </div>
-                </button>
-              ) : (
-                <Link
-                  href="/admin/calendar"
-                  className="group w-full text-left rounded-xl border border-[#D4AF56]/25 bg-[#1A1A22] p-4 flex flex-col justify-between gap-3 hover:border-[#D4AF56]/70 hover:bg-[#22222C] transition-all"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-[#E7D1AA]">
-                      <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                      Next Shoot Countdown
-                    </span>
-                    <ClockIcon className="w-4 h-4 text-[#D4AF56]" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-semibold tracking-tight text-[#D4AF56] tabular-nums">
-                      {nextShootSpotlight.countdownLabel}
-                    </p>
-                    <p className="text-[13.5px] font-medium text-[#F7F5EF] line-clamp-1 mt-0.5">
-                      {nextShootSpotlight.session.title}
-                    </p>
-                    <p className="text-[12px] text-[#A1A1AA] mt-1 tabular-nums line-clamp-1">
-                      {nextShootSpotlight.dateKey} •{' '}
-                      {formatDateTimeInTz(nextShootSpotlight.session.startAt, timezone)}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-white/10 pt-2.5 text-[12px]">
-                    <span className="text-[#C7C5BE]">Calendar slot</span>
-                    <span className="font-medium text-[#D4AF56]">Open calendar →</span>
-                  </div>
-                </Link>
-              )
-            ) : (
-              <Link
-                href="/admin/calendar"
-                className="group w-full text-left rounded-xl border border-dashed border-[#D4AF56]/35 bg-[#1A1A22] p-4 flex flex-col justify-between gap-3 hover:border-[#D4AF56] transition-colors"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-medium uppercase tracking-wider text-[#E7D1AA]">
-                    Next Shoot Countdown
-                  </span>
-                  <CalendarIcon className="w-4 h-4 text-[#D4AF56]" />
-                </div>
-                <div>
-                  <p className="text-lg font-semibold text-[#F7F5EF]">No Shoots in 14d Window</p>
-                  <p className="text-[12px] text-[#A1A1AA] mt-1">
-                    Assign shoot dates for confirmed weddings and pre-wedding sessions.
-                  </p>
-                </div>
-                <span className="text-[12px] font-medium text-[#D4AF56]">
-                  Schedule next shoot →
-                </span>
-              </Link>
-            )}
-
-            {/* Studio Pipeline & Collection Meter Card */}
-            <div className="rounded-xl border border-[#D4AF56]/25 bg-[#1A1A22] p-4 flex flex-col justify-between gap-3">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[11px] font-medium uppercase tracking-wider text-[#E7D1AA]">
-                  {financialReport ? 'Collection Health' : 'Pipeline Readiness'}
-                </span>
-                <span className="rounded-full bg-[#D4AF56]/15 px-2 py-0.5 text-[11px] font-semibold text-[#E7D1AA] tabular-nums">
-                  {meterPercent.toFixed(0)}%
-                </span>
-              </div>
-
-              <div>
-                <p className="text-2xl font-semibold tracking-tight text-[#F7F5EF] tabular-nums">
-                  {formatPoisha(totalAgreedPoisha, currency)}
-                </p>
-                <p className="text-[12px] text-[#A1A1AA] mt-0.5 tabular-nums">
-                  {financialReport
-                    ? `${formatPoisha(financialReport.summary.totalOutstandingDuePoisha, currency)} outstanding balance`
-                    : `${confirmedCount} confirmed of ${activeBookingsTotal} active bookings`}
-                </p>
-              </div>
-
-              <div className="space-y-2 border-t border-white/10 pt-2.5">
-                <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${Math.max(4, meterPercent)}%`,
-                      background:
-                        'linear-gradient(90deg, #8B6A21 0%, #D4AF56 55%, #E7D1AA 100%)',
-                    }}
-                  />
-                </div>
-                <div className="flex items-center justify-between text-[11.5px] text-[#C7C5BE] tabular-nums">
-                  <span>
-                    {financialReport
-                      ? `${meterPercent.toFixed(1)}% collected`
-                      : `${openQuotesCount} active proposals`}
-                  </span>
-                  <span>{timezone}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 1-Click Studio Launchpad Strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+    <div className="space-y-5">
+      {/* Compact Minimal Studio KPI Cards */}
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
         <Link
           href="/admin/inquiries"
-          className="group flex items-center gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-2.5 transition-all hover:-translate-y-0.5 hover:border-[var(--admin-accent)]"
+          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-3 hover:border-[var(--admin-accent)]/60 transition-colors group flex items-center justify-between gap-2.5"
         >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
-            <PlusIcon className="w-4 h-4" />
-          </span>
           <div className="min-w-0">
-            <p className="text-[13px] font-semibold text-[var(--admin-text)] group-hover:text-[var(--admin-accent)] transition-colors truncate">
-              Log Inquiry
+            <p className="text-[11.5px] font-medium text-[var(--admin-muted)] truncate">
+              Inquiries
             </p>
-            <p className="text-[11.5px] text-[var(--admin-muted)] truncate">
-              Capture new client lead
+            <p className="text-lg sm:text-xl font-semibold tracking-tight text-[var(--admin-text)] mt-0.5 tabular-nums">
+              {newInquiriesCount}
+              <span className="text-[11px] font-normal text-[var(--admin-muted)] ml-1">
+                new • {inquiries.length} total
+              </span>
             </p>
           </div>
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
+            <ApertureIcon className="w-4 h-4" />
+          </span>
         </Link>
 
         <Link
           href="/admin/quotes"
-          className="group flex items-center gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-2.5 transition-all hover:-translate-y-0.5 hover:border-[var(--admin-accent)]"
+          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-3 hover:border-[var(--admin-accent)]/60 transition-colors group flex items-center justify-between gap-2.5"
         >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
+          <div className="min-w-0">
+            <p className="text-[11.5px] font-medium text-[var(--admin-muted)] truncate">
+              Price Quotes
+            </p>
+            <p className="text-lg sm:text-xl font-semibold tracking-tight text-[var(--admin-text)] mt-0.5 tabular-nums">
+              {openQuotesCount}
+              <span className="text-[11px] font-normal text-[var(--admin-muted)] ml-1">
+                active • {quotes.length} total
+              </span>
+            </p>
+          </div>
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#CAA650]/15 text-[#8B6A21]">
             <ReceiptIcon className="w-4 h-4" />
           </span>
-          <div className="min-w-0">
-            <p className="text-[13px] font-semibold text-[var(--admin-text)] group-hover:text-[var(--admin-accent)] transition-colors truncate">
-              Craft Quote
-            </p>
-            <p className="text-[11.5px] text-[var(--admin-muted)] truncate">
-              Send custom proposal
-            </p>
-          </div>
-        </Link>
-
-        <Link
-          href="/admin/gallery"
-          className="group flex items-center gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-2.5 transition-all hover:-translate-y-0.5 hover:border-[var(--admin-accent)]"
-        >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
-            <CameraIcon className="w-4 h-4" />
-          </span>
-          <div className="min-w-0">
-            <p className="text-[13px] font-semibold text-[var(--admin-text)] group-hover:text-[var(--admin-accent)] transition-colors truncate">
-              Upload Gallery
-            </p>
-            <p className="text-[11.5px] text-[var(--admin-muted)] truncate">
-              Deliver client albums
-            </p>
-          </div>
-        </Link>
-
-        <Link
-          href="/admin/portfolio"
-          className="group flex items-center gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-2.5 transition-all hover:-translate-y-0.5 hover:border-[var(--admin-accent)]"
-        >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
-            <FilmIcon className="w-4 h-4" />
-          </span>
-          <div className="min-w-0">
-            <p className="text-[13px] font-semibold text-[var(--admin-text)] group-hover:text-[var(--admin-accent)] transition-colors truncate">
-              Publish Highlight
-            </p>
-            <p className="text-[11.5px] text-[var(--admin-muted)] truncate">
-              Showcase films &amp; reels
-            </p>
-          </div>
-        </Link>
-
-        <Link
-          href="/"
-          target="_blank"
-          rel="noreferrer"
-          className="group col-span-2 sm:col-span-1 flex items-center gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-2.5 transition-all hover:-translate-y-0.5 hover:border-[var(--admin-accent)]"
-        >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
-            <ExternalLinkIcon className="w-4 h-4" />
-          </span>
-          <div className="min-w-0">
-            <p className="text-[13px] font-semibold text-[var(--admin-text)] group-hover:text-[var(--admin-accent)] transition-colors truncate">
-              Live Storefront
-            </p>
-            <p className="text-[11.5px] text-[var(--admin-muted)] truncate">
-              Preview public site
-            </p>
-          </div>
-        </Link>
-      </div>
-
-      {/* 4 Branded KPI Cards with Momentum Meters */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Link
-          href="/admin/inquiries"
-          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 hover:border-[var(--admin-accent)]/60 transition-all group flex flex-col justify-between gap-3"
-        >
-          <div>
-            <div className="flex items-center justify-between">
-              <span className="text-[13px] font-medium text-[var(--admin-muted)]">
-                Inquiries
-              </span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
-                <ApertureIcon className="w-4 h-4" />
-              </span>
-            </div>
-            <p className="text-[24px] font-semibold tracking-tight text-[var(--admin-text)] mt-2.5 tabular-nums">
-              {newInquiriesCount}
-              <span className="text-[12.5px] font-normal text-[var(--admin-muted)] ml-1.5">
-                new
-              </span>
-            </p>
-            <p className="text-[12.5px] text-[var(--admin-muted)] mt-1 flex items-center gap-1 group-hover:text-[var(--admin-accent)] transition-colors tabular-nums">
-              <span>{inquiries.length} total • Open queue</span>
-              <ArrowRightIcon className="w-3 h-3" />
-            </p>
-          </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--admin-surface-subtle)]">
-            <div
-              className="h-full rounded-full bg-[var(--admin-accent)] transition-all duration-500"
-              style={{ width: `${inquiriesRatio}%` }}
-            />
-          </div>
-        </Link>
-
-        <Link
-          href="/admin/quotes"
-          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 hover:border-[var(--admin-accent)]/60 transition-all group flex flex-col justify-between gap-3"
-        >
-          <div>
-            <div className="flex items-center justify-between">
-              <span className="text-[13px] font-medium text-[var(--admin-muted)]">
-                Price Quotes
-              </span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#CAA650]/15 text-[#8B6A21]">
-                <ReceiptIcon className="w-4 h-4" />
-              </span>
-            </div>
-            <p className="text-[24px] font-semibold tracking-tight text-[var(--admin-text)] mt-2.5 tabular-nums">
-              {openQuotesCount}
-              <span className="text-[12.5px] font-normal text-[var(--admin-muted)] ml-1.5">
-                active
-              </span>
-            </p>
-            <p className="text-[12.5px] text-[var(--admin-muted)] mt-1 flex items-center gap-1 group-hover:text-[var(--admin-accent)] transition-colors tabular-nums">
-              <span>{quotes.length} total • Manage quotes</span>
-              <ArrowRightIcon className="w-3 h-3" />
-            </p>
-          </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--admin-surface-subtle)]">
-            <div
-              className="h-full rounded-full bg-[#CAA650] transition-all duration-500"
-              style={{ width: `${quotesRatio}%` }}
-            />
-          </div>
         </Link>
 
         <Link
           href="/admin/bookings"
-          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 hover:border-[var(--admin-accent)]/60 transition-all group flex flex-col justify-between gap-3"
+          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-3 hover:border-[var(--admin-accent)]/60 transition-colors group flex items-center justify-between gap-2.5"
         >
-          <div>
-            <div className="flex items-center justify-between">
-              <span className="text-[13px] font-medium text-[var(--admin-muted)]">
-                Bookings
-              </span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/12 text-emerald-600">
-                <UsersIcon className="w-4 h-4" />
-              </span>
-            </div>
-            <p className="text-[24px] font-semibold tracking-tight text-[var(--admin-text)] mt-2.5 tabular-nums">
+          <div className="min-w-0">
+            <p className="text-[11.5px] font-medium text-[var(--admin-muted)] truncate">
+              Bookings
+            </p>
+            <p className="text-lg sm:text-xl font-semibold tracking-tight text-[var(--admin-text)] mt-0.5 tabular-nums truncate">
               {confirmedCount}
-              <span className="text-[12.5px] font-normal text-[var(--admin-muted)] ml-1.5">
-                confirmed{pendingConfirmCount > 0 ? ` • ${pendingConfirmCount} pending` : ''}
+              <span className="text-[11px] font-normal text-[var(--admin-muted)] ml-1">
+                {pendingConfirmCount > 0
+                  ? `confirmed • ${pendingConfirmCount} pending`
+                  : `• ${formatPoisha(totalAgreedPoisha, currency)}`}
               </span>
             </p>
-            <p className="text-[12.5px] text-[var(--admin-muted)] mt-1 tabular-nums truncate group-hover:text-[var(--admin-accent)] transition-colors">
-              {formatPoisha(totalAgreedPoisha, currency)} active pipeline
-            </p>
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--admin-surface-subtle)]">
-            <div
-              className="h-full rounded-full bg-emerald-500 transition-all duration-500"
-              style={{ width: `${confirmedRatio}%` }}
-            />
-          </div>
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/12 text-emerald-600">
+            <UsersIcon className="w-4 h-4" />
+          </span>
         </Link>
 
         <Link
           href="/admin/calendar"
-          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 hover:border-[var(--admin-accent)]/60 transition-all group flex flex-col justify-between gap-3"
+          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-3 hover:border-[var(--admin-accent)]/60 transition-colors group flex items-center justify-between gap-2.5"
         >
-          <div>
-            <div className="flex items-center justify-between">
-              <span className="text-[13px] font-medium text-[var(--admin-muted)]">
-                Upcoming Shoots
-              </span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
-                <CalendarIcon className="w-4 h-4" />
-              </span>
-            </div>
-            <p className="text-[24px] font-semibold tracking-tight text-[var(--admin-text)] mt-2.5 tabular-nums">
+          <div className="min-w-0">
+            <p className="text-[11.5px] font-medium text-[var(--admin-muted)] truncate">
+              Upcoming Shoots
+            </p>
+            <p className="text-lg sm:text-xl font-semibold tracking-tight text-[var(--admin-text)] mt-0.5 tabular-nums">
               {upcomingSessions.length}
-              <span className="text-[12.5px] font-normal text-[var(--admin-muted)] ml-1.5">
+              <span className="text-[11px] font-normal text-[var(--admin-muted)] ml-1">
                 next 14d
               </span>
             </p>
-            <p className="text-[12.5px] text-[var(--admin-muted)] mt-1 flex items-center gap-1 group-hover:text-[var(--admin-accent)] transition-colors">
-              <span>View schedule</span>
-              <ArrowRightIcon className="w-3 h-3" />
-            </p>
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--admin-surface-subtle)]">
-            <div
-              className="h-full rounded-full bg-[#8B6A21] transition-all duration-500"
-              style={{ width: `${shootsRatio}%` }}
-            />
-          </div>
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]">
+            <CalendarIcon className="w-4 h-4" />
+          </span>
         </Link>
       </div>
 
@@ -987,65 +415,58 @@ export function AdminOverview({
           )}
         </section>
 
-        <section className="lg:col-span-5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--admin-border)] pb-3">
+        <section className="lg:col-span-5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 flex flex-col">
+          <div className="flex items-center justify-between border-b border-[var(--admin-border)] pb-3 mb-3">
             <div>
-              <h2 className="admin-section-title">Pipeline &amp; Mix</h2>
-              <p className="admin-meta">
-                {mixMode === 'status'
-                  ? 'Distribution across booking states'
-                  : mixMode === 'categories'
-                    ? 'Top event categories by contract value'
-                    : 'Lead-to-confirmed booking conversion'}
-              </p>
+              <h2 className="admin-section-title">Upcoming Shoots</h2>
+              <p className="admin-meta">Next 14 days in {timezone}</p>
             </div>
+            <Link
+              href="/admin/calendar"
+              className="text-xs font-medium text-[var(--admin-accent)] hover:underline shrink-0"
+            >
+              Open calendar →
+            </Link>
+          </div>
 
-            <div className="inline-flex rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-1 gap-1 shrink-0">
-              {[
-                { id: 'status' as const, label: 'Status' },
-                { id: 'categories' as const, label: 'Events' },
-                { id: 'funnel' as const, label: 'Funnel' },
-              ].map((t) => (
+          {upcomingSessions.length === 0 ? (
+            <div className="flex-1 flex items-center justify-center py-8 text-center">
+              <p className="admin-meta">No sessions scheduled in the next 14 days.</p>
+            </div>
+          ) : (
+            <div className="space-y-2.5">
+              {upcomingSessions.slice(0, 4).map((s) => (
                 <button
-                  key={t.id}
+                  key={s.id}
                   type="button"
-                  onClick={() => setMixMode(t.id)}
-                  className={cn(
-                    'rounded-md px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer',
-                    mixMode === t.id
-                      ? 'bg-[var(--admin-surface)] text-[var(--admin-text)] border border-[var(--admin-border)]'
-                      : 'text-[var(--admin-muted)] hover:text-[var(--admin-text)]',
-                  )}
+                  onClick={() => {
+                    if (s.bookingId) {
+                      setDrawerState({ bookingId: s.bookingId, focus: 'schedule' });
+                    } else {
+                      router.push('/admin/calendar');
+                    }
+                  }}
+                  className="w-full text-left block rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] hover:border-[var(--admin-accent)]/50 hover:bg-[var(--admin-surface-hover)] p-3 space-y-1 transition-colors cursor-pointer"
                 >
-                  {t.label}
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-mono-code font-medium text-[var(--admin-accent)] tabular-nums">
+                      {s.agencyLocalDate || formatLocalDate(s.startAt)}
+                    </span>
+                    <StatusBadge status={s.status} />
+                  </div>
+                  <p className="admin-row-title line-clamp-1">{s.title}</p>
+                  <p className="admin-meta tabular-nums line-clamp-1">
+                    {formatDateTimeInTz(s.startAt, timezone)} →{' '}
+                    {formatDateTimeInTz(s.endAt, timezone)}
+                  </p>
+                  {s.booking && (
+                    <p className="admin-meta line-clamp-1 tabular-nums">
+                      {s.booking.reference} — {s.booking.eventTitle}
+                    </p>
+                  )}
                 </button>
               ))}
             </div>
-          </div>
-
-          {mixMode === 'status' && (
-            <BreakdownDonutChart
-              segments={bookingStatusSegments}
-              centerLabel="Bookings"
-              centerValue={String(bookings.length)}
-              emptyMessage="Create a quote or booking to see status breakdown."
-            />
-          )}
-
-          {mixMode === 'categories' && (
-            <BreakdownDonutChart
-              segments={categorySegments}
-              centerLabel="Pipeline"
-              centerValue={formatCompactPoisha(totalAgreedPoisha, currency)}
-              emptyMessage="No active categorized bookings yet."
-            />
-          )}
-
-          {mixMode === 'funnel' && (
-            <HorizontalRankBars
-              items={funnelItems}
-              emptyMessage="No pipeline activity recorded yet."
-            />
           )}
         </section>
       </div>
@@ -1289,120 +710,63 @@ export function AdminOverview({
         </section>
       )}
 
-      {/* Two-Column Core Activity Grid: Recent Bookings + Upcoming Shoots */}
-      <div className="grid gap-5 lg:grid-cols-12">
-        <section className="lg:col-span-7 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5">
-          <div className="flex items-center justify-between border-b border-[var(--admin-border)] pb-3 mb-2">
-            <div>
-              <h2 className="admin-section-title">Recent Bookings</h2>
-              <p className="admin-meta">
-                Click any booking to open its quick-action drawer
-              </p>
-            </div>
-            <Link
-              href="/admin/bookings"
-              className="text-xs font-medium text-[var(--admin-accent)] hover:underline tabular-nums"
-            >
-              View all ({bookings.length}) →
-            </Link>
-          </div>
-
-          {bookings.length === 0 ? (
-            <p className="admin-meta py-8 text-center">
-              No bookings yet. Accept a quote in Price Quotes to create one.
+      {/* Full-Width Recent Bookings Section */}
+      <section className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5 space-y-4">
+        <div className="flex items-center justify-between border-b border-[var(--admin-border)] pb-3">
+          <div>
+            <h2 className="admin-section-title">Recent Bookings</h2>
+            <p className="admin-meta">
+              Click any booking to open its quick-action drawer
             </p>
-          ) : (
-            <div className="divide-y divide-[var(--admin-border)]">
-              {bookings.slice(0, 6).map((b) => (
-                <button
-                  key={b.id}
-                  type="button"
-                  onClick={() => setDrawerState({ bookingId: b.id, focus: 'overview' })}
-                  className="w-full text-left py-3 px-2.5 -mx-2.5 rounded-lg hover:bg-[var(--admin-surface-subtle)] transition-colors flex items-center justify-between gap-4 group cursor-pointer"
-                >
-                  <div className="min-w-0 space-y-0.5">
-                    <div className="flex items-center gap-2.5">
-                      <span className="font-mono-code text-xs text-[var(--admin-muted)] tabular-nums">
-                        {b.reference}
-                      </span>
-                      <StatusBadge status={b.status} />
-                    </div>
-                    <p className="admin-row-title group-hover:text-[var(--admin-accent)] transition-colors line-clamp-1">
-                      {b.eventTitle}
-                    </p>
-                    <p className="admin-meta line-clamp-1 tabular-nums">
-                      {b.clientName} • {formatLocalDate(b.eventDate)}
-                    </p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className="font-mono-code text-[14px] font-medium text-[var(--admin-text)] tabular-nums">
-                      {formatPoisha(b.agreedTotalPoisha, b.currency)}
-                    </p>
-                    <span className="text-[12px] font-medium text-[var(--admin-accent)] opacity-85 group-hover:opacity-100">
-                      Inspect →
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="lg:col-span-5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-5">
-          <div className="flex items-center justify-between border-b border-[var(--admin-border)] pb-3 mb-3">
-            <div>
-              <h2 className="admin-section-title">Upcoming Shoots</h2>
-              <p className="admin-meta">Next 14 days in {timezone}</p>
-            </div>
-            <Link
-              href="/admin/calendar"
-              className="text-xs font-medium text-[var(--admin-accent)] hover:underline"
-            >
-              Open calendar →
-            </Link>
           </div>
+          <Link
+            href="/admin/bookings"
+            className="text-xs font-medium text-[var(--admin-accent)] hover:underline tabular-nums shrink-0"
+          >
+            View all ({bookings.length}) →
+          </Link>
+        </div>
 
-          {upcomingSessions.length === 0 ? (
-            <p className="admin-meta py-8 text-center">
-              No sessions scheduled in the next 14 days.
-            </p>
-          ) : (
-            <div className="space-y-2.5">
-              {upcomingSessions.slice(0, 5).map((s) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={() => {
-                    if (s.bookingId) {
-                      setDrawerState({ bookingId: s.bookingId, focus: 'schedule' });
-                    } else {
-                      router.push('/admin/calendar');
-                    }
-                  }}
-                  className="w-full text-left block rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] hover:border-[var(--admin-accent)]/50 hover:bg-[var(--admin-surface-hover)] p-3 space-y-1 transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-mono-code font-medium text-[var(--admin-accent)] tabular-nums">
-                      {s.agencyLocalDate || formatLocalDate(s.startAt)}
+        {bookings.length === 0 ? (
+          <p className="admin-meta py-8 text-center">
+            No bookings yet. Accept a quote in Price Quotes to create one.
+          </p>
+        ) : (
+          <div className="grid gap-2.5 md:grid-cols-2">
+            {bookings.slice(0, 6).map((b) => (
+              <button
+                key={b.id}
+                type="button"
+                onClick={() => setDrawerState({ bookingId: b.id, focus: 'overview' })}
+                className="w-full text-left rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] px-3.5 py-3 hover:border-[var(--admin-accent)]/50 hover:bg-[var(--admin-surface-hover)] transition-colors flex items-center justify-between gap-4 group cursor-pointer"
+              >
+                <div className="min-w-0 space-y-0.5">
+                  <div className="flex items-center gap-2.5">
+                    <span className="font-mono-code text-xs text-[var(--admin-muted)] tabular-nums">
+                      {b.reference}
                     </span>
-                    <StatusBadge status={s.status} />
+                    <StatusBadge status={b.status} />
                   </div>
-                  <p className="admin-row-title line-clamp-1">{s.title}</p>
-                  <p className="admin-meta tabular-nums line-clamp-1">
-                    {formatDateTimeInTz(s.startAt, timezone)} →{' '}
-                    {formatDateTimeInTz(s.endAt, timezone)}
+                  <p className="admin-row-title group-hover:text-[var(--admin-accent)] transition-colors line-clamp-1">
+                    {b.eventTitle}
                   </p>
-                  {s.booking && (
-                    <p className="admin-meta line-clamp-1 tabular-nums">
-                      {s.booking.reference} — {s.booking.eventTitle}
-                    </p>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-        </section>
-      </div>
+                  <p className="admin-meta line-clamp-1 tabular-nums">
+                    {b.clientName} • {formatLocalDate(b.eventDate)}
+                  </p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="font-mono-code text-[14px] font-medium text-[var(--admin-text)] tabular-nums">
+                    {formatPoisha(b.agreedTotalPoisha, b.currency)}
+                  </p>
+                  <span className="text-[12px] font-medium text-[var(--admin-accent)] opacity-85 group-hover:opacity-100">
+                    Inspect →
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
 
       {/* Reusable Right-Hand Slide-Over Quick Detail & Action Drawer */}
       <BookingQuickDrawer
