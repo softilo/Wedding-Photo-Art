@@ -478,9 +478,9 @@ export function CrewGearWorkspace({
       )}
 
       {/* Search + Category Filter + Live Slot Availability Checker */}
-      <div className="atelier-card p-4 space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1 gap-1">
+      <div className="atelier-card p-3 sm:p-4 space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
+          <div className="flex items-center overflow-x-auto no-scrollbar max-w-full rounded-xl border border-slate-200 bg-slate-50 p-1 gap-1">
             {[
               { id: 'ALL' as const, label: `All (${resources.length})` },
               { id: 'CREW' as const, label: `Shoot Crew (${crewResources.length})` },
@@ -491,7 +491,7 @@ export function CrewGearWorkspace({
                 type="button"
                 onClick={() => setCategoryFilter(tab.id)}
                 className={cn(
-                  'rounded-lg px-3 py-1.5 text-xs font-medium cursor-pointer tabular-nums',
+                  'rounded-lg px-3 py-1.5 text-xs font-medium whitespace-nowrap shrink-0 cursor-pointer tabular-nums',
                   categoryFilter === tab.id
                     ? 'bg-white text-slate-900 border border-slate-200'
                     : 'text-slate-600 hover:text-slate-900',
@@ -502,23 +502,23 @@ export function CrewGearWorkspace({
             ))}
           </div>
 
-          <div className="relative flex-1 min-w-[220px] max-w-sm">
-            <SearchIcon className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <div className="relative w-full sm:flex-1 sm:max-w-sm">
+            <SearchIcon className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search crew name, specialty, drone, camera..."
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-8 pr-3 py-1.5 text-xs text-slate-900 outline-none focus:border-[var(--admin-accent)] focus:bg-white"
+              placeholder="Search crew name, specialty, camera..."
+              className="w-full h-9 sm:h-auto rounded-xl border border-slate-200 bg-slate-50 pl-8 pr-3 py-1.5 text-xs text-slate-900 outline-none focus:border-[var(--admin-accent)] focus:bg-white"
             />
           </div>
         </div>
 
         <form
           onSubmit={handleCheckAvailability}
-          className="pt-3 border-t border-slate-100 flex flex-wrap items-end gap-2.5"
+          className="pt-3 border-t border-slate-100 grid grid-cols-1 sm:flex sm:flex-wrap items-end gap-2.5"
         >
-          <div>
+          <div className="w-full sm:w-auto">
             <label className="block text-[11px] font-medium text-slate-500 mb-1">
               Quick Availability Check — Start ({timezone})
             </label>
@@ -526,10 +526,10 @@ export function CrewGearWorkspace({
               type="datetime-local"
               value={slotStart}
               onChange={(e) => setSlotStart(e.target.value)}
-              className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs tabular-nums"
+              className="w-full sm:w-auto h-9 sm:h-auto rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs tabular-nums"
             />
           </div>
-          <div>
+          <div className="w-full sm:w-auto">
             <label className="block text-[11px] font-medium text-slate-500 mb-1">
               End ({timezone})
             </label>
@@ -537,25 +537,27 @@ export function CrewGearWorkspace({
               type="datetime-local"
               value={slotEnd}
               onChange={(e) => setSlotEnd(e.target.value)}
-              className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs tabular-nums"
+              className="w-full sm:w-auto h-9 sm:h-auto rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs tabular-nums"
             />
           </div>
-          <button
-            type="submit"
-            disabled={checkingAvail}
-            className="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800 cursor-pointer"
-          >
-            {checkingAvail ? 'Checking...' : 'Check Free / Busy'}
-          </button>
-          {availabilityMap && (
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             <button
-              type="button"
-              onClick={() => setAvailabilityMap(null)}
-              className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs text-slate-600 hover:bg-slate-50 cursor-pointer"
+              type="submit"
+              disabled={checkingAvail}
+              className="flex-1 sm:flex-initial h-9 sm:h-auto rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800 cursor-pointer whitespace-nowrap"
             >
-              Clear Check
+              {checkingAvail ? 'Checking...' : 'Check Free / Busy'}
             </button>
-          )}
+            {availabilityMap && (
+              <button
+                type="button"
+                onClick={() => setAvailabilityMap(null)}
+                className="h-9 sm:h-auto rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs text-slate-600 hover:bg-slate-50 cursor-pointer whitespace-nowrap"
+              >
+                Clear Check
+              </button>
+            )}
+          </div>
         </form>
       </div>
 

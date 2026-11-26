@@ -84,30 +84,33 @@ export function StudioGalleryPickerModal({
           </button>
         </div>
 
-        <div className="p-4 border-b border-[var(--admin-border-subtle)] flex flex-wrap items-center gap-3">
-          <div className="relative flex-1 min-w-[200px]">
+        <div className="p-3 sm:p-4 border-b border-[var(--admin-border-subtle)] flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3">
+          <div className="relative w-full sm:flex-1 sm:min-w-[200px]">
             <SearchIcon className="w-4 h-4 text-[var(--admin-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
+              type="search"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Search studio gallery photos..."
-              className="w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-input)] pl-9 pr-3 py-2 text-xs text-[var(--admin-text)] outline-none focus:border-[var(--admin-accent)]"
+              className="w-full h-9 sm:h-auto rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-input)] pl-9 pr-3 py-2 text-xs text-[var(--admin-text)] outline-none focus:border-[var(--admin-accent)]"
             />
           </div>
 
-          <label className="inline-flex items-center gap-2 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] px-3 py-2 text-xs font-semibold text-[var(--admin-text)] cursor-pointer shrink-0">
-            <input
-              type="checkbox"
-              checked={landscapeOnly}
-              onChange={(e) => onLandscapeOnlyChange(e.target.checked)}
-              className="h-3.5 w-3.5 accent-[var(--admin-accent)] cursor-pointer"
-            />
-            <span>Landscape Only</span>
-          </label>
+          <div className="flex items-center justify-between gap-2 w-full sm:w-auto">
+            <label className="inline-flex items-center gap-2 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] px-3 py-2 text-xs font-semibold text-[var(--admin-text)] cursor-pointer shrink-0">
+              <input
+                type="checkbox"
+                checked={landscapeOnly}
+                onChange={(e) => onLandscapeOnlyChange(e.target.checked)}
+                className="h-3.5 w-3.5 accent-[var(--admin-accent)] cursor-pointer"
+              />
+              <span>Landscape Only</span>
+            </label>
 
-          <span className="text-xs font-mono-code text-[var(--admin-muted)] shrink-0">
-            {filteredPool.length} photos
-          </span>
+            <span className="text-xs font-mono-code text-[var(--admin-muted)] shrink-0 tabular-nums">
+              {filteredPool.length} photos
+            </span>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-5">

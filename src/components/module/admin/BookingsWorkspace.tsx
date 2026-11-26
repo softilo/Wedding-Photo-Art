@@ -1331,13 +1331,13 @@ export function BookingsWorkspace({
           {/* Search & Status Filters */}
           <div className="rounded-xl sm:rounded-2xl border border-border/60 bg-card p-2.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
             <div className="relative flex-1 sm:max-w-sm">
-              <SearchIcon className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+              <SearchIcon className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search client, event, or ref..."
-                className="w-full rounded-xl border border-border/60 bg-slate-50/70 pl-9 pr-3 py-2 text-xs text-slate-900 placeholder:text-muted-foreground outline-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                className="w-full h-9 sm:h-auto rounded-xl border border-border/60 bg-slate-50/70 pl-9 pr-3 py-2 text-xs text-slate-900 placeholder:text-muted-foreground outline-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all duration-200"
               />
             </div>
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar max-w-full pb-0.5">
@@ -1656,13 +1656,13 @@ export function BookingsWorkspace({
           {/* Search & Status Filters */}
           <div className="rounded-xl sm:rounded-2xl border border-border/60 bg-card p-2.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
             <div className="relative flex-1 sm:max-w-sm">
-              <SearchIcon className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+              <SearchIcon className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search quote reference, client, or event..."
-                className="w-full rounded-xl border border-border/60 bg-slate-50/70 pl-9 pr-3 py-2 text-xs text-slate-900 placeholder:text-muted-foreground outline-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                className="w-full h-9 sm:h-auto rounded-xl border border-border/60 bg-slate-50/70 pl-9 pr-3 py-2 text-xs text-slate-900 placeholder:text-muted-foreground outline-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all duration-200"
               />
             </div>
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar max-w-full pb-0.5">
@@ -2167,13 +2167,13 @@ export function BookingsWorkspace({
           {/* Search & Status Filters */}
           <div className="rounded-xl sm:rounded-2xl border border-border/60 bg-card p-2.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
             <div className="relative flex-1 sm:max-w-sm">
-              <SearchIcon className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+              <SearchIcon className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search booking ref, client, or event..."
-                className="w-full rounded-xl border border-border/60 bg-slate-50/70 pl-9 pr-3 py-2 text-xs text-slate-900 placeholder:text-muted-foreground outline-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                className="w-full h-9 sm:h-auto rounded-xl border border-border/60 bg-slate-50/70 pl-9 pr-3 py-2 text-xs text-slate-900 placeholder:text-muted-foreground outline-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all duration-200"
               />
             </div>
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar max-w-full pb-0.5">

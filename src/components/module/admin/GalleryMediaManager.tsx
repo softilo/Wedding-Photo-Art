@@ -495,8 +495,8 @@ export function GalleryMediaManager({
       </div>
 
       {/* Category Tabs (Photo / Video) + Search */}
-      <div className="rounded-2xl border border-border/60 bg-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="inline-flex rounded-xl border border-border/60 bg-slate-50/80 p-1 gap-1">
+      <div className="rounded-xl sm:rounded-2xl border border-border/60 bg-card p-2.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
+        <div className="flex items-center overflow-x-auto no-scrollbar max-w-full sm:inline-flex rounded-xl border border-border/60 bg-slate-50/80 p-1 gap-1">
           {[
             { id: 'ALL' as const, label: `All (${mediaItems.length})` },
             { id: 'IMAGE' as const, label: `Photo (${photoCount})` },
@@ -507,7 +507,7 @@ export function GalleryMediaManager({
               type="button"
               onClick={() => setCategoryFilter(tab.id)}
               className={cn(
-                'rounded-lg px-3.5 py-1.5 text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 transition-all duration-200 cursor-pointer',
+                'flex-1 sm:flex-initial text-center rounded-lg px-3.5 py-1.5 text-xs font-medium whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 transition-all duration-200 cursor-pointer',
                 categoryFilter === tab.id
                   ? 'bg-slate-900 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900',
@@ -518,14 +518,14 @@ export function GalleryMediaManager({
           ))}
         </div>
 
-        <div className="relative flex-1 max-w-sm">
-          <SearchIcon className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+        <div className="relative w-full sm:flex-1 sm:max-w-sm">
+          <SearchIcon className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search uploaded photo or video..."
-            className="w-full rounded-xl border border-border/60 bg-slate-50/70 pl-9 pr-3 py-2 text-xs text-slate-900 placeholder:text-muted-foreground outline-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+            className="w-full h-9 sm:h-auto rounded-xl border border-border/60 bg-slate-50/70 pl-9 pr-3 py-2 text-xs text-slate-900 placeholder:text-muted-foreground outline-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all duration-200"
           />
         </div>
       </div>

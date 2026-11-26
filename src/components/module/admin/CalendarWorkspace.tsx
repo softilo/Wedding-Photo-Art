@@ -1189,69 +1189,77 @@ export function CalendarWorkspace({
             </div>
 
             {/* Quick Presets & Date Inputs */}
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={jumpToToday}
-                className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                This Month
-              </button>
-              <button
-                type="button"
-                onClick={() => applyRangePreset(todayIso, addDaysYmd(todayIso, 7), null)}
-                className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                Next 7 Days
-              </button>
-              <button
-                type="button"
-                onClick={() => applyRangePreset(todayIso, addDaysYmd(todayIso, 90), null)}
-                className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                Next 90 Days
-              </button>
-              <input
-                type="date"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-                className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700"
-              />
-              <span className="text-xs text-slate-400">to</span>
-              <input
-                type="date"
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-                className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700"
-              />
-              <button
-                type="button"
-                disabled={isPending}
-                onClick={() => refreshCalendar(from, to)}
-                className="inline-flex items-center gap-1 rounded-lg bg-slate-900 px-3 py-1 text-xs font-semibold text-white hover:bg-slate-800"
-              >
-                <RefreshCwIcon className="w-3 h-3" />
-                <span>Apply</span>
-              </button>
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 w-full lg:w-auto">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar max-w-full pb-0.5">
+                <button
+                  type="button"
+                  onClick={jumpToToday}
+                  className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 sm:py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  This Month
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyRangePreset(todayIso, addDaysYmd(todayIso, 7), null)}
+                  className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 sm:py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Next 7 Days
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyRangePreset(todayIso, addDaysYmd(todayIso, 90), null)}
+                  className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 sm:py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Next 90 Days
+                </button>
+              </div>
+              <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
+                <input
+                  type="date"
+                  value={from}
+                  onChange={(e) => setFrom(e.target.value)}
+                  aria-label="From date"
+                  className="w-full sm:w-auto h-9 sm:h-auto rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700 min-w-0"
+                />
+                <span className="hidden sm:inline text-xs text-slate-400">to</span>
+                <input
+                  type="date"
+                  value={to}
+                  onChange={(e) => setTo(e.target.value)}
+                  aria-label="To date"
+                  className="w-full sm:w-auto h-9 sm:h-auto rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700 min-w-0"
+                />
+                <button
+                  type="button"
+                  disabled={isPending}
+                  onClick={() => refreshCalendar(from, to)}
+                  className="col-span-2 sm:col-span-1 w-full sm:w-auto h-9 sm:h-auto inline-flex items-center justify-center gap-1 rounded-lg bg-slate-900 px-3 py-1.5 sm:py-1 text-xs font-semibold text-white hover:bg-slate-800 cursor-pointer"
+                >
+                  <RefreshCwIcon className="w-3 h-3" />
+                  <span>Apply Range</span>
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Search, Status & Resource Filters */}
-          <div className="flex flex-wrap items-center gap-2.5">
-            <div className="relative flex-1 min-w-[220px]">
-              <SearchIcon className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-2.5">
+            <div className="relative col-span-2 sm:flex-1 sm:min-w-[220px]">
+              <SearchIcon className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
+                type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by client, venue, booking ref (BKG-...), or crew..."
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-9 pr-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-indigo-500 focus:bg-white"
+                placeholder="Search client, venue, BKG-..., crew..."
+                className="w-full h-9 sm:h-auto rounded-xl border border-slate-200 bg-slate-50/70 pl-9 pr-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-indigo-500 focus:bg-white"
               />
             </div>
 
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-              className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-1.5 text-xs font-semibold text-slate-700"
+              aria-label="Filter sessions by status"
+              className="w-full sm:w-auto h-9 sm:h-auto rounded-xl border border-slate-200 bg-slate-50/70 px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-slate-700 min-w-0"
             >
               <option value="ALL">All Statuses</option>
               <option value="SCHEDULED">Scheduled Only</option>
@@ -1261,7 +1269,8 @@ export function CalendarWorkspace({
             <select
               value={resourceFilter}
               onChange={(e) => setResourceFilter(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-1.5 text-xs font-semibold text-slate-700"
+              aria-label="Filter sessions by crew or gear"
+              className="w-full sm:w-auto h-9 sm:h-auto rounded-xl border border-slate-200 bg-slate-50/70 px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-slate-700 min-w-0"
             >
               <option value="ALL">All Crew &amp; Gear</option>
               {resources.map((r) => (

@@ -586,7 +586,7 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
     'w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] px-3 py-2 text-[13px] text-[var(--admin-text)] placeholder:text-[var(--admin-muted)] outline-none focus:border-[var(--admin-accent)] transition-colors';
 
   const compactInputClass =
-    'h-8 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] px-2.5 text-[12.5px] text-[var(--admin-text)] outline-none focus:border-[var(--admin-accent)] transition-colors';
+    'h-9 sm:h-8 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] px-2.5 text-[12.5px] text-[var(--admin-text)] outline-none focus:border-[var(--admin-accent)] transition-colors';
 
   return (
     <div className="space-y-5">
@@ -766,8 +766,8 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
       </div>
 
       {/* Compact Unified Filter Strip */}
-      <div className="admin-card px-3.5 sm:px-4 py-3 flex flex-col xl:flex-row xl:items-center justify-between gap-3 print:hidden">
-        <div className="flex items-center overflow-x-auto no-scrollbar max-w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-1 gap-1 self-start">
+      <div className="admin-card px-3 sm:px-4 py-3 flex flex-col xl:flex-row xl:items-center justify-between gap-2.5 sm:gap-3 print:hidden">
+        <div className="flex items-center overflow-x-auto no-scrollbar w-full xl:w-auto rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-1 gap-1 self-start">
           {[
             { id: 'ALL' as const, label: 'All Time' },
             { id: 'THIS_MONTH' as const, label: 'This Month' },
@@ -779,7 +779,7 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
               type="button"
               onClick={() => applyDatePreset(preset.id)}
               className={cn(
-                'rounded-md px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer whitespace-nowrap',
+                'rounded-md px-2.5 py-1.5 sm:py-1 text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0',
                 activePreset === preset.id
                   ? 'bg-[var(--admin-surface)] text-[var(--admin-text)] border border-[var(--admin-border)]'
                   : 'text-[var(--admin-muted)] hover:text-[var(--admin-text)]',
@@ -790,9 +790,11 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
           ))}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[11.5px] font-medium text-[var(--admin-muted)]">From</span>
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full xl:w-auto">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="text-[11px] sm:text-[11.5px] font-medium text-[var(--admin-muted)] shrink-0">
+              From
+            </span>
             <input
               type="date"
               value={fromDate}
@@ -800,11 +802,14 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
                 setFromDate(e.target.value);
                 setActivePreset('CUSTOM');
               }}
-              className={`${compactInputClass} font-mono-code`}
+              aria-label="Filter from date"
+              className={`w-full sm:w-auto min-w-0 ${compactInputClass} font-mono-code`}
             />
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[11.5px] font-medium text-[var(--admin-muted)]">To</span>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="text-[11px] sm:text-[11.5px] font-medium text-[var(--admin-muted)] shrink-0">
+              To
+            </span>
             <input
               type="date"
               value={toDate}
@@ -812,7 +817,8 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
                 setToDate(e.target.value);
                 setActivePreset('CUSTOM');
               }}
-              className={`${compactInputClass} font-mono-code`}
+              aria-label="Filter to date"
+              className={`w-full sm:w-auto min-w-0 ${compactInputClass} font-mono-code`}
             />
           </div>
 
@@ -823,7 +829,7 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
               refreshReport({ method: e.target.value });
             }}
             aria-label="Filter by payment method"
-            className={compactInputClass}
+            className={`w-full sm:w-auto min-w-0 ${compactInputClass}`}
           >
             <option value="ALL">All Channels</option>
             <option value="BKASH">bKash</option>
@@ -839,7 +845,7 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
               refreshReport({ bookingStatus: e.target.value });
             }}
             aria-label="Filter by booking status"
-            className={compactInputClass}
+            className={`w-full sm:w-auto min-w-0 ${compactInputClass}`}
           >
             <option value="ALL">All Statuses</option>
             <option value="PENDING_CONFIRMATION">Pending Confirmation</option>
@@ -848,24 +854,26 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
             <option value="CANCELLED">Cancelled</option>
           </select>
 
-          <button
-            type="button"
-            disabled={isPending}
-            onClick={() => refreshReport()}
-            className="h-8 rounded-lg bg-[var(--admin-accent)] px-3 text-xs font-semibold text-[#FCFDFD] hover:bg-[var(--admin-accent-hover)] transition-colors cursor-pointer whitespace-nowrap"
-          >
-            {isPending ? 'Loading...' : 'Apply'}
-          </button>
-
-          {hasActiveServerFilter && (
+          <div className="col-span-2 sm:col-span-1 flex items-center gap-2">
             <button
               type="button"
-              onClick={handleResetFilters}
-              className="h-8 px-2 text-xs font-medium text-[var(--admin-muted)] hover:text-[var(--admin-text)] underline cursor-pointer"
+              disabled={isPending}
+              onClick={() => refreshReport()}
+              className="flex-1 sm:flex-initial h-9 sm:h-8 rounded-lg bg-[var(--admin-accent)] px-3 text-xs font-semibold text-[#FCFDFD] hover:bg-[var(--admin-accent-hover)] transition-colors cursor-pointer whitespace-nowrap"
             >
-              Reset
+              {isPending ? 'Loading...' : 'Apply'}
             </button>
-          )}
+
+            {hasActiveServerFilter && (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="h-9 sm:h-8 px-2.5 rounded-lg border border-[var(--admin-border)] sm:border-0 text-xs font-medium text-[var(--admin-muted)] hover:text-[var(--admin-text)] sm:underline cursor-pointer shrink-0"
+              >
+                Reset
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -1161,8 +1169,8 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
       {/* TAB 3: ACCOUNTS RECEIVABLE & PER-BOOKING PROFITABILITY */}
       {activeTab === 'receivables' && (
         <section className="admin-card p-4 sm:p-5 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[var(--admin-border)] pb-4">
-            <div className="inline-flex flex-wrap rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-1 gap-1 self-start">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 border-b border-[var(--admin-border)] pb-3 sm:pb-4">
+            <div className="flex items-center overflow-x-auto no-scrollbar max-w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-1 gap-1 self-start">
               {[
                 { id: 'ALL' as const, label: `All (${report.receivables.length})` },
                 { id: 'DUE' as const, label: `Has Due (${summary.bookingsWithDueCount})` },
@@ -1174,7 +1182,7 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
                   type="button"
                   onClick={() => setReceivableSubFilter(st.id)}
                   className={cn(
-                    'rounded-md px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer tabular-nums',
+                    'rounded-md px-2.5 py-1.5 sm:py-1 text-xs font-medium whitespace-nowrap shrink-0 transition-colors cursor-pointer tabular-nums',
                     receivableSubFilter === st.id
                       ? 'bg-[var(--admin-surface)] text-[var(--admin-text)] border border-[var(--admin-border)]'
                       : 'text-[var(--admin-muted)] hover:text-[var(--admin-text)]',
@@ -1186,13 +1194,13 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
             </div>
 
             <div className="relative w-full sm:w-64">
-              <SearchIcon className="w-3.5 h-3.5 text-[var(--admin-muted)] absolute left-3 top-1/2 -translate-y-1/2" />
+              <SearchIcon className="w-3.5 h-3.5 text-[var(--admin-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search ref, client, or phone..."
-                className="w-full h-8 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] pl-8 pr-3 text-xs text-[var(--admin-text)] outline-none focus:border-[var(--admin-accent)]"
+                className="w-full h-9 sm:h-8 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] pl-8 pr-3 text-xs text-[var(--admin-text)] outline-none focus:border-[var(--admin-accent)]"
               />
             </div>
           </div>
@@ -1335,9 +1343,9 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
       {/* TAB 4: STUDIO & EVENT EXPENSES LEDGER */}
       {activeTab === 'expenses' && (
         <section className="admin-card p-4 sm:p-5 space-y-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-[var(--admin-border)] pb-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="inline-flex rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-1 gap-1">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 sm:gap-3 border-b border-[var(--admin-border)] pb-3 sm:pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+              <div className="flex items-center overflow-x-auto no-scrollbar max-w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-1 gap-1">
                 {[
                   { id: 'ALL' as const, label: `All (${report.expenses?.length ?? 0})` },
                   { id: 'BOOKING' as const, label: 'Event Costs' },
@@ -1348,7 +1356,7 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
                     type="button"
                     onClick={() => setExpenseScopeFilter(sc.id)}
                     className={cn(
-                      'rounded-md px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer tabular-nums',
+                      'rounded-md px-2.5 py-1.5 sm:py-1 text-xs font-medium whitespace-nowrap shrink-0 transition-colors cursor-pointer tabular-nums',
                       expenseScopeFilter === sc.id
                         ? 'bg-[var(--admin-surface)] text-[var(--admin-text)] border border-[var(--admin-border)]'
                         : 'text-[var(--admin-muted)] hover:text-[var(--admin-text)]',
@@ -1365,7 +1373,7 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
                   setExpenseCategoryFilter(e.target.value as 'ALL' | ExpenseCategory)
                 }
                 aria-label="Filter expenses by category"
-                className={compactInputClass}
+                className={`w-full sm:w-auto ${compactInputClass}`}
               >
                 <option value="ALL">All Categories</option>
                 {(Object.keys(EXPENSE_CATEGORY_META) as ExpenseCategory[]).map((cat) => (
@@ -1377,14 +1385,14 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="relative w-full sm:w-56">
-                <SearchIcon className="w-3.5 h-3.5 text-[var(--admin-muted)] absolute left-3 top-1/2 -translate-y-1/2" />
+              <div className="relative flex-1 sm:w-56">
+                <SearchIcon className="w-3.5 h-3.5 text-[var(--admin-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search title, vendor, ref..."
-                  className="w-full h-8 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] pl-8 pr-3 text-xs text-[var(--admin-text)] outline-none focus:border-[var(--admin-accent)]"
+                  className="w-full h-9 sm:h-8 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] pl-8 pr-3 text-xs text-[var(--admin-text)] outline-none focus:border-[var(--admin-accent)]"
                 />
               </div>
               <button
@@ -1393,7 +1401,7 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
                   setExpBookingId('');
                   setShowExpenseModal(true);
                 }}
-                className="shrink-0 h-8 rounded-lg bg-[var(--admin-accent)] px-3 text-xs font-semibold text-[#FCFDFD] hover:bg-[var(--admin-accent-hover)] cursor-pointer whitespace-nowrap"
+                className="shrink-0 h-9 sm:h-8 rounded-lg bg-[var(--admin-accent)] px-3 text-xs font-semibold text-[#FCFDFD] hover:bg-[var(--admin-accent-hover)] cursor-pointer whitespace-nowrap"
               >
                 + Add Expense
               </button>
@@ -1511,8 +1519,8 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
       {/* TAB 5: CUSTOMER TRANSACTION LEDGER & VERIFICATION QUEUE */}
       {activeTab === 'ledger' && (
         <section className="admin-card p-4 sm:p-5 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[var(--admin-border)] pb-4">
-            <div className="inline-flex flex-wrap rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-1 gap-1 self-start">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 border-b border-[var(--admin-border)] pb-3 sm:pb-4">
+            <div className="flex items-center overflow-x-auto no-scrollbar max-w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-1 gap-1 self-start">
               {[
                 { id: 'ALL' as const, label: `All (${report.transactions.length})` },
                 {
@@ -1528,7 +1536,7 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
                   type="button"
                   onClick={() => setLedgerSubFilter(st.id)}
                   className={cn(
-                    'rounded-md px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer tabular-nums',
+                    'rounded-md px-2.5 py-1.5 sm:py-1 text-xs font-medium whitespace-nowrap shrink-0 transition-colors cursor-pointer tabular-nums',
                     ledgerSubFilter === st.id
                       ? 'bg-[var(--admin-surface)] text-[var(--admin-text)] border border-[var(--admin-border)]'
                       : 'text-[var(--admin-muted)] hover:text-[var(--admin-text)]',
@@ -1540,13 +1548,13 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
             </div>
 
             <div className="relative w-full sm:w-64">
-              <SearchIcon className="w-3.5 h-3.5 text-[var(--admin-muted)] absolute left-3 top-1/2 -translate-y-1/2" />
+              <SearchIcon className="w-3.5 h-3.5 text-[var(--admin-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search TrxID, ref, client..."
-                className="w-full h-8 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] pl-8 pr-3 text-xs text-[var(--admin-text)] outline-none focus:border-[var(--admin-accent)]"
+                className="w-full h-9 sm:h-8 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] pl-8 pr-3 text-xs text-[var(--admin-text)] outline-none focus:border-[var(--admin-accent)]"
               />
             </div>
           </div>

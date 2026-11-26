@@ -318,14 +318,14 @@ export function StaffWorkspace({
                 <h2 className="admin-section-title">
                   Workflow Tasks ({filteredDispatchTasks.length})
                 </h2>
-                <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 gap-0.5">
+                <div className="flex items-center overflow-x-auto no-scrollbar max-w-full rounded-lg border border-slate-200 bg-slate-50 p-0.5 gap-0.5">
                   {(['OPEN', 'COMPLETED', 'ALL'] as const).map((tab) => (
                     <button
                       key={tab}
                       type="button"
                       onClick={() => setTaskFilter(tab)}
                       className={cn(
-                        'rounded-md px-2 py-1 text-[11px] font-medium cursor-pointer',
+                        'rounded-md px-2.5 py-1 text-[11px] font-medium whitespace-nowrap shrink-0 cursor-pointer',
                         taskFilter === tab
                           ? 'bg-white text-slate-900'
                           : 'text-slate-600 hover:text-slate-900',

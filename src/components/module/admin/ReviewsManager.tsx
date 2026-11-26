@@ -751,8 +751,8 @@ export function ReviewsManager({
       {/* =====================================================================
           FILTER BAR + SUMMARY SCOPE + SEARCH
       ===================================================================== */}
-      <div className="admin-card p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-1.5">
+      <div className="admin-card p-2.5 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
+        <div className="flex items-center overflow-x-auto no-scrollbar max-w-full gap-1.5 pb-0.5">
           {(
             [
               { id: 'all', label: `All (${reviews.length})` },
@@ -767,7 +767,7 @@ export function ReviewsManager({
                 type="button"
                 onClick={() => setStatusFilter(tab.id)}
                 className={cn(
-                  'rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer',
+                  'rounded-lg px-3 py-1.5 text-xs font-semibold whitespace-nowrap shrink-0 transition-colors cursor-pointer',
                   active
                     ? 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)]'
                     : 'bg-[var(--admin-surface-subtle)] text-[var(--admin-muted)] hover:text-[var(--admin-text)] hover:bg-[var(--admin-surface-hover)]',
@@ -778,7 +778,7 @@ export function ReviewsManager({
             );
           })}
 
-          <span className="ml-1 inline-flex items-center gap-1 rounded-lg border border-[var(--admin-border-subtle)] bg-[var(--admin-surface-subtle)] px-2.5 py-1.5 text-xs font-medium text-[var(--admin-text)]">
+          <span className="ml-1 inline-flex items-center gap-1 rounded-lg border border-[var(--admin-border-subtle)] bg-[var(--admin-surface-subtle)] px-2.5 py-1.5 text-xs font-medium text-[var(--admin-text)] whitespace-nowrap shrink-0">
             <StarSvg filled className="w-3.5 h-3.5" />
             <span>{avgRating} Avg</span>
           </span>
@@ -791,7 +791,7 @@ export function ReviewsManager({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search client, quote, event..."
-            className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-input)] pl-9 pr-3 py-1.5 text-xs text-[var(--admin-text)] placeholder:text-[var(--admin-muted)]/70 outline-none"
+            className="w-full h-9 sm:h-auto rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-input)] pl-9 pr-3 py-1.5 text-xs text-[var(--admin-text)] placeholder:text-[var(--admin-muted)]/70 outline-none"
           />
         </div>
       </div>
