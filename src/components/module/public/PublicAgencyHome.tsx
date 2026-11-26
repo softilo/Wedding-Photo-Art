@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import React, { useMemo, useState } from 'react';
 import {
+  ClientReview,
   EventType,
   PortfolioItem,
   PortfolioMediaItem,
@@ -28,6 +29,7 @@ import {
 } from '@/components/shared/Icons';
 import { HeroPhotoSlider } from './HeroPhotoSlider';
 import { PublicPortfolioShowcase } from './PublicPortfolioShowcase';
+import { PublicReviewsSection } from './PublicReviewsSection';
 import { PublicServicesSection } from './PublicServicesSection';
 import { StudioCountStats } from './StudioCountStats';
 
@@ -41,6 +43,7 @@ interface PublicAgencyHomeProps {
   editorialGridEvent?: PortfolioShowcaseEvent | null;
   servicesEvent?: PortfolioShowcaseEvent | null;
   galleryImages?: PortfolioMediaItem[];
+  reviews?: ClientReview[];
   isBackendConnected: boolean;
   initialPackageId?: string;
 }
@@ -54,6 +57,7 @@ export function PublicAgencyHome({
   heroEvent = null,
   servicesEvent = null,
   galleryImages = [],
+  reviews = [],
   isBackendConnected,
   initialPackageId = '',
 }: PublicAgencyHomeProps) {
@@ -94,6 +98,25 @@ export function PublicAgencyHome({
     const ids = new Set(packages.map((p) => p.eventTypeId).filter(Boolean));
     return eventTypes.filter((et) => ids.has(et.id));
   }, [packages, eventTypes]);
+
+  const fallbackReviewImageUrls = useMemo(() => {
+    const urls: string[] = [];
+    for (const img of galleryImages) {
+      if (img.secureUrl && !urls.includes(img.secureUrl)) {
+        urls.push(img.secureUrl);
+      }
+    }
+    if (heroEvent?.coverMedia?.secureUrl && !urls.includes(heroEvent.coverMedia.secureUrl)) {
+      urls.push(heroEvent.coverMedia.secureUrl);
+    }
+    for (const ev of allClientPortfolios) {
+      const cover = ev.coverMedia?.secureUrl;
+      if (cover && !urls.includes(cover)) {
+        urls.push(cover);
+      }
+    }
+    return urls.slice(0, 6);
+  }, [galleryImages, heroEvent, allClientPortfolios]);
 
   const filteredPackages = useMemo(() => {
     if (selectedCategoryId === 'ALL') return packages;
@@ -171,6 +194,15 @@ export function PublicAgencyHome({
         galleryImages={galleryImages}
         legacyPortfolio={portfolio}
         variant="home"
+      />
+
+      {/* =====================================================================
+          CLIENT REVIEWS BANNER: Full-Bleed Photo + Quote + 5 Stars + Name
+      ===================================================================== */}
+      <PublicReviewsSection
+        reviews={reviews}
+        fallbackImageUrls={fallbackReviewImageUrls}
+        studioName={branding.displayName}
       />
 
       {/* =====================================================================

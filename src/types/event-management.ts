@@ -827,3 +827,29 @@ export interface FinancialReportData {
   expenses: FinancialExpenseRow[];
 }
 
+export interface ClientReview {
+  id: string;
+  clientName: string;
+  quote: string;
+  rating: number;
+  eventTitle: string | null;
+  sourceLabel: string | null;
+  imageUrl: string;
+  imageAssetId: string | null;
+  imagePublicId: string | null;
+  imageFormat: string | null;
+  imageBytes: number | null;
+  imageWidth: number | null;
+  imageHeight: number | null;
+  deliveryUrls: PortfolioMediaDeliveryUrls;
+  isPublished: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminReviewsListResponse {
+  data: ClientReview[];
+  uploadStatus: CloudinaryStatusSummary;
+}
+

@@ -22,6 +22,7 @@ import {
   ReceiptIcon,
   ShieldCheckIcon,
   SlidersIcon,
+  StarIcon,
   UsersIcon,
 } from '@/components/shared/Icons';
 
@@ -125,6 +126,7 @@ export function DashboardShell({
     : [
         { href: '/admin/gallery', label: 'Gallery', icon: CameraIcon },
         { href: '/admin/hero', label: 'Public Page Setup', icon: GalleryHorizontalIcon },
+        { href: '/admin/reviews', label: 'Client Reviews', icon: StarIcon },
         { href: '/admin/portfolio', label: 'Client Portfolios', icon: LayersIcon },
         { href: '/admin/catalog', label: 'Packages', icon: PaletteIcon },
         { href: '/admin/crew', label: 'Crew & Gear', icon: UsersIcon },

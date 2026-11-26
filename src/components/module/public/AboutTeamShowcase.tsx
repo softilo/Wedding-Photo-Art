@@ -175,31 +175,11 @@ function FeaturedFounderSpotlight({
               </a>
             )}
 
-            {member.location && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E5D7B8] bg-[#FAF6EC] px-4 py-2 font-semibold text-[#3D3528]">
-                <MapPinIcon className="w-3.5 h-3.5 text-[#8B6A21]" />
-                <span>{member.location}</span>
-              </span>
-            )}
+          
           </div>
         )}
 
-        <div className="pt-2 flex flex-wrap items-center gap-3">
-          <Link
-            href="/#inquire"
-            className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs sm:text-sm font-bold text-white shadow-md hover:opacity-95 transition-opacity"
-            style={{ backgroundColor: accent }}
-          >
-            <span>Book With Our Lead Crew</span>
-            <ArrowRightIcon className="w-4 h-4" />
-          </Link>
-          <Link
-            href="/portfolio"
-            className="inline-flex items-center gap-2 rounded-full border-2 border-[#181611]/20 bg-white px-6 py-3 text-xs sm:text-sm font-bold text-[#181611] hover:border-[#8B6A21] hover:bg-[#F8F3E6] transition-colors"
-          >
-            <span>View Signature Albums</span>
-          </Link>
-        </div>
+
       </div>
     </article>
   );

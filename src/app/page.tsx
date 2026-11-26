@@ -37,6 +37,7 @@ async function RootStorefrontContent() {
     editorialGridEvent,
     servicesEvent,
     galleryImages,
+    reviews,
     isBackendConnected,
   } = await loadPublicStorefront();
 
@@ -61,6 +62,7 @@ async function RootStorefrontContent() {
         editorialGridEvent={editorialGridEvent}
         servicesEvent={servicesEvent}
         galleryImages={galleryImages}
+        reviews={reviews}
         isBackendConnected={isBackendConnected}
       />
       <Footer branding={branding} />

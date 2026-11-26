@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation';
 import { getMe } from '@/service/auth';
 import {
   getAdminAboutTeamEvent,
-  getAdminEditorialGridEvent,
   getAdminHeroSliderEvent,
   getAdminServicesShowcaseEvent,
   getGalleryStatus,
@@ -19,14 +18,12 @@ async function AdminHeroContent() {
 
   const [
     heroEventRes,
-    editorialEventRes,
     servicesEventRes,
     aboutTeamEventRes,
     galleryRes,
     statusRes,
   ] = await Promise.all([
     getAdminHeroSliderEvent(),
-    getAdminEditorialGridEvent(),
     getAdminServicesShowcaseEvent(),
     getAdminAboutTeamEvent(),
     listGalleryMedia('IMAGE'),
@@ -36,7 +33,6 @@ async function AdminHeroContent() {
   return (
     <HeroSliderManager
       initialHeroEvent={heroEventRes.ok ? (heroEventRes.data ?? null) : null}
-      initialEditorialEvent={editorialEventRes.ok ? (editorialEventRes.data ?? null) : null}
       initialServicesEvent={servicesEventRes.ok ? (servicesEventRes.data ?? null) : null}
       initialAboutTeamEvent={aboutTeamEventRes.ok ? (aboutTeamEventRes.data ?? null) : null}
       galleryImages={galleryRes.ok && galleryRes.data ? galleryRes.data.data : []}

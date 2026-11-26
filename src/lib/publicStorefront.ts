@@ -7,10 +7,12 @@ import {
   getPublicPortfolioEventBySlug,
   getPublicPortfolioEvents,
 } from '@/service/catalog/catalog.service';
+import { getPublicReviews } from '@/service/reviews/reviews.service';
 import { EDITORIAL_GRID_SLUG, HERO_SLIDER_SLUG } from '@/lib/heroSlider';
 import { ABOUT_TEAM_SLUG } from '@/lib/studioAboutTeam';
 import { SERVICES_SHOWCASE_SLUG } from '@/lib/studioServices';
 import {
+  ClientReview,
   EventType,
   PortfolioItem,
   PortfolioMediaItem,
@@ -293,6 +295,7 @@ export async function loadPublicStorefront(): Promise<{
   servicesEvent: PortfolioShowcaseEvent | null;
   aboutTeamEvent: PortfolioShowcaseEvent | null;
   galleryImages: PortfolioMediaItem[];
+  reviews: ClientReview[];
   isBackendConnected: boolean;
 }> {
   const [
@@ -306,6 +309,7 @@ export async function loadPublicStorefront(): Promise<{
     servicesRes,
     aboutTeamRes,
     galleryRes,
+    reviewsRes,
   ] = await Promise.all([
     getPublicBranding(),
     getPublicEventTypes(),
@@ -317,6 +321,7 @@ export async function loadPublicStorefront(): Promise<{
     getPublicPortfolioEventBySlug(SERVICES_SHOWCASE_SLUG),
     getPublicPortfolioEventBySlug(ABOUT_TEAM_SLUG),
     getPublicGalleryMedia('IMAGE'),
+    getPublicReviews(),
   ]);
 
   if (!brandRes.ok || !brandRes.data) {
@@ -331,6 +336,7 @@ export async function loadPublicStorefront(): Promise<{
       servicesEvent: null,
       aboutTeamEvent: null,
       galleryImages: [],
+      reviews: [],
       isBackendConnected: false,
     };
   }
@@ -353,6 +359,7 @@ export async function loadPublicStorefront(): Promise<{
             .filter((m) => m.resourceType === 'IMAGE' && m.status === 'READY')
             .slice(0, 12)
         : [],
+    reviews: reviewsRes.ok && Array.isArray(reviewsRes.data) ? reviewsRes.data : [],
     isBackendConnected: true,
   };
 }
