@@ -50,9 +50,9 @@ export function BookingReceiptModal({ bookingId, onClose }: BookingReceiptModalP
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-[1px]"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-0 sm:p-4 sm:backdrop-blur-[1px]"
     >
-      <div className="w-full max-w-2xl max-h-[90vh] flex flex-col rounded-2xl bg-white shadow-2xl border border-slate-200 overflow-hidden">
+      <div className="w-full h-dvh sm:h-auto sm:max-w-2xl sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-2xl bg-white shadow-none sm:shadow-2xl border-0 sm:border border-slate-200 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] sm:pt-0 sm:pb-0 overflow-hidden">
         <div className="shrink-0 flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-6 py-4 bg-slate-50 print:hidden">
           <div>
             <p className="text-sm font-bold text-slate-900">Money Receipt &amp; Booking Invoice</p>

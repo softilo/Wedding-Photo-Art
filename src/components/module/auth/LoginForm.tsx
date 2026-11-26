@@ -39,9 +39,9 @@ export function LoginForm({
   }, [state, router]);
 
   return (
-    <div className="min-h-dvh w-full flex flex-col bg-[#14120E] lg:bg-[#F9F8F5] lg:items-center lg:justify-center lg:px-4 lg:py-12">
+    <div className="min-h-dvh w-full flex flex-col bg-[#14120E] lg:bg-[#F9F8F5] lg:items-center lg:justify-center lg:px-4 lg:py-12 overflow-x-hidden">
       <div className="w-full flex-1 flex flex-col lg:flex-none lg:max-w-4xl lg:grid lg:grid-cols-12 lg:rounded-[1.125rem] lg:border lg:border-[#e5dfd0] lg:overflow-hidden lg:shadow-[0_28px_64px_-24px_rgba(24,22,17,0.16)] lg:bg-white">
-        <div className="lg:col-span-5 bg-[#14120E] text-[#F4EFE4] px-5 pt-[calc(1.75rem+env(safe-area-inset-top))] pb-10 sm:px-8 lg:p-9 flex flex-col justify-between relative overflow-hidden">
+        <div className="lg:col-span-5 bg-[#14120E] text-[#F4EFE4] px-4 pt-[calc(0.875rem+env(safe-area-inset-top))] pb-7 sm:px-8 lg:p-9 flex flex-col justify-between relative overflow-hidden shrink-0">
           <div
             className="absolute inset-0 opacity-25 pointer-events-none"
             style={{
@@ -50,25 +50,25 @@ export function LoginForm({
           />
           <div className="relative lg:space-y-6">
             <div className="flex items-center justify-between gap-3">
-              <div className="inline-flex items-center gap-3 text-white min-w-0">
+              <div className="inline-flex items-center gap-2.5 sm:gap-3 text-white min-w-0">
                 <BrandMark
                   logoUrl={resolvedBrand.logoUrl}
                   alt={resolvedBrand.displayName}
-                  size={44}
+                  size={40}
                   variant="dark"
                   className="rounded-xl shadow-md shrink-0"
                 />
                 <div className="min-w-0 leading-none">
-                  <span className="font-editorial text-xl sm:text-2xl font-semibold block truncate">
+                  <span className="font-editorial text-lg sm:text-2xl font-semibold block truncate">
                     {resolvedBrand.displayName}
                   </span>
-                  <span className="text-[10px] uppercase tracking-[0.2em] text-[#E7D1AA] block mt-1">
+                  <span className="text-[9.5px] sm:text-[10px] uppercase tracking-[0.2em] text-[#E7D1AA] block mt-0.5 sm:mt-1">
                     {STUDIO_PROFILE.city}
                   </span>
                 </div>
               </div>
 
-              <span className="lg:hidden shrink-0 rounded-full border border-[#E7D1AA]/35 bg-[#E7D1AA]/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#E7D1AA]">
+              <span className="lg:hidden shrink-0 rounded-full border border-[#E7D1AA]/35 bg-[#E7D1AA]/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#E7D1AA]">
                 Team Portal
               </span>
             </div>
@@ -101,25 +101,25 @@ export function LoginForm({
           </div>
         </div>
 
-        <div className="lg:col-span-7 bg-white flex-1 flex flex-col justify-between rounded-t-[26px] -mt-5 relative z-10 px-5 pt-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:px-8 lg:mt-0 lg:rounded-none lg:p-10">
+        <div className="lg:col-span-7 bg-white flex-1 flex flex-col justify-between rounded-t-[24px] -mt-3.5 relative z-10 px-4 pt-4 pb-[calc(0.875rem+env(safe-area-inset-bottom))] sm:px-8 lg:mt-0 lg:rounded-none lg:p-10">
           <div>
-            <h2 className="font-editorial text-2xl sm:text-3xl font-semibold text-[#181611]">
+            <h2 className="font-editorial text-[22px] sm:text-3xl font-semibold text-[#181611] leading-tight">
               Sign In
             </h2>
-            <p className="text-[13px] sm:text-sm text-[#6B6352] mt-1">
+            <p className="text-xs sm:text-sm text-[#6B6352] mt-0.5 line-clamp-1 sm:line-clamp-none">
               Enter your studio credentials to open the {resolvedBrand.displayName} workspace.
             </p>
 
-            <form action={formAction} className="mt-5 sm:mt-6 space-y-4">
+            <form action={formAction} className="mt-3.5 sm:mt-6 space-y-3 sm:space-y-4">
               {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
               {state.message && !state.success && (
-                <div className="rounded-xl border border-[#B8933C] bg-[#F8F3E6] px-4 py-3 text-sm font-medium text-[#5C4414]">
+                <div className="rounded-xl border border-[#B8933C] bg-[#F8F3E6] px-3.5 py-2.5 text-xs sm:text-sm font-medium text-[#5C4414]">
                   {state.message}
                 </div>
               )}
 
               <div>
-                <label className="block text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#4A4438] mb-1.5">
+                <label className="block text-[10.5px] sm:text-xs font-semibold uppercase tracking-wider text-[#4A4438] mb-1">
                   Email Address
                 </label>
                 <input
@@ -129,13 +129,13 @@ export function LoginForm({
                   autoComplete="email"
                   inputMode="email"
                   placeholder="studio@weddingphotoart.com"
-                  className="w-full h-12 lg:h-auto rounded-2xl lg:rounded-xl border border-[#D8CCB2] bg-[#F9F8F5] px-4 lg:px-3.5 lg:py-2.5 text-base sm:text-sm text-[#181611] placeholder:text-[#8A7F69] outline-none focus:border-[#8B6A21] focus:bg-white focus:ring-2 focus:ring-[#CAA650]/25 transition-all"
+                  className="w-full h-11 lg:h-auto rounded-xl border border-[#D8CCB2] bg-[#F9F8F5] px-3.5 lg:py-2.5 text-base sm:text-sm text-[#181611] placeholder:text-[#8A7F69] outline-none focus:border-[#8B6A21] focus:bg-white focus:ring-2 focus:ring-[#CAA650]/25 transition-all"
                 />
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#4A4438]">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-[10.5px] sm:text-xs font-semibold uppercase tracking-wider text-[#4A4438]">
                     Password
                   </label>
                   <button
@@ -153,7 +153,7 @@ export function LoginForm({
                   required
                   autoComplete="current-password"
                   placeholder="••••••••"
-                  className="w-full h-12 lg:h-auto rounded-2xl lg:rounded-xl border border-[#D8CCB2] bg-[#F9F8F5] px-4 lg:px-3.5 lg:py-2.5 text-base sm:text-sm text-[#181611] placeholder:text-[#8A7F69] outline-none focus:border-[#8B6A21] focus:bg-white focus:ring-2 focus:ring-[#CAA650]/25 transition-all"
+                  className="w-full h-11 lg:h-auto rounded-xl border border-[#D8CCB2] bg-[#F9F8F5] px-3.5 lg:py-2.5 text-base sm:text-sm text-[#181611] placeholder:text-[#8A7F69] outline-none focus:border-[#8B6A21] focus:bg-white focus:ring-2 focus:ring-[#CAA650]/25 transition-all"
                 />
               </div>
 
@@ -161,7 +161,7 @@ export function LoginForm({
                 type="submit"
                 disabled={isPending}
                 style={{ backgroundColor: accent }}
-                className="mt-2 inline-flex w-full h-12 lg:h-auto items-center justify-center gap-2 rounded-2xl lg:rounded-xl px-5 lg:py-3 text-[15px] sm:text-sm font-semibold text-white shadow-sm hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-60 cursor-pointer"
+                className="mt-1 sm:mt-2 inline-flex w-full h-11 lg:h-auto items-center justify-center gap-2 rounded-xl px-5 lg:py-3 text-sm font-semibold text-white shadow-sm hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-60 cursor-pointer"
               >
                 <span>{isPending ? 'Signing In...' : 'Enter Workspace'}</span>
                 <ArrowRightIcon className="w-4 h-4" />
@@ -169,7 +169,7 @@ export function LoginForm({
             </form>
           </div>
 
-          <div className="mt-6 pt-4 sm:pt-5 border-t border-[#ECE6D8] flex flex-wrap items-center justify-between gap-2 text-xs text-[#6B6352]">
+          <div className="mt-3 sm:mt-6 pt-2.5 sm:pt-5 border-t border-[#ECE6D8] flex flex-wrap items-center justify-between gap-2 text-xs text-[#6B6352]">
             <span>Looking for the public storefront?</span>
             <a
               href="/?external=1"

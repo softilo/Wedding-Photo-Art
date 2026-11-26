@@ -135,9 +135,14 @@ export function NotificationBell({
     };
   }, [loadFeed]);
 
-  // Close on outside click or Escape
+  // Close on outside click or Escape (+ lock scroll when full-screen on mobile)
   useEffect(() => {
     if (!open) return;
+    const isMobile = window.innerWidth < 640;
+    const prevOverflow = document.body.style.overflow;
+    if (isMobile) {
+      document.body.style.overflow = 'hidden';
+    }
     const onMouseDown = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
@@ -149,6 +154,9 @@ export function NotificationBell({
     document.addEventListener('mousedown', onMouseDown);
     document.addEventListener('keydown', onKeyDown);
     return () => {
+      if (isMobile) {
+        document.body.style.overflow = prevOverflow;
+      }
       document.removeEventListener('mousedown', onMouseDown);
       document.removeEventListener('keydown', onKeyDown);
     };
@@ -228,93 +236,90 @@ export function NotificationBell({
       </button>
 
       {open && (
-        <>
-          <div
-            aria-hidden="true"
-            onClick={() => setOpen(false)}
-            className="sm:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-[1px] admin-sheet-fade"
-          />
-          <div
-            className={cn(
-              'fixed inset-x-3 top-[calc(env(safe-area-inset-top)+4rem)] sm:inset-auto sm:top-full sm:mt-2 sm:w-[390px] rounded-2xl sm:rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] z-50 overflow-hidden shadow-2xl max-h-[75dvh] sm:max-h-none flex flex-col admin-sheet-fade',
-              align === 'right' ? 'sm:right-0' : 'sm:left-0',
-            )}
-          >
-            {/* Popover Header */}
-            <div className="px-4 py-3 border-b border-[var(--admin-border)] flex items-center justify-between gap-2 shrink-0">
-              <div>
-                <p className="text-[13.5px] font-semibold text-[var(--admin-text)]">
-                  Action Alerts
-                </p>
-                <p className="text-[11.5px] text-[var(--admin-muted)] tabular-nums">
-                  {feed.unreadCount} unread
-                  {feed.urgentUnreadCount > 0
-                    ? ` • ${feed.urgentUnreadCount} urgent`
-                    : ''}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => void loadFeed(true)}
-                  disabled={refreshing}
-                  title="Refresh alerts"
-                  className="rounded-lg p-1.5 text-[var(--admin-muted)] hover:bg-[var(--admin-surface-subtle)] hover:text-[var(--admin-text)] cursor-pointer disabled:opacity-50"
-                >
-                  <RefreshCwIcon className={cn('w-3.5 h-3.5', refreshing && 'animate-spin')} />
-                </button>
-                {feed.unreadCount > 0 && (
-                  <button
-                    type="button"
-                    disabled={isPending}
-                    onClick={handleMarkAllRead}
-                    className="rounded-lg px-2 py-1 text-[11.5px] font-medium text-[var(--admin-accent)] hover:bg-[var(--admin-accent-soft)] cursor-pointer"
-                  >
-                    Mark all read
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  aria-label="Close alerts"
-                  className="sm:hidden rounded-lg p-1.5 text-[var(--admin-muted)] hover:bg-[var(--admin-surface-subtle)] hover:text-[var(--admin-text)] cursor-pointer"
-                >
-                  <CloseIcon className="w-4 h-4" />
-                </button>
-              </div>
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Action alerts"
+          className={cn(
+            'fixed inset-0 w-full h-dvh pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] sm:pt-0 sm:pb-0 sm:inset-auto sm:top-full sm:mt-2 sm:w-[390px] sm:h-auto rounded-none sm:rounded-xl border-0 sm:border sm:border-[var(--admin-border)] bg-[var(--admin-surface)] z-50 overflow-hidden shadow-none sm:shadow-2xl flex flex-col admin-sheet-fade',
+            align === 'right' ? 'sm:right-0' : 'sm:left-0',
+          )}
+        >
+          {/* Popover Header */}
+          <div className="px-4 py-3 border-b border-[var(--admin-border)] flex items-center justify-between gap-2 shrink-0">
+            <div>
+              <p className="text-[14.5px] sm:text-[13.5px] font-semibold text-[var(--admin-text)]">
+                Action Alerts
+              </p>
+              <p className="text-[11.5px] text-[var(--admin-muted)] tabular-nums">
+                {feed.unreadCount} unread
+                {feed.urgentUnreadCount > 0
+                  ? ` • ${feed.urgentUnreadCount} urgent`
+                  : ''}
+              </p>
             </div>
 
-            {/* Filter Tabs */}
-            <div className="px-4 py-2 border-b border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] flex items-center gap-1 shrink-0">
+            <div className="flex items-center gap-1.5">
               <button
                 type="button"
-                onClick={() => setTab('all')}
-                className={cn(
-                  'rounded-md px-2.5 py-1 text-[11.5px] font-medium cursor-pointer tabular-nums',
-                  tab === 'all'
-                    ? 'bg-[var(--admin-surface)] text-[var(--admin-text)] border border-[var(--admin-border)]'
-                    : 'text-[var(--admin-muted)] hover:text-[var(--admin-text)]',
-                )}
+                onClick={() => void loadFeed(true)}
+                disabled={refreshing}
+                title="Refresh alerts"
+                className="rounded-lg p-1.5 text-[var(--admin-muted)] hover:bg-[var(--admin-surface-subtle)] hover:text-[var(--admin-text)] cursor-pointer disabled:opacity-50"
               >
-                All ({feed.items.length})
+                <RefreshCwIcon className={cn('w-4 h-4 sm:w-3.5 sm:h-3.5', refreshing && 'animate-spin')} />
               </button>
+              {feed.unreadCount > 0 && (
+                <button
+                  type="button"
+                  disabled={isPending}
+                  onClick={handleMarkAllRead}
+                  className="rounded-lg px-2 py-1 text-[11.5px] font-medium text-[var(--admin-accent)] hover:bg-[var(--admin-accent-soft)] cursor-pointer"
+                >
+                  Mark all read
+                </button>
+              )}
               <button
                 type="button"
-                onClick={() => setTab('unread')}
-                className={cn(
-                  'rounded-md px-2.5 py-1 text-[11.5px] font-medium cursor-pointer tabular-nums',
-                  tab === 'unread'
-                    ? 'bg-[var(--admin-surface)] text-[var(--admin-text)] border border-[var(--admin-border)]'
-                    : 'text-[var(--admin-muted)] hover:text-[var(--admin-text)]',
-                )}
+                onClick={() => setOpen(false)}
+                aria-label="Close alerts"
+                className="sm:hidden h-8 w-8 rounded-full border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] inline-flex items-center justify-center text-[var(--admin-muted)] cursor-pointer"
               >
-                Unread ({feed.unreadCount})
+                <CloseIcon className="w-4 h-4" />
               </button>
             </div>
+          </div>
 
-            {/* Notification Items List */}
-            <div className="flex-1 sm:max-h-[380px] overflow-y-auto no-scrollbar divide-y divide-[var(--admin-border)]">
+          {/* Filter Tabs */}
+          <div className="px-4 py-2 border-b border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] flex items-center gap-1 shrink-0">
+            <button
+              type="button"
+              onClick={() => setTab('all')}
+              className={cn(
+                'rounded-md px-2.5 py-1 text-[11.5px] font-medium cursor-pointer tabular-nums',
+                tab === 'all'
+                  ? 'bg-[var(--admin-surface)] text-[var(--admin-text)] border border-[var(--admin-border)]'
+                  : 'text-[var(--admin-muted)] hover:text-[var(--admin-text)]',
+              )}
+            >
+              All ({feed.items.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab('unread')}
+              className={cn(
+                'rounded-md px-2.5 py-1 text-[11.5px] font-medium cursor-pointer tabular-nums',
+                tab === 'unread'
+                  ? 'bg-[var(--admin-surface)] text-[var(--admin-text)] border border-[var(--admin-border)]'
+                  : 'text-[var(--admin-muted)] hover:text-[var(--admin-text)]',
+              )}
+            >
+              Unread ({feed.unreadCount})
+            </button>
+          </div>
+
+          {/* Notification Items List */}
+          <div className="flex-1 min-h-0 sm:max-h-[380px] overflow-y-auto no-scrollbar divide-y divide-[var(--admin-border)]">
               {visibleItems.length === 0 ? (
                 <div className="py-10 px-4 text-center space-y-1">
                   <p className="text-[13px] font-medium text-[var(--admin-text)]">
@@ -374,9 +379,8 @@ export function NotificationBell({
                   </button>
                 ))
               )}
-            </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

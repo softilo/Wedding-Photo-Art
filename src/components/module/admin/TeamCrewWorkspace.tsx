@@ -1341,8 +1341,8 @@ export function TeamCrewWorkspace({
 
       {/* Add Team Member Modal (Creates Login + Optional Linked Shoot Profile in 1 step) */}
       {showAddMember && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
+        <div className="fixed inset-0 z-50 flex flex-col sm:flex-row sm:items-center sm:justify-center bg-white sm:bg-slate-900/50 p-0 sm:p-4 sm:backdrop-blur-xs admin-sheet-fade">
+          <div className="flex-1 sm:flex-initial w-full sm:max-w-md h-dvh sm:h-auto sm:max-h-[90dvh] rounded-none sm:rounded-2xl border-0 sm:border border-slate-200 bg-white p-4 sm:p-6 pt-[calc(1rem+env(safe-area-inset-top))] sm:pt-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 overflow-y-auto space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <h3 className="admin-section-title">Add Studio Team Member</h3>

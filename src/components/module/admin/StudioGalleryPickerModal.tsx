@@ -63,11 +63,11 @@ export function StudioGalleryPickerModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 sm:backdrop-blur-sm p-0 sm:p-6"
       onClick={onClose}
     >
       <div
-        className="admin-card w-full max-w-4xl max-h-[88vh] flex flex-col overflow-hidden"
+        className="admin-card w-full h-dvh sm:h-auto sm:max-w-4xl sm:max-h-[88vh] rounded-none sm:rounded-xl border-0 sm:border pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] sm:pt-0 sm:pb-0 flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-4 sm:p-5 border-b border-[var(--admin-border)] flex flex-wrap items-center justify-between gap-3">

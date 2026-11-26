@@ -785,8 +785,8 @@ export function CalendarWorkspace({
 
       {/* Modal: Google Calendar Sync */}
       {activePanel === 'google' && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/50 p-0 sm:p-4 backdrop-blur-xs admin-sheet-fade">
-          <div className="w-full sm:max-w-2xl rounded-t-3xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 max-h-[90dvh] overflow-y-auto shadow-xl space-y-5 admin-sheet-up">
+        <div className="fixed inset-0 z-50 flex flex-col sm:flex-row sm:items-center sm:justify-center bg-white sm:bg-slate-900/50 p-0 sm:p-4 sm:backdrop-blur-xs admin-sheet-fade">
+          <div className="flex-1 sm:flex-initial w-full sm:max-w-2xl h-dvh sm:h-auto sm:max-h-[90dvh] rounded-none sm:rounded-2xl border-0 sm:border sm:border-slate-200 bg-white p-4 sm:p-6 pt-[calc(1rem+env(safe-area-inset-top))] sm:pt-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 overflow-y-auto shadow-none sm:shadow-xl space-y-5">
             <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-3">
               <div>
                 <h2 className="text-base font-bold tracking-tight text-slate-900">
@@ -880,10 +880,10 @@ export function CalendarWorkspace({
 
       {/* Modal: Schedule Event Form */}
       {activePanel === 'schedule' && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/50 p-0 sm:p-4 backdrop-blur-xs overflow-y-auto admin-sheet-fade">
+        <div className="fixed inset-0 z-50 flex flex-col sm:flex-row sm:items-center sm:justify-center bg-white sm:bg-slate-900/50 p-0 sm:p-4 sm:backdrop-blur-xs overflow-y-auto admin-sheet-fade">
           <form
             onSubmit={handleCreateSession}
-            className="w-full sm:max-w-xl rounded-t-3xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 max-h-[92dvh] overflow-y-auto shadow-xl space-y-4 sm:my-8 admin-sheet-up"
+            className="flex-1 sm:flex-initial w-full sm:max-w-xl h-dvh sm:h-auto sm:max-h-[92dvh] rounded-none sm:rounded-2xl border-0 sm:border sm:border-slate-200 bg-white p-4 sm:p-6 pt-[calc(1rem+env(safe-area-inset-top))] sm:pt-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 overflow-y-auto shadow-none sm:shadow-xl space-y-4 sm:my-8"
           >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
@@ -1666,10 +1666,10 @@ export function CalendarWorkspace({
 
       {/* Modal: Reschedule Session */}
       {rescheduleTarget && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/50 p-0 sm:p-4 overflow-y-auto admin-sheet-fade">
+        <div className="fixed inset-0 z-50 flex flex-col sm:flex-row sm:items-center sm:justify-center bg-white sm:bg-slate-900/50 p-0 sm:p-4 overflow-y-auto admin-sheet-fade">
           <form
             onSubmit={handleRescheduleSubmit}
-            className="w-full sm:max-w-lg rounded-t-3xl sm:rounded-2xl bg-white p-4 sm:p-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 max-h-[92dvh] overflow-y-auto shadow-2xl border border-slate-200 space-y-4 sm:my-8 admin-sheet-up"
+            className="flex-1 sm:flex-initial w-full sm:max-w-lg h-dvh sm:h-auto sm:max-h-[92dvh] rounded-none sm:rounded-2xl bg-white p-4 sm:p-6 pt-[calc(1rem+env(safe-area-inset-top))] sm:pt-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 overflow-y-auto shadow-none sm:shadow-2xl border-0 sm:border border-slate-200 space-y-4 sm:my-8"
           >
             <div className="flex items-start justify-between border-b border-slate-100 pb-3">
               <div>
@@ -1851,10 +1851,10 @@ export function CalendarWorkspace({
 
       {/* Modal: Cancel Session */}
       {cancelTarget && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/50 p-0 sm:p-4 admin-sheet-fade">
+        <div className="fixed inset-0 z-50 flex flex-col sm:flex-row sm:items-center sm:justify-center bg-white sm:bg-slate-900/50 p-0 sm:p-4 admin-sheet-fade">
           <form
             onSubmit={handleCancelSubmit}
-            className="w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl bg-white p-4 sm:p-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 shadow-2xl border border-slate-200 space-y-4 admin-sheet-up"
+            className="flex-1 sm:flex-initial w-full sm:max-w-md h-dvh sm:h-auto rounded-none sm:rounded-2xl bg-white p-4 sm:p-6 pt-[calc(1rem+env(safe-area-inset-top))] sm:pt-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 overflow-y-auto shadow-none sm:shadow-2xl border-0 sm:border border-slate-200 space-y-4"
           >
             <div>
               <h3 className="text-lg font-bold text-slate-900">Cancel Session</h3>

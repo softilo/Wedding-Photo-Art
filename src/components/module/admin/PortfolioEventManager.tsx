@@ -2304,9 +2304,9 @@ export function PortfolioEventManager({
           onClick={(e) => {
             if (e.target === e.currentTarget) setShowGalleryPicker(false);
           }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-0 sm:p-4 sm:backdrop-blur-xs"
         >
-          <div className="w-full max-w-3xl max-h-[85vh] flex flex-col rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden">
+          <div className="w-full h-dvh sm:h-auto sm:max-w-3xl sm:max-h-[85vh] rounded-none sm:rounded-2xl border-0 sm:border border-slate-200 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] sm:pt-0 sm:pb-0 flex flex-col bg-white shadow-none sm:shadow-2xl overflow-hidden">
             <div className="shrink-0 flex items-center justify-between border-b border-slate-100 px-6 py-4 bg-slate-50">
               <div>
                 <h3 className="text-sm font-bold text-slate-900">

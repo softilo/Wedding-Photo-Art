@@ -1019,14 +1019,14 @@ export function ReviewsManager({
       ===================================================================== */}
       {composerOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-3 sm:p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 sm:backdrop-blur-xs p-0 sm:p-6"
           onClick={() => !isUploading && !isPending && setComposerOpen(false)}
         >
           <div
             role="dialog"
             aria-modal="true"
             aria-label={form.editingId ? 'Edit Client Review' : 'Add Client Review'}
-            className="admin-card w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden"
+            className="admin-card w-full h-dvh sm:h-auto sm:max-w-4xl sm:max-h-[92vh] rounded-none sm:rounded-xl border-0 sm:border pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] sm:pt-0 sm:pb-0 flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}

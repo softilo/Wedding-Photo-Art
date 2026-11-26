@@ -1668,8 +1668,8 @@ export function FinancialReportWorkspace({ initialReport }: FinancialReportWorks
 
       {/* RECORD EXPENSE MODAL */}
       {showExpenseModal && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-[#0B1020]/55 p-0 sm:p-4 backdrop-blur-xs admin-sheet-fade">
-          <div className="w-full sm:max-w-xl rounded-t-3xl sm:rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 max-h-[92dvh] overflow-y-auto space-y-4 admin-sheet-up">
+        <div className="fixed inset-0 z-50 flex flex-col sm:flex-row sm:items-center sm:justify-center bg-[var(--admin-surface)] sm:bg-[#0B1020]/55 p-0 sm:p-4 sm:backdrop-blur-xs admin-sheet-fade">
+          <div className="flex-1 sm:flex-initial w-full sm:max-w-xl h-dvh sm:h-auto sm:max-h-[92dvh] rounded-none sm:rounded-2xl border-0 sm:border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:p-6 pt-[calc(1rem+env(safe-area-inset-top))] sm:pt-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 overflow-y-auto space-y-4">
             <div className="flex items-start justify-between gap-3 border-b border-[var(--admin-border)] pb-3">
               <div>
                 <h2 className="admin-section-title">Record Studio or Event Expense</h2>
