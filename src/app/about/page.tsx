@@ -8,21 +8,29 @@ import { JsonLd } from '@/components/shared/JsonLd';
 import { loadPublicStorefront } from '@/lib/publicStorefront';
 import { buildStudioJsonLdGraph } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'About Us & Creative Team',
-  description:
-    'Meet Shahadat Hossain (Founder & Lead Photographer) and the creative photographers, cinematographers, and editors behind Wedding PhotoArt in Feni, Bangladesh since 2015.',
-  alternates: {
-    canonical: '/about',
-  },
-  openGraph: {
-    type: 'website',
-    url: '/about',
-    title: 'About Us & Creative Team | Wedding PhotoArt',
-    description:
-      'Meet Founder Shahadat Hossain and the Wedding PhotoArt team — serving couples across Feni and Bangladesh since 2015.',
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { branding, aboutTeamShowcase } = await loadPublicStorefront();
+  const featured = aboutTeamShowcase?.members?.find((m) => m.isActive && m.isFeatured)
+    ?? aboutTeamShowcase?.members?.find((m) => m.isActive)
+    ?? null;
+  const leadSummary =
+    aboutTeamShowcase?.profile?.storyLead?.trim() ||
+    `Meet ${featured ? `${featured.name} and the creative team` : 'our creative team'} behind ${branding.displayName}.`;
+
+  return {
+    title: `About Us & Creative Team`,
+    description: leadSummary,
+    alternates: {
+      canonical: '/about',
+    },
+    openGraph: {
+      type: 'website',
+      url: '/about',
+      title: `About Us & Creative Team | ${branding.displayName}`,
+      description: leadSummary,
+    },
+  };
+}
 
 async function AboutPageContent() {
   const {

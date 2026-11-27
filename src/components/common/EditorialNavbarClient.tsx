@@ -35,8 +35,8 @@ const EDITORIAL_MENU_ITEMS = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
   { href: '/#packages', label: 'Packages' },
-  { href: '/#portfolio', label: 'Sample Works' },
-  { href: '/#inquire', label: 'Book Us' },
+  { href: '/#portfolio', label: 'Our Works' },
+  { href: '/#reviews', label: 'Reviews ' },
   { href: '/#studio-concierge', label: 'Why Us' },
   { href: '/career', label: 'Career' },
   { href: '/contact', label: 'Contact' },
@@ -222,150 +222,150 @@ export function EditorialNavbarClient({
             : '-translate-x-full opacity-0 pointer-events-none invisible',
         )}
       >
-            {/* Drawer Top Controls */}
-            <div className="flex items-center justify-between gap-3 pb-3.5 border-b border-white/10 shrink-0">
-              <div className="flex items-center gap-2">
-                <a
-                  href={facebookUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`${displayName} Facebook`}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#F4EFE4] hover:border-[#CAA650] hover:text-[#E7D1AA] transition-colors"
-                >
-                  <FacebookIcon className="w-4 h-4" />
-                </a>
-                <a
-                  href={youtubeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`${displayName} YouTube`}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#F4EFE4] hover:border-[#EF4444] hover:text-[#F87171] transition-colors"
-                >
-                  <YouTubeIcon className="w-4 h-4" />
-                </a>
-                <a
-                  href={whatsappHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Chat with ${displayName} on WhatsApp`}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#F4EFE4] hover:border-[#25D366] hover:text-[#25D366] transition-colors"
-                >
-                  <WhatsAppIcon className="w-4 h-4" />
-                </a>
-                <a
-                  href={phoneHref}
-                  aria-label={`Call ${displayName}`}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#F4EFE4] hover:border-[#CAA650] hover:text-[#E7D1AA] transition-colors"
-                >
-                  <PhoneIcon className="w-4 h-4" />
-                </a>
-              </div>
-
-              <button
-                type="button"
-                onClick={closeDrawer}
-                aria-label="Close navigation menu"
-                className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#CAA650]/45 bg-white/5 text-white hover:border-[#E7D1AA] hover:bg-[#CAA650]/20 transition-all cursor-pointer"
-              >
-                <CloseIcon className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
-              </button>
-            </div>
-
-            {/* Large Editorial Menu Links */}
-            <nav
-              aria-label="Drawer navigation"
-              className="relative my-auto py-3 flex flex-col space-y-0.5 sm:space-y-1"
+        {/* Drawer Top Controls */}
+        <div className="flex items-center justify-between gap-3 pb-3.5 border-b border-white/10 shrink-0">
+          <div className="flex items-center gap-2">
+            <a
+              href={facebookUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${displayName} Facebook`}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#F4EFE4] hover:border-[#CAA650] hover:text-[#E7D1AA] transition-colors"
             >
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute right-2 top-3 opacity-[0.06] select-none"
+              <FacebookIcon className="w-4 h-4" />
+            </a>
+            <a
+              href={youtubeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${displayName} YouTube`}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#F4EFE4] hover:border-[#EF4444] hover:text-[#F87171] transition-colors"
+            >
+              <YouTubeIcon className="w-4 h-4" />
+            </a>
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Chat with ${displayName} on WhatsApp`}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#F4EFE4] hover:border-[#25D366] hover:text-[#25D366] transition-colors"
+            >
+              <WhatsAppIcon className="w-4 h-4" />
+            </a>
+            <a
+              href={phoneHref}
+              aria-label={`Call ${displayName}`}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#F4EFE4] hover:border-[#CAA650] hover:text-[#E7D1AA] transition-colors"
+            >
+              <PhoneIcon className="w-4 h-4" />
+            </a>
+          </div>
+
+          <button
+            type="button"
+            onClick={closeDrawer}
+            aria-label="Close navigation menu"
+            className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#CAA650]/45 bg-white/5 text-white hover:border-[#E7D1AA] hover:bg-[#CAA650]/20 transition-all cursor-pointer"
+          >
+            <CloseIcon className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
+          </button>
+        </div>
+
+        {/* Large Editorial Menu Links */}
+        <nav
+          aria-label="Drawer navigation"
+          className="relative my-auto py-3 flex flex-col space-y-0.5 sm:space-y-1"
+        >
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute right-2 top-3 opacity-[0.06] select-none"
+          >
+            <BrandMark logoUrl={logoUrl} alt="" size={84} variant="dark" className="rounded-2xl" />
+          </div>
+
+          {EDITORIAL_MENU_ITEMS.map((item) => {
+            const isActive = isNavItemActive(item.href);
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => {
+                  if (item.href === '/') {
+                    setActiveHash('');
+                  } else if (item.href.startsWith('/#')) {
+                    setActiveHash(item.href.slice(1));
+                  }
+                  closeDrawer();
+                }}
+                className="group relative flex items-center gap-4 py-1 focus:outline-none"
               >
-                <BrandMark logoUrl={logoUrl} alt="" size={84} variant="dark" className="rounded-2xl" />
-              </div>
-
-              {EDITORIAL_MENU_ITEMS.map((item) => {
-                const isActive = isNavItemActive(item.href);
-
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => {
-                      if (item.href === '/') {
-                        setActiveHash('');
-                      } else if (item.href.startsWith('/#')) {
-                        setActiveHash(item.href.slice(1));
-                      }
-                      closeDrawer();
-                    }}
-                    className="group relative flex items-center gap-4 py-1 focus:outline-none"
-                  >
-                    <span
-                      aria-hidden="true"
-                      className={cn(
-                        'h-[1.5px] shrink-0 rounded-full transition-all duration-300 ease-out',
-                        isActive
-                          ? 'w-7 opacity-100 bg-[#E7D1AA]'
-                          : 'w-0 opacity-0 bg-[#CAA650] group-hover:w-7 group-hover:opacity-100',
-                      )}
-                    />
-                    <span
-                      className={cn(
-                        'font-editorial text-[1.8rem] sm:text-[2.15rem] font-medium leading-[1.12] whitespace-nowrap transition-colors duration-200',
-                        isActive
-                          ? 'text-[#E7D1AA]'
-                          : 'text-[#F4EFE4] group-hover:text-[#E7D1AA]',
-                      )}
-                    >
-                      {item.label}
-                    </span>
-                    <span
-                      aria-hidden="true"
-                      className={cn(
-                        'h-[1px] transition-all duration-300 ease-out bg-gradient-to-r from-[#E7D1AA]/85 via-[#CAA650]/40 to-transparent',
-                        isActive
-                          ? 'flex-1 opacity-100'
-                          : 'w-0 opacity-0 group-hover:flex-1 group-hover:opacity-75',
-                      )}
-                    />
-                  </Link>
-                );
-              })}
-            </nav>
-
-            {/* Drawer Bottom Info */}
-            <div className="pt-4 border-t border-white/10 space-y-2.5 shrink-0">
-              <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                <a
-                  href={phoneHref}
-                  onClick={closeDrawer}
-                  className="inline-flex items-center gap-1.5 font-mono-code font-semibold text-[#E7D1AA] hover:underline"
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'h-[1.5px] shrink-0 rounded-full transition-all duration-300 ease-out',
+                    isActive
+                      ? 'w-7 opacity-100 bg-[#E7D1AA]'
+                      : 'w-0 opacity-0 bg-[#CAA650] group-hover:w-7 group-hover:opacity-100',
+                  )}
+                />
+                <span
+                  className={cn(
+                    'font-editorial text-[1.8rem] sm:text-[2.15rem] font-medium leading-[1.12] whitespace-nowrap transition-colors duration-200',
+                    isActive
+                      ? 'text-[#E7D1AA]'
+                      : 'text-[#F4EFE4] group-hover:text-[#E7D1AA]',
+                  )}
                 >
-                  <PhoneIcon className="w-3.5 h-3.5" />
-                  <span>{phoneDisplay}</span>
-                </a>
-                <Link
-                  href="/login"
-                  onClick={closeDrawer}
-                  className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 font-semibold text-[#D5CDB8] hover:text-white hover:border-[#CAA650]/50 transition-colors"
-                >
-                  <span>Team Portal</span>
-                  <ArrowRightIcon className="w-3.5 h-3.5" />
-                </Link>
-              </div>
+                  {item.label}
+                </span>
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'h-[1px] transition-all duration-300 ease-out bg-gradient-to-r from-[#E7D1AA]/85 via-[#CAA650]/40 to-transparent',
+                    isActive
+                      ? 'flex-1 opacity-100'
+                      : 'w-0 opacity-0 group-hover:flex-1 group-hover:opacity-75',
+                  )}
+                />
+              </Link>
+            );
+          })}
+        </nav>
 
-              <a
-                href={mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={closeDrawer}
-                className="flex items-start gap-2 text-[11px] text-[#9C937E] hover:text-white transition-colors"
-              >
-                <MapPinIcon className="w-3.5 h-3.5 text-[#E7D1AA] shrink-0 mt-0.5" />
-                <span className="leading-snug">{address}</span>
-              </a>
-            </div>
-          </aside>
+        {/* Drawer Bottom Info */}
+        <div className="pt-4 border-t border-white/10 space-y-2.5 shrink-0">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+            <a
+              href={phoneHref}
+              onClick={closeDrawer}
+              className="inline-flex items-center gap-1.5 font-mono-code font-semibold text-[#E7D1AA] hover:underline"
+            >
+              <PhoneIcon className="w-3.5 h-3.5" />
+              <span>{phoneDisplay}</span>
+            </a>
+            <Link
+              href="/login"
+              onClick={closeDrawer}
+              className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 font-semibold text-[#D5CDB8] hover:text-white hover:border-[#CAA650]/50 transition-colors"
+            >
+              <span>Team Portal</span>
+              <ArrowRightIcon className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <a
+            href={mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={closeDrawer}
+            className="flex items-start gap-2 text-[11px] text-[#9C937E] hover:text-white transition-colors"
+          >
+            <MapPinIcon className="w-3.5 h-3.5 text-[#E7D1AA] shrink-0 mt-0.5" />
+            <span className="leading-snug">{address}</span>
+          </a>
+        </div>
+      </aside>
     </>
   );
 }

@@ -76,7 +76,7 @@ function FeaturedFounderSpotlight({
         <div className="absolute top-4 left-4">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[#CAA650]/70 bg-[#14120E]/90 backdrop-blur-sm px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#F3DFB8] shadow-md">
             <CameraIcon className="w-3.5 h-3.5" />
-            <span>Founder &amp; Lead</span>
+            <span>Lead Spotlight</span>
           </span>
         </div>
       </div>
@@ -265,15 +265,10 @@ export function AboutTeamShowcase({
   );
 
   const { profile, featuredMember, otherMembers } = resolved;
-  const storyEyebrow = profile?.storyEyebrow || 'Est. 2015 • Feni, Bangladesh';
-  const storyTitle =
-    profile?.storyTitle || 'Crafting Heirloom Wedding Stories Across Bangladesh';
-  const storyLead =
-    profile?.storyLead ||
-    `${branding.displayName} is a collective of dedicated photographers, cinematographers, and visual editors.`;
-  const storyBody =
-    profile?.storyBody ||
-    'Manage our studio heritage paragraph and creative team profiles from Dashboard → Public Page Setup.';
+  const storyEyebrow = profile?.storyEyebrow?.trim() || '';
+  const storyTitle = profile?.storyTitle?.trim() || `About ${branding.displayName}`;
+  const storyLead = profile?.storyLead?.trim() || '';
+  const storyBody = profile?.storyBody?.trim() || '';
 
   return (
     <main className="flex-1 bg-[#F9F8F5] text-[#181611]">
@@ -281,16 +276,20 @@ export function AboutTeamShowcase({
       <section className="border-b border-[#2E291F] bg-[#14120E] text-[#F4EFE4]">
         <div className="mx-auto max-w-[1380px] px-4 py-16 sm:py-20 sm:px-6 lg:px-10 grid gap-8 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-8 space-y-4">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#CAA650]/40 bg-[#CAA650]/15 px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#E7D1AA]">
-              <CameraIcon className="w-3.5 h-3.5" />
-              <span>{storyEyebrow}</span>
-            </span>
+            {storyEyebrow && (
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#CAA650]/40 bg-[#CAA650]/15 px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#E7D1AA]">
+                <CameraIcon className="w-3.5 h-3.5" />
+                <span>{storyEyebrow}</span>
+              </span>
+            )}
             <h1 className="font-editorial text-4xl sm:text-5xl lg:text-[3.45rem] font-semibold text-white leading-[1.08]">
               About {branding.displayName}
             </h1>
-            <p className="text-sm sm:text-base text-[#C7BFA9] max-w-2xl leading-relaxed">
-              {storyLead}
-            </p>
+            {storyLead && (
+              <p className="text-sm sm:text-base text-[#C7BFA9] max-w-2xl leading-relaxed">
+                {storyLead}
+              </p>
+            )}
           </div>
 
           <div className="lg:col-span-4 flex flex-wrap lg:justify-end gap-3">
@@ -324,11 +323,13 @@ export function AboutTeamShowcase({
           >
             {storyTitle}
           </h2>
-          <p className="mx-auto max-w-2xl text-sm sm:text-base text-[#4A4438] leading-[1.85]">
-            {storyBody}
-          </p>
+          {storyBody && (
+            <p className="mx-auto max-w-2xl text-sm sm:text-base text-[#4A4438] leading-[1.85]">
+              {storyBody}
+            </p>
+          )}
 
-          <StudioCountStats accentColor={accent} />
+          <StudioCountStats accentColor={accent} stats={profile?.milestones} />
         </div>
       </section>
 
@@ -412,14 +413,14 @@ export function AboutTeamShowcase({
           <div className="rounded-3xl border border-[#DFCEAA] bg-white p-6 sm:p-10 grid gap-8 lg:grid-cols-12 items-center shadow-2xs">
             <div className="lg:col-span-7 space-y-3">
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#7A5E21]">
-                Studio Lounge • {STUDIO_PROFILE.city}
+                Studio Lounge • {branding.displayName}
               </p>
               <h2 className="font-editorial text-3xl sm:text-4xl font-semibold text-[#181611]">
-                Visit Our Feni Studio in Person
+                Visit Our Studio in Person
               </h2>
               <p className="text-sm text-[#4A4438] max-w-xl leading-relaxed">
-                Drop by Grand Haque Tower on Mizan Rd to review sample photo-books, meet our leads,
-                and plan photography and cinema coverage tailored to your wedding timeline.
+                Meet our team at {contactAddress} to review sample photo-books, inspect print craft,
+                and plan photography and cinema coverage tailored to your event timeline.
               </p>
             </div>
 

@@ -881,11 +881,26 @@ export interface AdminServicesResponse extends PublicServicesResponse {
   uploadStatus: CloudinaryStatusSummary;
 }
 
+export interface StudioMilestoneItem {
+  label: string;
+  target: number;
+  suffix: string;
+  startFrom: number;
+}
+
+export interface StudioCareerRoleItem {
+  title: string;
+  type: string;
+  summary: string;
+}
+
 export interface StudioAboutProfileRecord {
   storyEyebrow: string;
   storyTitle: string;
   storyLead: string;
   storyBody: string;
+  milestones?: StudioMilestoneItem[];
+  careerRoles?: StudioCareerRoleItem[];
   servicesSectionEnabled?: boolean;
   updatedAt?: string;
 }

@@ -6,6 +6,8 @@ import {
   AdminAboutTeamResponse,
   PortfolioMediaItem,
   StudioAboutProfileRecord,
+  StudioCareerRoleItem,
+  StudioMilestoneItem,
 } from '@/types/event-management';
 import { listGalleryMedia } from '@/service/catalog/catalog.service';
 import {
@@ -68,19 +70,44 @@ interface MemberUploadState {
   statusText: string;
 }
 
-function mapResponseToProfile(
-  data: AdminAboutTeamResponse | null,
-  studioName: string,
-): StudioAboutProfileRecord {
-  return (
-    data?.profile ?? {
-      storyEyebrow: 'Est. 2015 • Feni, Bangladesh',
-      storyTitle: 'Crafting Heirloom Wedding Stories Across Bangladesh',
-      storyLead: `${studioName} is a collective of dedicated photographers, cinematographers, and visual editors.`,
-      storyBody:
-        'Share your studio story, craft philosophy, and creative vision for couples exploring your About page.',
-    }
-  );
+const EMPTY_PROFILE: StudioAboutProfileRecord = {
+  storyEyebrow: '',
+  storyTitle: '',
+  storyLead: '',
+  storyBody: '',
+  milestones: [],
+  careerRoles: [],
+};
+
+function normalizeProfileState(profile?: StudioAboutProfileRecord | null): StudioAboutProfileRecord {
+  if (!profile) return EMPTY_PROFILE;
+  return {
+    storyEyebrow: profile.storyEyebrow ?? '',
+    storyTitle: profile.storyTitle ?? '',
+    storyLead: profile.storyLead ?? '',
+    storyBody: profile.storyBody ?? '',
+    milestones: Array.isArray(profile.milestones)
+      ? profile.milestones.map((m) => ({
+          label: m.label ?? '',
+          target: Number.isFinite(Number(m.target)) ? Number(m.target) : 0,
+          suffix: m.suffix ?? '',
+          startFrom: Number.isFinite(Number(m.startFrom)) ? Number(m.startFrom) : 0,
+        }))
+      : [],
+    careerRoles: Array.isArray(profile.careerRoles)
+      ? profile.careerRoles.map((r) => ({
+          title: r.title ?? '',
+          type: r.type ?? '',
+          summary: r.summary ?? '',
+        }))
+      : [],
+    servicesSectionEnabled: profile.servicesSectionEnabled,
+    updatedAt: profile.updatedAt,
+  };
+}
+
+function mapResponseToProfile(data: AdminAboutTeamResponse | null): StudioAboutProfileRecord {
+  return normalizeProfileState(data?.profile ?? null);
 }
 
 function mapResponseToMembers(data: AdminAboutTeamResponse | null): EditableTeamMember[] {
@@ -146,7 +173,7 @@ export function AboutTeamSetup({
 }: AboutTeamSetupProps) {
   const [savedData, setSavedData] = useState<AdminAboutTeamResponse | null>(initialAboutTeamData);
   const [profile, setProfile] = useState<StudioAboutProfileRecord>(() =>
-    mapResponseToProfile(initialAboutTeamData, studioName),
+    mapResponseToProfile(initialAboutTeamData),
   );
   const [members, setMembers] = useState<EditableTeamMember[]>(() =>
     mapResponseToMembers(initialAboutTeamData),
@@ -161,26 +188,29 @@ export function AboutTeamSetup({
 
   const applyServerSnapshot = (nextData: AdminAboutTeamResponse) => {
     setSavedData(nextData);
-    setProfile(mapResponseToProfile(nextData, studioName));
+    setProfile(mapResponseToProfile(nextData));
     setMembers(mapResponseToMembers(nextData));
     onAboutTeamDataChange?.(nextData);
   };
 
   const hasUnsavedChanges = useMemo(() => {
-    const savedProfile = mapResponseToProfile(savedData, studioName);
+    if (!savedData) return false;
+    const savedProfile = mapResponseToProfile(savedData);
     const savedMembers = mapResponseToMembers(savedData);
     const profileChanged =
       profile.storyEyebrow.trim() !== savedProfile.storyEyebrow.trim() ||
       profile.storyTitle.trim() !== savedProfile.storyTitle.trim() ||
       profile.storyLead.trim() !== savedProfile.storyLead.trim() ||
-      profile.storyBody.trim() !== savedProfile.storyBody.trim();
+      profile.storyBody.trim() !== savedProfile.storyBody.trim() ||
+      JSON.stringify(profile.milestones ?? []) !== JSON.stringify(savedProfile.milestones ?? []) ||
+      JSON.stringify(profile.careerRoles ?? []) !== JSON.stringify(savedProfile.careerRoles ?? []);
     if (profileChanged) return true;
 
     return (
       JSON.stringify(toSaveMembersPayload(members)) !==
       JSON.stringify(toSaveMembersPayload(savedMembers))
     );
-  }, [members, profile, savedData, studioName]);
+  }, [members, profile, savedData]);
 
   const persistAll = async (
     nextProfile: StudioAboutProfileRecord,
@@ -191,11 +221,31 @@ export function AboutTeamSetup({
       onNotify('err', 'Please provide an About Studio story headline.');
       return false;
     }
-    const valid = nextMembers.filter((m) => m.name.trim().length > 0);
-    if (valid.length === 0) {
-      onNotify('err', 'Add at least one team member name before saving.');
+    if (nextMembers.length === 0) {
+      onNotify('err', 'Add at least one team member card before saving.');
       return false;
     }
+    if (nextMembers.some((m) => !m.name.trim())) {
+      onNotify('err', 'Please enter a full name for every team member card before saving.');
+      return false;
+    }
+
+    const milestonesPayload: StudioMilestoneItem[] = (nextProfile.milestones || [])
+      .map((m) => ({
+        label: m.label.trim(),
+        target: Math.max(0, Math.round(Number(m.target) || 0)),
+        suffix: m.suffix.trim(),
+        startFrom: Math.max(0, Math.round(Number(m.startFrom) || 0)),
+      }))
+      .filter((m) => m.label.length > 0);
+
+    const careerRolesPayload: StudioCareerRoleItem[] = (nextProfile.careerRoles || [])
+      .map((r) => ({
+        title: r.title.trim(),
+        type: r.type.trim() || 'Full-Time',
+        summary: r.summary.trim() || `Role at ${studioName}`,
+      }))
+      .filter((r) => r.title.length > 0);
 
     const res = await saveAboutTeamBulk({
       profile: {
@@ -203,8 +253,10 @@ export function AboutTeamSetup({
         storyTitle: nextProfile.storyTitle.trim(),
         storyLead: nextProfile.storyLead.trim(),
         storyBody: nextProfile.storyBody.trim(),
+        milestones: milestonesPayload,
+        careerRoles: careerRolesPayload,
       },
-      members: toSaveMembersPayload(valid),
+      members: toSaveMembersPayload(nextMembers),
     });
 
     if (!res.ok || !res.data) {
@@ -218,23 +270,23 @@ export function AboutTeamSetup({
 
   const handleSaveAll = () => {
     startTransition(async () => {
-      await persistAll(profile, members, 'About story & team details saved to database!');
+      await persistAll(profile, members, 'About story, stats, careers & team saved to database!');
     });
   };
 
   const handleAddMember = () => {
     const newMember: EditableTeamMember = {
       localKey: `new-team-${Date.now().toString(36)}`,
-      name: 'New Team Member',
+      name: '',
       subtitle: '',
-      role: 'Photographer / Cinematographer',
-      specialty: 'Wedding & Event Storytelling',
-      bio: `Part of the in-house ${studioName} crew crafting natural-light frames and expressive wedding stories.`,
+      role: '',
+      specialty: '',
+      bio: '',
       quote: '',
       phone: '',
       instagram: '',
       location: '',
-      isFeatured: false,
+      isFeatured: members.length === 0,
       imageUrl: null,
       imageAssetId: null,
       imagePublicId: null,
@@ -271,6 +323,12 @@ export function AboutTeamSetup({
   };
 
   const removeMember = (localKey: string) => {
+    const target = members.find((m) => m.localKey === localKey);
+    if (!target) return;
+    if (!target.id) {
+      setMembers((prev) => prev.filter((m) => m.localKey !== localKey));
+      return;
+    }
     if (members.length <= 1) {
       onNotify('err', 'Keep at least 1 team profile card.');
       return;
@@ -445,6 +503,26 @@ export function AboutTeamSetup({
     return set;
   }, [members, pickerMemberKey]);
 
+  if (!savedData) {
+    return (
+      <div className="admin-card p-6 sm:p-8 text-center space-y-3">
+        <p className="text-sm font-semibold text-rose-600 dark:text-rose-400">
+          Could not load About Story &amp; Team records from the database
+        </p>
+        <p className="text-xs text-[var(--admin-muted)] max-w-md mx-auto">
+          To protect your saved studio records, frontend fallback data is disabled. Check that the backend server is reachable and reload.
+        </p>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="inline-flex items-center rounded-xl bg-[var(--admin-accent)] px-4 py-2 text-xs font-semibold text-[var(--admin-accent-fg)] cursor-pointer"
+        >
+          Retry Loading from DB
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {/* Clean Action Bar */}
@@ -567,7 +645,7 @@ export function AboutTeamSetup({
                   onChange={(e) =>
                     setProfile((prev) => ({ ...prev, storyEyebrow: e.target.value }))
                   }
-                  placeholder="Est. 2015 • Feni, Bangladesh"
+                  placeholder="Studio location & heritage badge"
                   className="w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-input)] px-3 py-2 text-xs sm:text-sm text-[var(--admin-text)] focus:outline-none focus:border-[var(--admin-accent)]"
                 />
               </div>
@@ -583,7 +661,7 @@ export function AboutTeamSetup({
                   onChange={(e) =>
                     setProfile((prev) => ({ ...prev, storyTitle: e.target.value }))
                   }
-                  placeholder="Crafting Heirloom Wedding Stories..."
+                  placeholder="Headline for your /about story"
                   className="w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-input)] px-3 py-2 text-xs sm:text-sm font-semibold text-[var(--admin-text)] focus:outline-none focus:border-[var(--admin-accent)]"
                 />
               </div>
@@ -616,6 +694,200 @@ export function AboutTeamSetup({
                   }
                   className="w-full rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-input)] px-3 py-2 text-xs text-[var(--admin-text)] leading-relaxed focus:outline-none focus:border-[var(--admin-accent)]"
                 />
+              </div>
+            </div>
+
+            {/* DB-backed Studio Counter Milestones */}
+            <div className="pt-3 border-t border-[var(--admin-border-subtle)] space-y-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <h4 className="text-xs font-semibold text-[var(--admin-text)]">
+                    Counter Milestones
+                  </h4>
+                  <p className="text-[10.5px] text-[var(--admin-muted)]">
+                    Shown on Homepage &amp; /about
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setProfile((prev) => ({
+                      ...prev,
+                      milestones: [
+                        ...(prev.milestones || []),
+                        { label: 'Awards', target: 10, suffix: '+', startFrom: 0 },
+                      ],
+                    }))
+                  }
+                  className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-2 py-1 text-[10.5px] font-semibold text-[var(--admin-accent)] hover:bg-[var(--admin-surface-hover)] cursor-pointer"
+                >
+                  + Stat
+                </button>
+              </div>
+              <div className="space-y-1.5">
+                {(profile.milestones || []).map((stat, sIdx) => (
+                  <div
+                    key={sIdx}
+                    className="grid grid-cols-[1fr_72px_52px_auto] gap-1.5 items-center"
+                  >
+                    <input
+                      type="text"
+                      value={stat.label}
+                      maxLength={40}
+                      onChange={(e) =>
+                        setProfile((prev) => ({
+                          ...prev,
+                          milestones: (prev.milestones || []).map((item, i) =>
+                            i === sIdx ? { ...item, label: e.target.value } : item,
+                          ),
+                        }))
+                      }
+                      placeholder="Label"
+                      className="min-w-0 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-input)] px-2 py-1 text-xs text-[var(--admin-text)] focus:outline-none focus:border-[var(--admin-accent)]"
+                    />
+                    <input
+                      type="number"
+                      min={0}
+                      value={stat.target}
+                      onChange={(e) =>
+                        setProfile((prev) => ({
+                          ...prev,
+                          milestones: (prev.milestones || []).map((item, i) =>
+                            i === sIdx ? { ...item, target: Number(e.target.value) || 0 } : item,
+                          ),
+                        }))
+                      }
+                      placeholder="1500"
+                      className="min-w-0 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-input)] px-2 py-1 text-xs font-mono-code text-[var(--admin-text)] focus:outline-none focus:border-[var(--admin-accent)]"
+                    />
+                    <input
+                      type="text"
+                      value={stat.suffix}
+                      maxLength={16}
+                      onChange={(e) =>
+                        setProfile((prev) => ({
+                          ...prev,
+                          milestones: (prev.milestones || []).map((item, i) =>
+                            i === sIdx ? { ...item, suffix: e.target.value } : item,
+                          ),
+                        }))
+                      }
+                      placeholder="+"
+                      className="min-w-0 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-input)] px-2 py-1 text-xs text-center text-[var(--admin-text)] focus:outline-none focus:border-[var(--admin-accent)]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setProfile((prev) => ({
+                          ...prev,
+                          milestones: (prev.milestones || []).filter((_, i) => i !== sIdx),
+                        }))
+                      }
+                      aria-label="Remove stat"
+                      className="rounded-lg px-1.5 py-1 text-xs font-semibold text-rose-500 hover:bg-rose-500/10 cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* DB-backed Open Career Roles */}
+            <div className="pt-3 border-t border-[var(--admin-border-subtle)] space-y-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <h4 className="text-xs font-semibold text-[var(--admin-text)]">
+                    Career Openings
+                  </h4>
+                  <p className="text-[10.5px] text-[var(--admin-muted)]">
+                    Listed on <span className="font-mono-code">/career</span>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setProfile((prev) => ({
+                      ...prev,
+                      careerRoles: [
+                        ...(prev.careerRoles || []),
+                        { title: '', type: 'Full-Time / Event Crew', summary: '' },
+                      ],
+                    }))
+                  }
+                  className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-2 py-1 text-[10.5px] font-semibold text-[var(--admin-accent)] hover:bg-[var(--admin-surface-hover)] cursor-pointer"
+                >
+                  + Role
+                </button>
+              </div>
+              <div className="space-y-2">
+                {(profile.careerRoles || []).map((role, rIdx) => (
+                  <div
+                    key={rIdx}
+                    className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] p-2.5 space-y-1.5"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="text"
+                        value={role.title}
+                        maxLength={120}
+                        onChange={(e) =>
+                          setProfile((prev) => ({
+                            ...prev,
+                            careerRoles: (prev.careerRoles || []).map((item, i) =>
+                              i === rIdx ? { ...item, title: e.target.value } : item,
+                            ),
+                          }))
+                        }
+                        placeholder="Role title"
+                        className="flex-1 min-w-0 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-input)] px-2 py-1 text-xs font-semibold text-[var(--admin-text)] focus:outline-none focus:border-[var(--admin-accent)]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setProfile((prev) => ({
+                            ...prev,
+                            careerRoles: (prev.careerRoles || []).filter((_, i) => i !== rIdx),
+                          }))
+                        }
+                        aria-label="Remove career opening"
+                        className="rounded-lg px-1.5 py-1 text-xs font-semibold text-rose-500 hover:bg-rose-500/10 cursor-pointer shrink-0"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      value={role.type}
+                      maxLength={120}
+                      onChange={(e) =>
+                        setProfile((prev) => ({
+                          ...prev,
+                          careerRoles: (prev.careerRoles || []).map((item, i) =>
+                            i === rIdx ? { ...item, type: e.target.value } : item,
+                          ),
+                        }))
+                      }
+                      placeholder="Full-Time / Location"
+                      className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-input)] px-2 py-1 text-[11px] text-[var(--admin-text)] focus:outline-none focus:border-[var(--admin-accent)]"
+                    />
+                    <textarea
+                      rows={2}
+                      value={role.summary}
+                      maxLength={500}
+                      onChange={(e) =>
+                        setProfile((prev) => ({
+                          ...prev,
+                          careerRoles: (prev.careerRoles || []).map((item, i) =>
+                            i === rIdx ? { ...item, summary: e.target.value } : item,
+                          ),
+                        }))
+                      }
+                      placeholder="Short role responsibilities..."
+                      className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-input)] px-2 py-1 text-[11px] text-[var(--admin-text)] focus:outline-none focus:border-[var(--admin-accent)]"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
 

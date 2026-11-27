@@ -8,6 +8,7 @@ import { PageSkeleton } from '@/components/shared/PageSkeleton';
 import { JsonLd } from '@/components/shared/JsonLd';
 import { loadPublicStorefront, STUDIO_PROFILE } from '@/lib/publicStorefront';
 import { buildStudioJsonLdGraph } from '@/lib/seo';
+import { resolveAboutTeamFromDb } from '@/lib/studioAboutTeam';
 import {
   ArrowRightIcon,
   ClockIcon,
@@ -21,25 +22,32 @@ import {
   YouTubeIcon,
 } from '@/components/shared/Icons';
 
-export const metadata: Metadata = {
-  title: 'Contact & Feni Studio Location',
-  description:
-    'Visit Wedding PhotoArt at Grand Haque Tower (5th Floor), Shop No: 4068, Mizan Rd, Feni, Bangladesh. Get Google Maps directions, call +880 1855-585601, chat on WhatsApp, or request a wedding quote.',
-  alternates: {
-    canonical: '/contact',
-  },
-  openGraph: {
-    type: 'website',
-    url: '/contact',
-    title: 'Contact & Feni Studio Location | Wedding PhotoArt',
-    description:
-      'Find Wedding PhotoArt on Google Maps at Grand Haque Tower, Mizan Rd, Feni. Call, WhatsApp, or book your wedding date online.',
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { branding } = await loadPublicStorefront();
+  const address = branding.contactDetails?.address || STUDIO_PROFILE.address;
+  return {
+    title: 'Contact & Studio Location',
+    description: `Visit ${branding.displayName} at ${address}. Get directions, call, chat on WhatsApp, or request a quote.`,
+    alternates: {
+      canonical: '/contact',
+    },
+    openGraph: {
+      type: 'website',
+      url: '/contact',
+      title: `Contact & Studio Location | ${branding.displayName}`,
+      description: `Find ${branding.displayName} at ${address}. Call, WhatsApp, or book your event date online.`,
+    },
+  };
+}
 
 async function ContactPageContent() {
-  const { branding, packages, portfolioEvents, galleryImages } =
+  const { branding, packages, portfolioEvents, aboutTeamShowcase, galleryImages } =
     await loadPublicStorefront();
+
+  const { featuredMember } = resolveAboutTeamFromDb({
+    aboutTeamShowcase,
+    brandingName: branding.displayName,
+  });
 
   const accent = branding.themeTokens.accentColor || '#8B6A21';
   const contactPhone = branding.contactDetails?.phone || STUDIO_PROFILE.phoneIntl;
@@ -245,10 +253,12 @@ async function ContactPageContent() {
               <div className="rounded-2xl border border-[#DFCEAA] bg-[#F8F3E6] p-5 flex items-center justify-between gap-4">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wider text-[#7A5E21]">
-                    Meet Our Founder
+                    Meet Our Team Lead
                   </p>
                   <p className="font-editorial text-xl font-semibold text-[#181611]">
-                    Shahadat Hossain &amp; Team
+                    {featuredMember
+                      ? `${featuredMember.name} & Team`
+                      : `${branding.displayName} Team`}
                   </p>
                 </div>
                 <Link

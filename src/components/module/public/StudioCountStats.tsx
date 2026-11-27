@@ -1,50 +1,47 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-
-interface StatConfig {
-  label: string;
-  target: number;
-  suffix: string;
-  startFrom?: number;
-}
-
-const STUDIO_STATS: StatConfig[] = [
-  { label: 'Since', target: 2015, suffix: '', startFrom: 1995 },
-  { label: 'Events', target: 1500, suffix: '+', startFrom: 0 },
-  { label: 'Photos', target: 80, suffix: 'k+', startFrom: 0 },
-  { label: 'Clients', target: 40, suffix: 'k+', startFrom: 0 },
-];
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { StudioMilestoneItem } from '@/types/event-management';
 
 interface StudioCountStatsProps {
   accentColor: string;
+  stats?: StudioMilestoneItem[] | null;
 }
 
 function easeOutCubic(t: number): number {
   return 1 - Math.pow(1 - t, 3);
 }
 
-export function StudioCountStats({ accentColor }: StudioCountStatsProps) {
+export function StudioCountStats({ accentColor, stats }: StudioCountStatsProps) {
+  const activeStats = useMemo(
+    () => (stats || []).filter((s) => s.label.trim().length > 0),
+    [stats],
+  );
+  const statsKey = useMemo(
+    () => activeStats.map((s) => `${s.label}:${s.target}:${s.startFrom}`).join('|'),
+    [activeStats],
+  );
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const hasAnimatedRef = useRef(false);
-  const [values, setValues] = useState<number[]>(() => STUDIO_STATS.map((s) => s.target));
+  const animatedKeyRef = useRef<string>('');
+  const [animState, setAnimState] = useState<{ key: string; values: number[] } | null>(null);
 
   useEffect(() => {
+    if (activeStats.length === 0) return undefined;
     const el = containerRef.current;
     if (!el || typeof IntersectionObserver === 'undefined') return undefined;
 
     let rafId = 0;
 
     const startAnimation = () => {
-      if (hasAnimatedRef.current) return;
-      hasAnimatedRef.current = true;
+      if (animatedKeyRef.current === statsKey) return;
+      animatedKeyRef.current = statsKey;
 
       if (
         typeof window !== 'undefined' &&
         typeof window.matchMedia === 'function' &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches
       ) {
-        setValues(STUDIO_STATS.map((s) => s.target));
+        setAnimState({ key: statsKey, values: activeStats.map((s) => s.target) });
         return;
       }
 
@@ -59,12 +56,13 @@ export function StudioCountStats({ accentColor }: StudioCountStatsProps) {
         const progress = Math.min(elapsed / durationMs, 1);
         const eased = easeOutCubic(progress);
 
-        setValues(
-          STUDIO_STATS.map((stat) => {
+        setAnimState({
+          key: statsKey,
+          values: activeStats.map((stat) => {
             const origin = stat.startFrom ?? 0;
             return Math.round(origin + (stat.target - origin) * eased);
           }),
-        );
+        });
 
         if (progress < 1) {
           rafId = window.requestAnimationFrame(step);
@@ -92,10 +90,16 @@ export function StudioCountStats({ accentColor }: StudioCountStatsProps) {
         window.cancelAnimationFrame(rafId);
       }
     };
-  }, []);
+  }, [activeStats, statsKey]);
 
-  const renderStat = (stat: StatConfig, idx: number) => (
-    <div key={stat.label} className="text-center space-y-1.5 sm:space-y-2">
+  if (activeStats.length === 0) {
+    return null;
+  }
+
+  const displayedValues = animState?.key === statsKey ? animState.values : null;
+
+  const renderStat = (stat: StudioMilestoneItem, idx: number) => (
+    <div key={`${stat.label}-${idx}`} className="text-center space-y-1.5 sm:space-y-2">
       <p
         className="font-editorial text-sm sm:text-base font-medium tracking-wide"
         style={{ color: accentColor }}
@@ -103,27 +107,38 @@ export function StudioCountStats({ accentColor }: StudioCountStatsProps) {
         {stat.label}
       </p>
       <p className="text-[2rem] sm:text-[2.45rem] lg:text-[2.65rem] font-normal tracking-tight text-[#181611] leading-none tabular-nums">
-        {values[idx]}
+        {displayedValues?.[idx] ?? stat.target}
         {stat.suffix}
       </p>
     </div>
   );
 
+  if (activeStats.length === 4) {
+    return (
+      <div
+        ref={containerRef}
+        className="mx-auto max-w-5xl pt-10 sm:pt-14 grid grid-cols-2 md:grid-cols-[1fr_1fr_auto_1fr_1fr] items-center gap-y-8 gap-x-6 md:gap-x-4"
+      >
+        {renderStat(activeStats[0], 0)}
+        {renderStat(activeStats[1], 1)}
+
+        <div
+          aria-hidden="true"
+          className="hidden md:block h-14 w-[1.5px] bg-[#C8C2B8] mx-auto"
+        />
+
+        {renderStat(activeStats[2], 2)}
+        {renderStat(activeStats[3], 3)}
+      </div>
+    );
+  }
+
   return (
     <div
       ref={containerRef}
-      className="mx-auto max-w-5xl pt-10 sm:pt-14 grid grid-cols-2 md:grid-cols-[1fr_1fr_auto_1fr_1fr] items-center gap-y-8 gap-x-6 md:gap-x-4"
+      className="mx-auto max-w-5xl pt-10 sm:pt-14 grid grid-cols-2 md:grid-cols-4 items-center gap-y-8 gap-x-6"
     >
-      {renderStat(STUDIO_STATS[0], 0)}
-      {renderStat(STUDIO_STATS[1], 1)}
-
-      <div
-        aria-hidden="true"
-        className="hidden md:block h-14 w-[1.5px] bg-[#C8C2B8] mx-auto"
-      />
-
-      {renderStat(STUDIO_STATS[2], 2)}
-      {renderStat(STUDIO_STATS[3], 3)}
+      {activeStats.map((stat, idx) => renderStat(stat, idx))}
     </div>
   );
 }

@@ -8,6 +8,8 @@ import {
   PublicAboutTeamResponse,
   PublicServicesResponse,
   SignedCloudinaryUploadPayload,
+  StudioCareerRoleItem,
+  StudioMilestoneItem,
 } from '@/types/event-management';
 import { ActionResult, parseApiResponse } from '../shared/apiResult';
 
@@ -16,6 +18,8 @@ function revalidateStudioContentPaths(): void {
   revalidatePath('/');
   revalidatePath('/all-services');
   revalidatePath('/about');
+  revalidatePath('/contact');
+  revalidatePath('/career');
   revalidatePath('/admin/hero');
 }
 
@@ -149,6 +153,8 @@ export async function saveAboutTeamBulk(payload: {
     storyTitle: string;
     storyLead: string;
     storyBody: string;
+    milestones?: StudioMilestoneItem[];
+    careerRoles?: StudioCareerRoleItem[];
   };
   members: SaveTeamMemberPayload[];
 }): Promise<ActionResult<AdminAboutTeamResponse>> {

@@ -10,6 +10,7 @@ import {
   PortfolioShowcaseEvent,
   PublicBranding,
   PublicServicesResponse,
+  StudioMilestoneItem,
   StudioPackage,
 } from '@/types/event-management';
 import { isSystemPortfolioEventSlug } from '@/lib/heroSlider';
@@ -43,6 +44,7 @@ interface PublicAgencyHomeProps {
   heroEvent?: PortfolioShowcaseEvent | null;
   editorialGridEvent?: PortfolioShowcaseEvent | null;
   servicesShowcase?: PublicServicesResponse | null;
+  milestones?: StudioMilestoneItem[] | null;
   galleryImages?: PortfolioMediaItem[];
   reviews?: ClientReview[];
   isBackendConnected: boolean;
@@ -57,6 +59,7 @@ export function PublicAgencyHome({
   portfolioEvents = [],
   heroEvent = null,
   servicesShowcase = null,
+  milestones = null,
   galleryImages = [],
   reviews = [],
   isBackendConnected,
@@ -181,7 +184,7 @@ export function PublicAgencyHome({
             authentic stories of people&apos;s lives.
           </p>
 
-          <StudioCountStats accentColor={accent} />
+          <StudioCountStats accentColor={accent} stats={milestones} />
         </div>
       </section>
 
