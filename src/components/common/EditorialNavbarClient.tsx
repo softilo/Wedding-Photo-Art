@@ -35,8 +35,8 @@ const EDITORIAL_MENU_ITEMS = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
   { href: '/#packages', label: 'Packages' },
-  { href: '/#portfolio', label: 'Our Works' },
   { href: '/#reviews', label: 'Reviews ' },
+  { href: '/#portfolio', label: 'Our Works' },
   { href: '/#studio-concierge', label: 'Why Us' },
   { href: '/career', label: 'Career' },
   { href: '/contact', label: 'Contact' },
@@ -122,7 +122,7 @@ export function EditorialNavbarClient({
           }}
         />
 
-        <div className="mx-auto flex h-16 sm:h-[68px] max-w-6xl items-center justify-between gap-3 px-3 sm:px-6">
+        <div className="mx-auto flex h-16 sm:h-[68px] max-w-7xl items-center justify-between gap-3 px-3 sm:px-6">
           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
             <button
               type="button"

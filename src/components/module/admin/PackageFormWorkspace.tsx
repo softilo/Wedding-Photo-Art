@@ -897,8 +897,8 @@ export function PackageFormWorkspace({
                   </ul>
                 )}
                 <div className="pt-2">
-                  <span className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#DFCEAA] bg-[#F8F3E6] px-4 py-2 text-xs font-semibold text-[#181611]">
-                    <span>Choose This Collection</span>
+                  <span className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#16A34A] px-4 py-2 text-xs font-semibold text-white shadow-sm">
+                    <span>Book on WhatsApp</span>
                     <ArrowRightIcon className="w-3.5 h-3.5" />
                   </span>
                 </div>

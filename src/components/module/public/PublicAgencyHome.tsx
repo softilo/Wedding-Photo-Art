@@ -127,19 +127,41 @@ export function PublicAgencyHome({
     return packages.filter((p) => p.eventTypeId === selectedCategoryId);
   }, [packages, selectedCategoryId]);
 
-  const handleSelectPackage = (id: string) => {
-    setSelectedPackageId(id);
-    const matched = packages.find((p) => p.id === id);
-    if (matched) {
-      setSelectedInquiryLabel(matched.name);
+  const buildPackageWhatsAppHref = (pkg: StudioPackage) => {
+    const lines: string[] = [
+      `Hello ${branding.displayName}! I would like to book / inquire about this package:`,
+      '',
+      `Package: ${pkg.name}`,
+    ];
+    if (pkg.eventType?.name) {
+      lines.push(`Category: ${pkg.eventType.name}`);
     }
-    document.getElementById('inquire')?.scrollIntoView({ behavior: 'smooth' });
+    lines.push(`Base Price: ${formatPoisha(pkg.basePricePoisha, branding.currency)}`);
+    if (pkg.description?.trim()) {
+      lines.push(`Summary: ${pkg.description.trim()}`);
+    }
+    if (pkg.items && pkg.items.length > 0) {
+      lines.push('', 'Included Items:');
+      for (const item of pkg.items) {
+        const lineTotal =
+          item.unitPricePoisha > 0
+            ? ` (${formatPoisha(item.unitPricePoisha * item.quantity, branding.currency)})`
+            : '';
+        lines.push(`- ${item.quantity}x ${item.description}${lineTotal}`);
+      }
+    }
+    lines.push('', 'Please share date availability and booking details.');
+    return buildWhatsAppUrl(contactPhone, branding.displayName, lines.join('\n'));
   };
 
-  const handleSelectComboPreset = (preset: (typeof STUDIO_PROFILE.comboPresets)[number]) => {
-    setSelectedPackageId('');
-    setSelectedInquiryLabel(preset.title);
-    document.getElementById('inquire')?.scrollIntoView({ behavior: 'smooth' });
+  const buildComboWhatsAppHref = (preset: (typeof STUDIO_PROFILE.comboPresets)[number]) => {
+    const msg = [
+      `Hello ${branding.displayName}! I would like to inquire about a custom multi-day package:`,
+      '',
+      `Combo: ${preset.title}`,
+      `Details: ${preset.notes}`,
+    ].join('\n');
+    return buildWhatsAppUrl(contactPhone, branding.displayName, msg);
   };
 
   return (
@@ -233,7 +255,7 @@ export function PublicAgencyHome({
         id="packages"
         className="border-b border-[#E5DFD0] bg-[#F3EFE6]/65 scroll-mt-16"
       >
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:py-20 sm:px-6 space-y-8">
+        <div className="mx-auto max-w-[1380px] px-4 py-16 sm:px-6 sm:py-20 lg:px-10 space-y-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div className="space-y-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-[#DFCEAA] bg-white px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.18em] text-[#7A5E21]">
@@ -244,8 +266,8 @@ export function PublicAgencyHome({
               </h2>
             </div>
             <p className="text-sm text-[#4A4438] max-w-md">
-              Select any collection below to attach it to your free quote request—every line item
-              can be tailored to your guest count and schedule.
+              Tap any package below to send its full details directly to our studio on WhatsApp—every
+              line item can be tailored to your guest count and schedule.
             </p>
           </div>
 
@@ -384,33 +406,23 @@ export function PublicAgencyHome({
                     </div>
 
                     <div className="p-6 pt-5">
-                      <button
-                        type="button"
-                        onClick={() => handleSelectPackage(pkg.id)}
+                      <a
+                        href={buildPackageWhatsAppHref(pkg)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => {
+                          setSelectedPackageId(pkg.id);
+                          setSelectedInquiryLabel(pkg.name);
+                        }}
                         className={cn(
-                          'inline-flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer',
-                          isSelected
-                            ? 'text-white shadow-sm'
-                            : 'border-[#DFCEAA] bg-[#F8F3E6] text-[#181611] hover:bg-[#181611] hover:text-white hover:border-[#181611]',
+                          'inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#16A34A] bg-[#16A34A] px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-[#16A34A]/20 hover:bg-[#15803D] hover:border-[#15803D] transition-all active:scale-[0.99] cursor-pointer',
+                          isSelected ? 'ring-2 ring-[#25D366]/45' : '',
                         )}
-                        style={
-                          isSelected
-                            ? { backgroundColor: accent, borderColor: accent }
-                            : undefined
-                        }
                       >
-                        {isSelected ? (
-                          <>
-                            <CheckCircleIcon className="w-3.5 h-3.5" />
-                            <span>Selected for Quote</span>
-                          </>
-                        ) : (
-                          <>
-                            <span>Choose This Collection</span>
-                            <ArrowRightIcon className="w-3.5 h-3.5" />
-                          </>
-                        )}
-                      </button>
+                        <WhatsAppIcon className="w-4 h-4 shrink-0" />
+                        <span>Book on WhatsApp</span>
+                        <ArrowRightIcon className="w-3.5 h-3.5 shrink-0" />
+                      </a>
                     </div>
                   </div>
                 );
@@ -428,20 +440,26 @@ export function PublicAgencyHome({
                 Need a Custom Multi-Day Wedding Combo?
               </h3>
               <p className="text-xs sm:text-sm text-[#4A4438]">
-                Pick a quick preset below to pre-fill your inquiry for an itemized combo quote:
+                Pick a quick preset below to message us on WhatsApp for an itemized combo quote:
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               {STUDIO_PROFILE.comboPresets.map((preset) => (
-                <button
+                <a
                   key={preset.id}
-                  type="button"
-                  onClick={() => handleSelectComboPreset(preset)}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#DFCEAA] bg-[#F8F3E6] px-3.5 py-2 text-xs font-semibold text-[#181611] hover:border-[#8B6A21] hover:bg-[#181611] hover:text-white transition-colors cursor-pointer"
+                  href={buildComboWhatsAppHref(preset)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => {
+                    setSelectedPackageId('');
+                    setSelectedInquiryLabel(preset.title);
+                  }}
+                  className="group inline-flex items-center gap-1.5 rounded-xl border border-[#181611] bg-[#181611] px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#16A34A] hover:border-[#16A34A] transition-colors cursor-pointer"
                 >
+                  <WhatsAppIcon className="w-3.5 h-3.5 text-[#25D366] group-hover:text-white transition-colors shrink-0" />
                   <span>{preset.label}</span>
-                  <ArrowRightIcon className="w-3 h-3" />
-                </button>
+                  <ArrowRightIcon className="w-3 h-3 shrink-0" />
+                </a>
               ))}
             </div>
           </div>
