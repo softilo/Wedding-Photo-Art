@@ -400,15 +400,15 @@ export function ServicesShowcaseSetup({
   return (
     <div className="space-y-5">
       {/* Section Header & Top Controls */}
-      <div className="admin-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="space-y-1">
+      <div className="admin-card p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="space-y-0.5">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-base sm:text-lg font-semibold text-[var(--admin-text)]">
-              Studio Services Cards (Stored in DB • Isolated from Portfolio)
+            <h2 className="admin-section-title text-[15px] sm:text-base">
+              Studio Services Cards
             </h2>
             <span
               className={cn(
-                'inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold',
+                'inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold',
                 enabled
                   ? 'border-emerald-500/35 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300'
                   : 'border-amber-500/35 bg-amber-500/10 text-amber-700 dark:text-amber-300',
@@ -417,10 +417,9 @@ export function ServicesShowcaseSetup({
               {enabled ? `${homeFeaturedKeys.size} on Homepage` : 'Hidden'}
             </span>
           </div>
-          <p className="text-xs text-[var(--admin-muted)]">
-            Service photos upload directly into your isolated{' '}
-            <span className="font-mono-code text-[var(--admin-text)]">/services</span> folder and
-            will never show inside Client Portfolios or Gallery.
+          <p className="admin-meta">
+            Top 3 featured services appear on your homepage, with the full catalog at{' '}
+            <span className="font-mono-code">/all-services</span>.
           </p>
         </div>
 
@@ -429,9 +428,9 @@ export function ServicesShowcaseSetup({
             href="/all-services"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-xs font-semibold text-[var(--admin-text)] hover:bg-[var(--admin-surface-hover)] transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-1.5 sm:py-2 text-xs font-semibold text-[var(--admin-text)] hover:bg-[var(--admin-surface-hover)] transition-colors"
           >
-            <span>View /all-services</span>
+            <span>Preview /all-services</span>
             <ExternalLinkIcon className="w-3.5 h-3.5" />
           </Link>
 
@@ -439,7 +438,7 @@ export function ServicesShowcaseSetup({
             type="button"
             disabled={isPending}
             onClick={handleToggleSectionEnabled}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-xs font-semibold text-[var(--admin-text)] hover:bg-[var(--admin-surface-hover)] transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-1.5 sm:py-2 text-xs font-semibold text-[var(--admin-text)] hover:bg-[var(--admin-surface-hover)] transition-colors cursor-pointer"
           >
             {enabled ? 'Hide Section' : 'Show Section'}
           </button>
@@ -447,7 +446,7 @@ export function ServicesShowcaseSetup({
           <button
             type="button"
             onClick={handleAddService}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--admin-accent)]/45 bg-[var(--admin-accent-soft)] px-3.5 py-2 text-xs font-semibold text-[var(--admin-accent)] hover:opacity-90 transition-opacity cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--admin-accent)]/45 bg-[var(--admin-accent-soft)] px-3 py-1.5 sm:py-2 text-xs font-semibold text-[var(--admin-accent)] hover:opacity-90 transition-opacity cursor-pointer"
           >
             <PlusIcon className="w-3.5 h-3.5" />
             <span>Add Service</span>
@@ -455,22 +454,22 @@ export function ServicesShowcaseSetup({
 
           <button
             type="button"
-            disabled={isPending}
+            disabled={isPending || !hasUnsavedChanges}
             onClick={handleSaveAll}
             className={cn(
-              'inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold transition-opacity cursor-pointer',
+              'inline-flex items-center gap-1.5 rounded-xl px-4 py-1.5 sm:py-2 text-xs font-semibold transition-opacity',
               hasUnsavedChanges
-                ? 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)] shadow-xs hover:opacity-95'
-                : 'border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] text-[var(--admin-muted)]',
+                ? 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)] shadow-xs hover:opacity-95 cursor-pointer'
+                : 'border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] text-[var(--admin-muted)] cursor-default',
             )}
           >
-            {isPending ? 'Saving...' : hasUnsavedChanges ? 'Save Services Changes' : 'Saved ✓'}
+            {isPending ? 'Saving...' : hasUnsavedChanges ? 'Save Services' : 'Saved ✓'}
           </button>
         </div>
       </div>
 
       {/* Editable Cards Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {items.map((item, idx) => {
           const thumbUrl = item.imageUrl
             ? buildCloudinaryImageUrl(item.imageUrl, {

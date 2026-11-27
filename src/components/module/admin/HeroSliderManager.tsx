@@ -594,11 +594,16 @@ export function HeroSliderManager({
     savedSettings.tabletColumns !== settingsDraft.tabletColumns ||
     savedSettings.desktopColumns !== settingsDraft.desktopColumns;
 
+  const handleSelectTab = (tab: 'hero' | 'services' | 'about') => {
+    setActiveTab(tab);
+    setFeedback(null);
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-5">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="space-y-1.5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="hidden lg:block space-y-1">
           <div className="flex flex-wrap items-center gap-2.5">
             <h1 className="admin-page-title">Public Page Setup</h1>
             {activeTab === 'hero' ? (
@@ -651,8 +656,7 @@ export function HeroSliderManager({
             )}
           </div>
           <p className="admin-meta">
-            Manage your public homepage photography section-by-section in original / 4K{' '}
-            <span className="font-mono-code">q_100</span> quality.
+            Manage your homepage hero slideshow, studio services, and about page team cleanly in one place.
           </p>
         </div>
 
@@ -661,7 +665,7 @@ export function HeroSliderManager({
             href="/?external=1"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-2 text-xs font-semibold text-[var(--admin-text)] hover:bg-[var(--admin-surface-hover)] transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-1.5 sm:py-2 text-xs font-semibold text-[var(--admin-text)] hover:bg-[var(--admin-surface-hover)] transition-colors"
           >
             <span>View Live Homepage</span>
             <ExternalLinkIcon className="w-3.5 h-3.5" />
@@ -671,138 +675,95 @@ export function HeroSliderManager({
               <button
                 type="button"
                 onClick={handleOpenGalleryPicker}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3.5 py-2 text-xs font-semibold text-[var(--admin-text)] hover:bg-[var(--admin-surface-hover)] transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-1.5 sm:py-2 text-xs font-semibold text-[var(--admin-text)] hover:bg-[var(--admin-surface-hover)] transition-colors cursor-pointer"
               >
                 <CameraIcon className="w-3.5 h-3.5 text-[var(--admin-accent)]" />
-                <span>Pick From Gallery</span>
+                <span>Pick Gallery</span>
               </button>
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--admin-accent)] px-4 py-2 text-xs font-semibold text-[var(--admin-accent-fg)] shadow-xs hover:opacity-95 transition-opacity cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--admin-accent)] px-3.5 py-1.5 sm:py-2 text-xs font-semibold text-[var(--admin-accent-fg)] shadow-xs hover:opacity-95 transition-opacity cursor-pointer"
               >
                 <PlusIcon className="w-3.5 h-3.5" />
-                <span>Upload Landscape Photos</span>
+                <span>Upload Landscape</span>
               </button>
             </>
           )}
         </div>
       </div>
 
-      {/* Section Categories Bar (Hero, Services, About & Team) */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Compact Section Tabs Bar */}
+      <div className="admin-card p-1.5 flex items-center overflow-x-auto no-scrollbar gap-1">
         <button
           type="button"
-          onClick={() => setActiveTab('hero')}
+          onClick={() => handleSelectTab('hero')}
           className={cn(
-            'text-left rounded-2xl border p-4 transition-all flex items-center justify-between gap-3 cursor-pointer',
+            'inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer',
             activeTab === 'hero'
-              ? 'border-[var(--admin-accent)] bg-[var(--admin-accent-soft)] shadow-2xs'
-              : 'border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-surface-subtle)]',
+              ? 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)] shadow-xs'
+              : 'text-[var(--admin-muted)] hover:text-[var(--admin-text)] hover:bg-[var(--admin-surface-subtle)]',
           )}
         >
-          <div className="flex items-center gap-3 min-w-0">
-            <span
-              className={cn(
-                'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border',
-                activeTab === 'hero'
-                  ? 'border-[var(--admin-accent)]/40 bg-[var(--admin-accent)] text-[var(--admin-accent-fg)]'
-                  : 'border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] text-[var(--admin-accent)]',
-              )}
-            >
-              <GalleryHorizontalIcon className="w-5 h-5" />
-            </span>
-            <div className="min-w-0">
-              <p className="text-[10.5px] font-bold uppercase tracking-wider text-[var(--admin-accent)]">
-                Section 01
-              </p>
-              <p className="text-sm font-semibold text-[var(--admin-text)] truncate">
-                Hero Slideshow Carousel
-              </p>
-              <p className="text-[11px] text-[var(--admin-muted)] truncate">
-                Full-width top slider • {settingsDraft.desktopColumns}/{settingsDraft.tabletColumns}/
-                {settingsDraft.mobileColumns} view mode
-              </p>
-            </div>
-          </div>
-          <span className="font-mono-code text-xs font-bold text-[var(--admin-muted)] shrink-0">
-            {orderedSlides.length} slides
+          <GalleryHorizontalIcon className="w-3.5 h-3.5" />
+          <span>Hero Slideshow</span>
+          <span
+            className={cn(
+              'rounded-full px-1.5 py-0.5 font-mono-code text-[10px] leading-none',
+              activeTab === 'hero'
+                ? 'bg-black/15 text-current'
+                : 'bg-[var(--admin-surface-subtle)] text-[var(--admin-muted)]',
+            )}
+          >
+            {orderedSlides.length}
           </span>
         </button>
 
         <button
           type="button"
-          onClick={() => setActiveTab('services')}
+          onClick={() => handleSelectTab('services')}
           className={cn(
-            'text-left rounded-2xl border p-4 transition-all flex items-center justify-between gap-3 cursor-pointer',
+            'inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer',
             activeTab === 'services'
-              ? 'border-[var(--admin-accent)] bg-[var(--admin-accent-soft)] shadow-2xs'
-              : 'border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-surface-subtle)]',
+              ? 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)] shadow-xs'
+              : 'text-[var(--admin-muted)] hover:text-[var(--admin-text)] hover:bg-[var(--admin-surface-subtle)]',
           )}
         >
-          <div className="flex items-center gap-3 min-w-0">
-            <span
-              className={cn(
-                'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border',
-                activeTab === 'services'
-                  ? 'border-[var(--admin-accent)]/40 bg-[var(--admin-accent)] text-[var(--admin-accent-fg)]'
-                  : 'border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] text-[var(--admin-accent)]',
-              )}
-            >
-              <CameraIcon className="w-5 h-5" />
-            </span>
-            <div className="min-w-0">
-              <p className="text-[10.5px] font-bold uppercase tracking-wider text-[var(--admin-accent)]">
-                Section 02
-              </p>
-              <p className="text-sm font-semibold text-[var(--admin-text)] truncate">
-                Studio Services Cards
-              </p>
-              <p className="text-[11px] text-[var(--admin-muted)] truncate">
-                Top 3 on Homepage + Full Grid at /all-services
-              </p>
-            </div>
-          </div>
-          <span className="font-mono-code text-xs font-bold text-[var(--admin-muted)] shrink-0">
-            {(servicesDataState?.items || []).filter((i) => i.isActive).length} items
+          <CameraIcon className="w-3.5 h-3.5" />
+          <span>Studio Services</span>
+          <span
+            className={cn(
+              'rounded-full px-1.5 py-0.5 font-mono-code text-[10px] leading-none',
+              activeTab === 'services'
+                ? 'bg-black/15 text-current'
+                : 'bg-[var(--admin-surface-subtle)] text-[var(--admin-muted)]',
+            )}
+          >
+            {(servicesDataState?.items || []).filter((i) => i.isActive).length}
           </span>
         </button>
 
         <button
           type="button"
-          onClick={() => setActiveTab('about')}
+          onClick={() => handleSelectTab('about')}
           className={cn(
-            'text-left rounded-2xl border p-4 transition-all flex items-center justify-between gap-3 cursor-pointer',
+            'inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer',
             activeTab === 'about'
-              ? 'border-[var(--admin-accent)] bg-[var(--admin-accent-soft)] shadow-2xs'
-              : 'border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-surface-subtle)]',
+              ? 'bg-[var(--admin-accent)] text-[var(--admin-accent-fg)] shadow-xs'
+              : 'text-[var(--admin-muted)] hover:text-[var(--admin-text)] hover:bg-[var(--admin-surface-subtle)]',
           )}
         >
-          <div className="flex items-center gap-3 min-w-0">
-            <span
-              className={cn(
-                'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border',
-                activeTab === 'about'
-                  ? 'border-[var(--admin-accent)]/40 bg-[var(--admin-accent)] text-[var(--admin-accent-fg)]'
-                  : 'border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] text-[var(--admin-accent)]',
-              )}
-            >
-              <LayersIcon className="w-5 h-5" />
-            </span>
-            <div className="min-w-0">
-              <p className="text-[10.5px] font-bold uppercase tracking-wider text-[var(--admin-accent)]">
-                Section 03
-              </p>
-              <p className="text-sm font-semibold text-[var(--admin-text)] truncate">
-                About &amp; Team Details
-              </p>
-              <p className="text-[11px] text-[var(--admin-muted)] truncate">
-                Studio story &amp; team roster for /about
-              </p>
-            </div>
-          </div>
-          <span className="font-mono-code text-xs font-bold text-[var(--admin-muted)] shrink-0">
-            {(aboutTeamDataState?.members || []).filter((m) => m.isActive).length} team
+          <LayersIcon className="w-3.5 h-3.5" />
+          <span>About &amp; Team</span>
+          <span
+            className={cn(
+              'rounded-full px-1.5 py-0.5 font-mono-code text-[10px] leading-none',
+              activeTab === 'about'
+                ? 'bg-black/15 text-current'
+                : 'bg-[var(--admin-surface-subtle)] text-[var(--admin-muted)]',
+            )}
+          >
+            {(aboutTeamDataState?.members || []).filter((m) => m.isActive).length}
           </span>
         </button>
       </div>
