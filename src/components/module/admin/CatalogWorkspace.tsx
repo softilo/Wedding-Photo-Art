@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useTransition } from 'react';
+import Link from 'next/link';
 import {
   DeliverableLabelTemplate,
   EventType,
@@ -16,14 +17,13 @@ import {
 import {
   createDeliverableLabel,
   createEventType,
-  createPackage,
   createTaskTemplate,
   updateDeliverableLabel,
   updatePackage,
   updateTaskTemplate,
 } from '@/service/catalog/catalog.service';
 import { cn, formatPoisha } from '@/lib/utils';
-import { PaletteIcon, PlusIcon, SlidersIcon, UsersIcon } from '@/components/shared/Icons';
+import { CameraIcon, PaletteIcon, PlusIcon, SlidersIcon, UsersIcon } from '@/components/shared/Icons';
 
 export type StudioSetupSection = 'catalog' | 'team' | 'settings';
 
@@ -64,7 +64,6 @@ export function CatalogWorkspace({
   const [teamTab, setTeamTab] = useState<'members' | 'automation'>('members');
 
   // Modals for clean creation
-  const [showAddPkg, setShowAddPkg] = useState(false);
   const [showAddMember, setShowAddMember] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -85,13 +84,6 @@ export function CatalogWorkspace({
   const [advancePolicyValue, setAdvancePolicyValue] = useState(
     String(initialSettings?.advancePolicyValue ?? 20),
   );
-
-  // Package creation state
-  const [pkgName, setPkgName] = useState('');
-  const [pkgSlug, setPkgSlug] = useState('');
-  const [pkgPriceTk, setPkgPriceTk] = useState('50000');
-  const [pkgDesc, setPkgDesc] = useState('');
-  const [pkgEventTypeId, setPkgEventTypeId] = useState('');
 
   // Team member creation state
   const [memName, setMemName] = useState('');
@@ -132,31 +124,6 @@ export function CatalogWorkspace({
       }
       setSettings(res.data);
       notify('ok', 'Studio branding & advance deposit policy saved.');
-    });
-  };
-
-  const handleCreatePackage = (e: React.FormEvent) => {
-    e.preventDefault();
-    const basePricePoisha = Math.round(Number(pkgPriceTk) * 100);
-    startTransition(async () => {
-      const res = await createPackage({
-        name: pkgName,
-        slug: pkgSlug || pkgName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-        description: pkgDesc || undefined,
-        eventTypeId: pkgEventTypeId || undefined,
-        basePricePoisha,
-        isPublished: true,
-      });
-      if (!res.ok || !res.data) {
-        notify('err', res.message || 'Failed to create package');
-        return;
-      }
-      setPackages([...packages, res.data]);
-      setPkgName('');
-      setPkgSlug('');
-      setPkgDesc('');
-      setShowAddPkg(false);
-      notify('ok', `Package "${res.data.name}" published`);
     });
   };
 
@@ -205,15 +172,9 @@ export function CatalogWorkspace({
   const handleCreateEventType = (e: React.FormEvent) => {
     e.preventDefault();
     if (!etName.trim()) return;
-    const slug = etName
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
     startTransition(async () => {
       const res = await createEventType({
         name: etName.trim(),
-        slug,
         description: etDesc.trim() || undefined,
       });
       if (!res.ok || !res.data) {
@@ -329,75 +290,111 @@ export function CatalogWorkspace({
             </div>
 
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setShowAddPkg(true)}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-indigo-700 transition-colors"
+              <Link
+                href="/admin/catalog/new"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--admin-accent)] px-3.5 py-2 text-xs font-semibold text-[var(--admin-accent-fg)] shadow-xs hover:opacity-95 transition-opacity"
               >
                 <PlusIcon className="w-3.5 h-3.5" />
                 <span>New Package</span>
-              </button>
+              </Link>
             </div>
           </div>
 
           <div className="grid gap-6 lg:grid-cols-12">
-              <div className="lg:col-span-8 atelier-card p-6 space-y-4">
-                <div className="flex items-center justify-between border-b border-border/60 pb-3">
+              <div className="lg:col-span-8 admin-card p-5 sm:p-6 space-y-4">
+                <div className="flex items-center justify-between border-b border-[var(--admin-border-subtle)] pb-3">
                   <div>
-                    <h2 className="text-base font-bold text-slate-900">Service Packages</h2>
-                    <p className="text-xs text-slate-500">
+                    <h2 className="admin-section-title">Service Packages</h2>
+                    <p className="text-xs text-[var(--admin-muted)]">
                       Published packages appear on your public website and inside Quote presets.
                     </p>
                   </div>
                 </div>
 
                 {packages.length === 0 ? (
-                  <p className="text-sm text-slate-500 py-8 text-center">
+                  <p className="text-sm text-[var(--admin-muted)] py-8 text-center">
                     No packages yet. Click &ldquo;New Package&rdquo; to create your first offering.
                   </p>
                 ) : (
-                  <div className="divide-y divide-slate-100">
-                    {packages.map((pkg) => (
-                      <div key={pkg.id} className="py-3.5 flex items-center justify-between gap-3">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <p className="font-semibold text-sm text-slate-900">{pkg.name}</p>
-                            {pkg.eventType && (
-                              <span className="rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-700">
-                                {pkg.eventType.name}
-                              </span>
-                            )}
-                          </div>
-                          <p className="font-mono-code text-xs text-muted-foreground font-medium mt-0.5 tabular-nums">
-                            {formatPoisha(pkg.basePricePoisha, currency)}
-                            {pkg.description ? ` • ${pkg.description}` : ''}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleTogglePublish(pkg)}
-                          className={cn(
-                            'rounded-full px-3 py-1 text-xs font-semibold border transition-colors',
-                            pkg.isPublished
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-                              : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200',
-                          )}
+                  <div className="divide-y divide-[var(--admin-border-subtle)]">
+                    {packages.map((pkg) => {
+                      const thumbUrl = pkg.coverDeliveryUrls?.thumbnailUrl || pkg.coverImageUrl;
+                      return (
+                        <div
+                          key={pkg.id}
+                          className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                         >
-                          {pkg.isPublished ? 'Published' : 'Draft'}
-                        </button>
-                      </div>
-                    ))}
+                          <div className="flex items-start gap-3 min-w-0">
+                            <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] flex items-center justify-center">
+                              {thumbUrl ? (
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                <img
+                                  src={thumbUrl}
+                                  alt={pkg.name}
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                <CameraIcon className="w-4 h-4 text-[var(--admin-muted)]" />
+                              )}
+                            </div>
+
+                            <div className="min-w-0">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <p className="font-semibold text-sm text-[var(--admin-text)] truncate">
+                                  {pkg.name}
+                                </p>
+                                {pkg.eventType && (
+                                  <span className="rounded-md bg-[var(--admin-accent-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--admin-accent)]">
+                                    {pkg.eventType.name}
+                                  </span>
+                                )}
+                                {pkg.items && pkg.items.length > 0 && (
+                                  <span className="rounded-md border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] px-2 py-0.5 text-[11px] font-medium text-[var(--admin-muted)]">
+                                    {pkg.items.length} item{pkg.items.length === 1 ? '' : 's'}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="font-mono-code text-xs text-[var(--admin-muted)] font-medium mt-0.5 tabular-nums line-clamp-1">
+                                {formatPoisha(pkg.basePricePoisha, currency)}
+                                {pkg.description ? ` • ${pkg.description}` : ''}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                            <Link
+                              href={`/admin/catalog/${pkg.id}`}
+                              className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-1 text-xs font-semibold text-[var(--admin-text)] hover:bg-[var(--admin-surface-hover)] transition-colors"
+                            >
+                              Edit
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => handleTogglePublish(pkg)}
+                              className={cn(
+                                'rounded-full px-3 py-1 text-xs font-semibold border transition-colors cursor-pointer',
+                                pkg.isPublished
+                                  ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/35 hover:bg-emerald-500/20'
+                                  : 'bg-[var(--admin-surface-subtle)] text-[var(--admin-muted)] border-[var(--admin-border)] hover:text-[var(--admin-text)]',
+                              )}
+                            >
+                              {pkg.isPublished ? 'Published' : 'Draft'}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
 
               {/* Event Types Side Card */}
-              <div className="lg:col-span-4 atelier-card p-6 space-y-4">
-                <div className="border-b border-border/60 pb-3">
-                  <h2 className="text-base font-bold text-slate-900">
+              <div className="lg:col-span-4 admin-card p-5 sm:p-6 space-y-4">
+                <div className="border-b border-[var(--admin-border-subtle)] pb-3">
+                  <h2 className="admin-section-title">
                     Event Categories ({eventTypes.length})
                   </h2>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-[var(--admin-muted)]">
                     Used to group packages and trigger event-specific workflows.
                   </p>
                 </div>
@@ -418,7 +415,7 @@ export function CatalogWorkspace({
                   <button
                     type="submit"
                     disabled={isPending}
-                    className="w-full rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white hover:bg-slate-800"
+                    className="w-full rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-semibold text-white hover:bg-slate-800 cursor-pointer"
                   >
                     + Add Category
                   </button>
@@ -427,105 +424,14 @@ export function CatalogWorkspace({
                   {eventTypes.map((et) => (
                     <div
                       key={et.id}
-                      className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs"
+                      className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-subtle)] px-3 py-1.5 text-xs"
                     >
-                      <span className="font-semibold text-slate-900">{et.name}</span>
+                      <span className="font-semibold text-[var(--admin-text)]">{et.name}</span>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
-
-          {/* Add Package Modal */}
-          {showAddPkg && (
-            <div className="fixed inset-0 z-50 flex flex-col sm:flex-row sm:items-center sm:justify-center bg-white sm:bg-slate-900/50 p-0 sm:p-4 sm:backdrop-blur-xs admin-sheet-fade">
-              <div className="flex-1 sm:flex-initial w-full sm:max-w-lg h-dvh sm:h-auto sm:max-h-[90dvh] rounded-none sm:rounded-2xl border-0 sm:border border-border/60 bg-card p-4 sm:p-6 pt-[calc(1rem+env(safe-area-inset-top))] sm:pt-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-6 overflow-y-auto shadow-none sm:shadow-xl space-y-4">
-                <div className="flex items-center justify-between border-b border-border/60 pb-3">
-                  <h3 className="text-base font-bold text-slate-900">Create Service Package</h3>
-                  <button
-                    type="button"
-                    onClick={() => setShowAddPkg(false)}
-                    className="rounded-lg px-2 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-100"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <form onSubmit={handleCreatePackage} className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">
-                      Package Name *
-                    </label>
-                    <input
-                      required
-                      value={pkgName}
-                      onChange={(e) => setPkgName(e.target.value)}
-                      placeholder="e.g. Signature Wedding Story"
-                      className={inputClass}
-                    />
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1">
-                        Base Price ({currency}) *
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        required
-                        value={pkgPriceTk}
-                        onChange={(e) => setPkgPriceTk(e.target.value)}
-                        className={`${inputClass} font-mono-code`}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-600 mb-1">
-                        Event Category
-                      </label>
-                      <select
-                        value={pkgEventTypeId}
-                        onChange={(e) => setPkgEventTypeId(e.target.value)}
-                        className={inputClass}
-                      >
-                        <option value="">Any event category</option>
-                        {eventTypes.map((et) => (
-                          <option key={et.id} value={et.id}>
-                            {et.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">
-                      Included Deliverables / Summary
-                    </label>
-                    <input
-                      value={pkgDesc}
-                      onChange={(e) => setPkgDesc(e.target.value)}
-                      placeholder="e.g. 2 Senior Photographers, 1 Cinematographer, 1 Album"
-                      className={inputClass}
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowAddPkg(false)}
-                      className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isPending}
-                      className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-700"
-                    >
-                      Save &amp; Publish
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
         </>
       )}
 

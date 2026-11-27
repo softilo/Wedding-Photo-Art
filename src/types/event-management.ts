@@ -96,6 +96,14 @@ export interface StudioPackage {
   slug: string;
   description: string | null;
   basePricePoisha: number;
+  coverImageUrl?: string | null;
+  coverImageAssetId?: string | null;
+  coverImagePublicId?: string | null;
+  coverImageFormat?: string | null;
+  coverImageBytes?: number | null;
+  coverImageWidth?: number | null;
+  coverImageHeight?: number | null;
+  coverDeliveryUrls?: PortfolioMediaDeliveryUrls | null;
   isActive: boolean;
   isPublished: boolean;
   items?: PackageItem[];

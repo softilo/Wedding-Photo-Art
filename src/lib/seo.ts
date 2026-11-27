@@ -153,6 +153,7 @@ export function buildStudioJsonLdGraph(params: {
     '@type': 'Offer',
     name: pkg.name,
     description: pkg.description || `${pkg.name} by ${displayName}`,
+    ...(pkg.coverImageUrl ? { image: pkg.coverImageUrl } : {}),
     priceCurrency: branding.currency || 'BDT',
     price: Math.round((pkg.basePricePoisha || 0) / 100),
     availability: 'https://schema.org/InStock',

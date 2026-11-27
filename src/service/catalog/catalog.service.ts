@@ -60,7 +60,7 @@ export async function listEventTypes(): Promise<ActionResult<EventType[]>> {
 
 export async function createEventType(payload: {
   name: string;
-  slug: string;
+  slug?: string;
   description?: string;
 }): Promise<ActionResult<EventType>> {
   const res = await serverFetch.post('/catalog/event-types', {
@@ -95,19 +95,57 @@ export async function createServiceItem(payload: {
   return result;
 }
 
+export interface PackageItemWritePayload {
+  serviceItemId?: string;
+  description: string;
+  quantity: number;
+  unitPricePoisha: number;
+}
+
+export interface SavePackagePayload {
+  eventTypeId?: string | null;
+  name?: string;
+  slug?: string;
+  description?: string | null;
+  basePricePoisha?: number;
+  isPublished?: boolean;
+  isActive?: boolean;
+  coverImageUrl?: string | null;
+  coverImageAssetId?: string | null;
+  coverImagePublicId?: string | null;
+  coverImageFormat?: string | null;
+  coverImageBytes?: number | null;
+  coverImageWidth?: number | null;
+  coverImageHeight?: number | null;
+  coverImageVersion?: number | null;
+  coverImageResponseSignature?: string | null;
+  items?: PackageItemWritePayload[];
+}
+
 export async function listPackages(): Promise<ActionResult<PaginatedResponse<StudioPackage>>> {
   const res = await serverFetch.get('/catalog/packages?limit=50');
   return parseApiResponse<PaginatedResponse<StudioPackage>>(res);
 }
 
-export async function createPackage(payload: {
-  eventTypeId?: string;
-  name: string;
-  slug: string;
-  description?: string;
-  basePricePoisha: number;
-  isPublished?: boolean;
-}): Promise<ActionResult<StudioPackage>> {
+export async function getAdminPackage(packageId: string): Promise<ActionResult<StudioPackage>> {
+  const res = await serverFetch.get(`/catalog/packages/${encodeURIComponent(packageId)}`);
+  return parseApiResponse<StudioPackage>(res);
+}
+
+export async function signPackageCoverUpload(payload: {
+  format: string;
+  bytes: number;
+}): Promise<ActionResult<SignedCloudinaryUploadPayload>> {
+  const res = await serverFetch.post('/catalog/packages/sign-upload', {
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return parseApiResponse<SignedCloudinaryUploadPayload>(res);
+}
+
+export async function createPackage(
+  payload: SavePackagePayload & { name: string; basePricePoisha: number },
+): Promise<ActionResult<StudioPackage>> {
   const res = await serverFetch.post('/catalog/packages', {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -115,6 +153,7 @@ export async function createPackage(payload: {
   const result = await parseApiResponse<StudioPackage>(res);
   if (result.ok) {
     updateTag('public-storefront');
+    revalidatePath('/');
     revalidatePath('/admin/catalog');
   }
   return result;
@@ -122,13 +161,7 @@ export async function createPackage(payload: {
 
 export async function updatePackage(
   packageId: string,
-  payload: {
-    name?: string;
-    description?: string;
-    basePricePoisha?: number;
-    isPublished?: boolean;
-    isActive?: boolean;
-  },
+  payload: SavePackagePayload,
 ): Promise<ActionResult<StudioPackage>> {
   const res = await serverFetch.patch(`/catalog/packages/${encodeURIComponent(packageId)}`, {
     headers: { 'Content-Type': 'application/json' },
@@ -137,7 +170,9 @@ export async function updatePackage(
   const result = await parseApiResponse<StudioPackage>(res);
   if (result.ok) {
     updateTag('public-storefront');
+    revalidatePath('/');
     revalidatePath('/admin/catalog');
+    revalidatePath(`/admin/catalog/${packageId}`);
   }
   return result;
 }
@@ -293,7 +328,7 @@ export async function getAdminPortfolioEvent(
 
 export async function createPortfolioEvent(payload: {
   title: string;
-  slug: string;
+  slug?: string;
   eventDate?: string;
   description?: string;
   location?: string;

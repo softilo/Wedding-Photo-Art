@@ -173,9 +173,16 @@ export function DashboardShell({
 
   const activeNav = allItems.find(isItemActive) || allItems[0];
   const isBookingDetail = pathname.startsWith('/admin/bookings/');
+  const isNewPackage = pathname === '/admin/catalog/new';
+  const isEditPackage =
+    pathname.startsWith('/admin/catalog/') && pathname !== '/admin/catalog/new';
   const mobileScreenTitle = isBookingDetail
     ? 'Booking Details'
-    : activeNav?.label || 'Workspace';
+    : isNewPackage
+      ? 'New Package'
+      : isEditPackage
+        ? 'Edit Package'
+        : activeNav?.label || 'Workspace';
 
   const mobilePrimaryTabs: NavItem[] = isStaffOnly
     ? [{ href: '/staff', label: 'My Shoots', icon: CheckCircleIcon }]

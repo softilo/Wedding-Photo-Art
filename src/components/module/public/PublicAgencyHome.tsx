@@ -312,86 +312,106 @@ export function PublicAgencyHome({
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {filteredPackages.map((pkg) => {
                 const isSelected = selectedPackageId === pkg.id;
+                const coverUrl = pkg.coverDeliveryUrls?.coverUrl || pkg.coverImageUrl || null;
                 return (
                   <div
                     key={pkg.id}
                     className={cn(
-                      'atelier-card atelier-card-hover flex flex-col justify-between p-6 bg-white',
+                      'atelier-card atelier-card-hover flex flex-col justify-between overflow-hidden bg-white',
                       isSelected ? 'ring-2 ring-[#CAA650]/45 border-[#8B6A21]' : '',
                     )}
                   >
                     <div>
-                      {pkg.eventType && (
-                        <span className="inline-block mb-2.5 rounded-full bg-[#F8F3E6] border border-[#DFCEAA] px-3 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-[#6F5319]">
-                          {pkg.eventType.name}
-                        </span>
-                      )}
-                      <div className="flex items-start justify-between gap-3">
-                        <h3 className="font-editorial text-2xl font-semibold text-[#181611] leading-snug">
-                          {pkg.name}
-                        </h3>
-                        <span
-                          className="rounded-lg px-2.5 py-1 text-xs font-mono-code font-semibold text-white shrink-0 tabular-nums"
-                          style={{ backgroundColor: primary }}
-                        >
-                          {formatPoisha(pkg.basePricePoisha, branding.currency)}
-                        </span>
-                      </div>
-                      {pkg.description && (
-                        <p className="mt-2.5 text-sm text-[#4A4438] leading-relaxed">
-                          {pkg.description}
-                        </p>
+                      {coverUrl && (
+                        <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#F3EFE6] border-b border-[#ECE6D8]">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={coverUrl}
+                            alt={pkg.name}
+                            loading="lazy"
+                            decoding="async"
+                            className="h-full w-full object-cover object-center transition-transform duration-500 hover:scale-[1.03]"
+                          />
+                        </div>
                       )}
 
-                      {pkg.items && pkg.items.length > 0 && (
-                        <ul className="mt-5 space-y-2 border-t border-[#ECE6D8] pt-4 text-xs text-[#4A4438]">
-                          {pkg.items.map((item) => (
-                            <li key={item.id} className="flex items-center justify-between gap-2">
-                              <span className="flex items-center gap-1.5 min-w-0">
-                                <CheckCircleIcon className="w-3.5 h-3.5 text-[#8B6A21] shrink-0" />
-                                <span className="truncate">
-                                  {item.quantity}× {item.description}
+                      <div className="p-6 pb-0">
+                        {pkg.eventType && (
+                          <span className="inline-block mb-2.5 rounded-full bg-[#F8F3E6] border border-[#DFCEAA] px-3 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-[#6F5319]">
+                            {pkg.eventType.name}
+                          </span>
+                        )}
+                        <div className="flex items-start justify-between gap-3">
+                          <h3 className="font-editorial text-2xl font-semibold text-[#181611] leading-snug">
+                            {pkg.name}
+                          </h3>
+                          <span
+                            className="rounded-lg px-2.5 py-1 text-xs font-mono-code font-semibold text-white shrink-0 tabular-nums"
+                            style={{ backgroundColor: primary }}
+                          >
+                            {formatPoisha(pkg.basePricePoisha, branding.currency)}
+                          </span>
+                        </div>
+                        {pkg.description && (
+                          <p className="mt-2.5 text-sm text-[#4A4438] leading-relaxed">
+                            {pkg.description}
+                          </p>
+                        )}
+
+                        {pkg.items && pkg.items.length > 0 && (
+                          <ul className="mt-5 space-y-2 border-t border-[#ECE6D8] pt-4 text-xs text-[#4A4438]">
+                            {pkg.items.map((item) => (
+                              <li key={item.id} className="flex items-center justify-between gap-2">
+                                <span className="flex items-center gap-1.5 min-w-0">
+                                  <CheckCircleIcon className="w-3.5 h-3.5 text-[#8B6A21] shrink-0" />
+                                  <span className="truncate">
+                                    {item.quantity}× {item.description}
+                                  </span>
                                 </span>
-                              </span>
-                              <span className="font-mono-code text-[#6B6352] tabular-nums shrink-0">
-                                {formatPoisha(
-                                  item.unitPricePoisha * item.quantity,
-                                  branding.currency,
+                                {item.unitPricePoisha > 0 && (
+                                  <span className="font-mono-code text-[#6B6352] tabular-nums shrink-0">
+                                    {formatPoisha(
+                                      item.unitPricePoisha * item.quantity,
+                                      branding.currency,
+                                    )}
+                                  </span>
                                 )}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => handleSelectPackage(pkg.id)}
-                      className={cn(
-                        'mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer',
-                        isSelected
-                          ? 'text-white shadow-sm'
-                          : 'border-[#DFCEAA] bg-[#F8F3E6] text-[#181611] hover:bg-[#181611] hover:text-white hover:border-[#181611]',
-                      )}
-                      style={
-                        isSelected
-                          ? { backgroundColor: accent, borderColor: accent }
-                          : undefined
-                      }
-                    >
-                      {isSelected ? (
-                        <>
-                          <CheckCircleIcon className="w-3.5 h-3.5" />
-                          <span>Selected for Quote</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>Choose This Collection</span>
-                          <ArrowRightIcon className="w-3.5 h-3.5" />
-                        </>
-                      )}
-                    </button>
+                    <div className="p-6 pt-5">
+                      <button
+                        type="button"
+                        onClick={() => handleSelectPackage(pkg.id)}
+                        className={cn(
+                          'inline-flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer',
+                          isSelected
+                            ? 'text-white shadow-sm'
+                            : 'border-[#DFCEAA] bg-[#F8F3E6] text-[#181611] hover:bg-[#181611] hover:text-white hover:border-[#181611]',
+                        )}
+                        style={
+                          isSelected
+                            ? { backgroundColor: accent, borderColor: accent }
+                            : undefined
+                        }
+                      >
+                        {isSelected ? (
+                          <>
+                            <CheckCircleIcon className="w-3.5 h-3.5" />
+                            <span>Selected for Quote</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>Choose This Collection</span>
+                            <ArrowRightIcon className="w-3.5 h-3.5" />
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 );
               })}

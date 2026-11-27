@@ -37,7 +37,6 @@ import {
   generateMatchingAlbumTheme,
   parseAlbumDescriptionAndTheme,
   serializeAlbumDescriptionWithTheme,
-  shortenTitleToSlug,
 } from '@/lib/albumTheme';
 import { isSystemPortfolioEventSlug } from '@/lib/heroSlider';
 import { cn, formatLocalDate } from '@/lib/utils';
@@ -82,15 +81,6 @@ interface UploadQueueItem {
     version?: number;
     signature?: string;
   };
-}
-
-function slugifyTitle(value: string): string {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 80);
 }
 
 function detectFileFormat(file: File): {
@@ -154,8 +144,6 @@ export function PortfolioEventManager({
 
   // Create Draft form state
   const [newTitle, setNewTitle] = useState('');
-  const [newSlug, setNewSlug] = useState('');
-  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   const [newDate, setNewDate] = useState('');
   const [newLocation, setNewLocation] = useState('');
   const [newEventTypeId, setNewEventTypeId] = useState('');
@@ -165,7 +153,6 @@ export function PortfolioEventManager({
   const selectedEvent = events.find((e) => e.id === selectedEventId) ?? null;
   const initialParsed = parseAlbumDescriptionAndTheme(selectedEvent?.description);
   const [editTitle, setEditTitle] = useState(selectedEvent?.title || '');
-  const [editSlug, setEditSlug] = useState(selectedEvent?.slug || '');
   const [editDate, setEditDate] = useState(
     selectedEvent?.eventDate ? selectedEvent.eventDate.slice(0, 10) : '',
   );
@@ -236,7 +223,6 @@ export function PortfolioEventManager({
     const parsed = parseAlbumDescriptionAndTheme(ev.description);
     setSelectedEventId(ev.id);
     setEditTitle(ev.title);
-    setEditSlug(ev.slug);
     setEditDate(ev.eventDate ? ev.eventDate.slice(0, 10) : '');
     setEditLocation(ev.location || '');
     setEditEventTypeId(ev.eventTypeId || '');
@@ -301,16 +287,15 @@ export function PortfolioEventManager({
 
   const handleCreateDraft = (e: React.FormEvent) => {
     e.preventDefault();
-    const finalSlug = (newSlug || slugifyTitle(newTitle)).trim();
-    if (!finalSlug) {
-      notify('err', 'Please provide a valid URL slug (lowercase letters, numbers, and hyphens).');
+    const trimmedTitle = newTitle.trim();
+    if (!trimmedTitle) {
+      notify('err', 'Please provide an event or album title.');
       return;
     }
 
     startTransition(async () => {
       const res = await createPortfolioEvent({
-        title: newTitle.trim(),
-        slug: finalSlug,
+        title: trimmedTitle,
         eventDate: newDate || undefined,
         location: newLocation.trim() || undefined,
         eventTypeId: newEventTypeId || undefined,
@@ -324,8 +309,6 @@ export function PortfolioEventManager({
       setEvents((prev) => [created, ...prev]);
       selectEventForEditing(created);
       setNewTitle('');
-      setNewSlug('');
-      setSlugManuallyEdited(false);
       setNewDate('');
       setNewLocation('');
       setNewEventTypeId('');
@@ -342,7 +325,6 @@ export function PortfolioEventManager({
       const serializedDescription = serializeAlbumDescriptionWithTheme(editDescription, editTheme);
       const res = await updatePortfolioEvent(selectedEvent.id, {
         title: editTitle.trim(),
-        slug: editSlug.trim().toLowerCase(),
         eventDate: editDate || undefined,
         location: editLocation.trim() || undefined,
         eventTypeId: editEventTypeId || undefined,
@@ -353,7 +335,7 @@ export function PortfolioEventManager({
         return;
       }
       setEvents((prev) => prev.map((ev) => (ev.id === res.data!.id ? res.data! : ev)));
-      notify('ok', 'Album profile info & slug saved.');
+      notify('ok', 'Album profile info saved.');
     });
   };
 
@@ -939,35 +921,11 @@ export function PortfolioEventManager({
               <input
                 required
                 value={newTitle}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setNewTitle(val);
-                  if (!slugManuallyEdited) {
-                    setNewSlug(slugifyTitle(val));
-                  }
-                }}
+                onChange={(e) => setNewTitle(e.target.value)}
                 placeholder="e.g. Ayesha & Rafiq Royal Wedding Reception"
                 className={inputClass}
               />
             </div>
-
-            {!isGalleryMode && (
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">
-                  URL Slug *
-                </label>
-                <input
-                  required
-                  value={newSlug}
-                  onChange={(e) => {
-                    setSlugManuallyEdited(true);
-                    setNewSlug(slugifyTitle(e.target.value));
-                  }}
-                  placeholder="ayesha-rafiq-royal-wedding"
-                  className={`${inputClass} font-mono-code`}
-                />
-              </div>
-            )}
 
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">
@@ -1733,29 +1691,6 @@ export function PortfolioEventManager({
                         value={editTitle}
                         onChange={(e) => setEditTitle(e.target.value)}
                         className={inputClass}
-                      />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="block text-[11px] font-semibold uppercase text-slate-500">
-                          Short URL Slug (/album/...)
-                        </label>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const shortened = shortenTitleToSlug(editTitle || editSlug);
-                            if (shortened) setEditSlug(shortened);
-                          }}
-                          className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 cursor-pointer"
-                        >
-                          Auto-Shorten URL
-                        </button>
-                      </div>
-                      <input
-                        required
-                        value={editSlug}
-                        onChange={(e) => setEditSlug(slugifyTitle(e.target.value))}
-                        className={`${inputClass} font-mono-code`}
                       />
                     </div>
                     <div>
